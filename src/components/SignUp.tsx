@@ -5,6 +5,7 @@ import { CiMail, CiUser } from 'react-icons/ci'
 import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
 import { supabase } from '~/config/supabase'
 import { IoEyeOutline } from 'react-icons/io5'
+import { Link } from 'react-router-dom'
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
@@ -104,12 +105,14 @@ function SignUp() {
             <p className="text-red-500 text-xs italic mt-2">Password is required!</p>
           )}
         </div>
-        <button className="py-2 px-4 border mb-2 w-[100%] text-center bg-[#0e64f1] text-white rounded-lg">
+        <button className="py-2 px-4 mb-2 w-full text-center bg-[#0e64f1] text-white rounded-lg">
           Sign up
         </button>
         <p className="text-center text-sm">
           Already have an account?
-          <span className="ml-1 text-[#0e64f1] text-sm">Sign in</span>
+          <Link to={'/sign-in'} className="ml-1 text-[#0e64f1]">
+            Sign in
+          </Link>
         </p>
       </form>
     </div>
