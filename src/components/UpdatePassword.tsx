@@ -18,15 +18,13 @@ function UpdatePassword() {
   })
 
   const onSubmit = async (values: FieldValues) => {
-    if (values.password && values.confirmPassword) {
-      if (values.password === values.confirmPassword) {
-        try {
-          const { error } = await supabase.auth.updateUser({ password: values.password })
+    if (values.password === values.confirmPassword) {
+      try {
+        const { error } = await supabase.auth.updateUser({ password: values.password })
 
-          if (error) throw error
-        } catch (error) {
-          console.log(error)
-        }
+        if (error) throw error
+      } catch (error) {
+        console.log(error)
       }
     }
   }
@@ -42,7 +40,7 @@ function UpdatePassword() {
   }
 
   return (
-    <div className="w-[100%] h-screen flex justify-center items-center bg-white">
+    <div className="h-screen flex justify-center items-center bg-white">
       <div className="w-[400px] bg-[#eff1f2] p-5 rounded-xl">
         <h2 className="mb-5 text-center text-[#0e64f1] text-3xl font-medium">Update password</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -59,7 +57,7 @@ function UpdatePassword() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="**********"
-                className="w-[100%] p-2 rounded-lg outline-none"
+                className="w-full p-2 rounded-lg outline-none"
                 {...register('password', { required: true })}
               />
               <div onClick={togglePasswordVisibility} className="mr-2">
@@ -71,7 +69,7 @@ function UpdatePassword() {
               </div>
             </div>
             {errors.password && (
-              <p className="text-red-500 italic text-sm w-[100%]">Password is required!</p>
+              <p className="text-red-500 italic text-sm">Password is required!</p>
             )}
           </div>
           <div className="mb-4">
@@ -87,8 +85,8 @@ function UpdatePassword() {
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="**********"
-                className="w-[100%] p-2 rounded-lg outline-none"
-                {...register('confirmPassword')}
+                className="w-full p-2 rounded-lg outline-none"
+                {...register('confirmPassword', { required: true })}
               />
               <div onClick={toggleConfirmPasswordVisibility} className="mr-2">
                 {showConfirmPassword ? (
@@ -98,10 +96,13 @@ function UpdatePassword() {
                 )}
               </div>
             </div>
+            {errors.confirmPassword && (
+              <p className="text-red-500 italic text-sm">Confirm password is required!</p>
+            )}
           </div>
           <button
             type="submit"
-            className="bg-[#007bff] text-white w-[100%] p-2 rounded-lg font-semibold hover:opacity-85 outline-none"
+            className="bg-[#007bff] text-white w-full p-2 rounded-lg font-semibold hover:opacity-85 outline-none"
           >
             Update
           </button>
