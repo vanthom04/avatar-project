@@ -1,8 +1,7 @@
-import { RouterProvider } from 'react-router-dom'
-import router from '~/routes/router'
+import SignUp from './components/SignUp'
 
 function App() {
-  return <RouterProvider router={router} />
+  return <SignUp />
 }
 
 export default App
