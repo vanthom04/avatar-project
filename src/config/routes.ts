@@ -7,5 +7,7 @@ export const routes = {
   recoverPassword: '/recover-password',
   updatePassword: '/update-password',
   notFound: '/404',
-  template: '/templates/:idTemplate'
+  template: '/templates/:idTemplate',
+  managerMyAvatars: '/manager-my-avatars',
+  customAvatar: '/custom-avatar'
 }

@@ -4,6 +4,15 @@ interface TemplateType {
   image_url: string
 }
 
+interface MyAvatarType {
+  id: number
+  name: string
+  thumbnail: string
+  images: string
+  options: object
+  created_at: string
+}
+
 export const templates: TemplateType[] = [
   {
     id: 1,
@@ -28,5 +37,32 @@ export const templates: TemplateType[] = [
     name: 'Character 4',
     image_url:
       'https://avatar.canawan.com/image/?image=https://cdn-files.canawan.com/my-styles/characters/character-4.png'
+  }
+]
+
+export const myavatar: MyAvatarType[] = [
+  {
+    id: 1,
+    name: '',
+    thumbnail: '',
+    images: '',
+    options: [{}],
+    created_at: ''
+  },
+  {
+    id: 2,
+    name: '',
+    thumbnail: '',
+    images: '',
+    options: [{}],
+    created_at: ''
+  },
+  {
+    id: 3,
+    name: '',
+    thumbnail: '',
+    images: '',
+    options: [{}],
+    created_at: ''
   }
 ]

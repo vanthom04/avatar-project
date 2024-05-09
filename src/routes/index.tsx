@@ -9,6 +9,8 @@ import ProfilePage from '~/pages/Profile'
 import SignUpPage from '~/pages/SignUp'
 import NotFoundPage from '~/pages/NotFound'
 import Template from '~/pages/Template'
+import ManagerMyAvatars from '~/pages/ManagerMyAvatars'
+import CustomAvatar from '~/pages/CustomAvatar'
 
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
@@ -28,7 +30,9 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
-      { path: config.routes.template, element: <Template /> }
+      { path: config.routes.template, element: <Template /> },
+      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatars /> },
+      { path: config.routes.customAvatar, element: <CustomAvatar /> }
     ]
   },
   {
