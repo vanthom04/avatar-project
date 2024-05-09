@@ -1,8 +1,8 @@
-import RecoverPassword from './components/RecoverPassword'
-import UpdatePassword from './components/UpdatePassword'
+import { RouterProvider } from 'react-router-dom'
+import router from '~/routes/router'
 
 function App() {
-  return <UpdatePassword />
+  return <RouterProvider router={router} />
 }
 
 export default App
