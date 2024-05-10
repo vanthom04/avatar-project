@@ -12,11 +12,11 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh', 'prettier'],
   rules: {
+    'no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 1,
     '@typescript-eslint/no-unused-vars': 1,
     '@typescript-eslint/space-before-blocks': ['error', 'always'],
     '@typescript-eslint/object-curly-spacing': [1, 'always'],
-    '@typescript-eslint/indent': ['warn', 2, { SwitchCase: 1 }],
     '@typescript-eslint/semi': [1, 'never'],
     '@typescript-eslint/quotes': ['warn', 'single'],
     '@typescript-eslint/keyword-spacing': 1,

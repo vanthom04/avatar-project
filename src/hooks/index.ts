@@ -1,1 +1,2 @@
-export { default } from './useRouter'
+export * from './useUser'
+export { default as useRouter } from './useRouter'

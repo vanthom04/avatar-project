@@ -1,9 +1,9 @@
+import { RouterProvider } from 'react-router-dom'
+import router from './routes'
+
 function App() {
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <h1 className="text-red-700 text-5xl">Avatar Project</h1>
-    </div>
-  )
+  return <RouterProvider router={router} />
+  return <RouterProvider router={router} />
 }
 
 export default App
