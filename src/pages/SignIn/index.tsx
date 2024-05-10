@@ -1,5 +1,6 @@
+import SignIn from './sign-in'
 function SignInPage() {
-  return <div>SignInPage</div>
+  return <SignIn />
 }
 
 export default SignInPage

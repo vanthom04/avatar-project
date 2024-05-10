@@ -3,8 +3,7 @@ import config from '~/config'
 import { useUser } from '~/hooks'
 
 const PublicRoute: React.FC = () => {
-  // const { user } = useUser()
-  const user = true
+  const { user } = useUser()
 
   return user ? (
     <Navigate to={config.routes.home} replace />

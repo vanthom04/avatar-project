@@ -4,8 +4,12 @@ import toast from 'react-hot-toast'
 import { CiMail } from 'react-icons/ci'
 import { IoKeyOutline } from 'react-icons/io5'
 import { Link } from 'react-router-dom'
+import config from '~/config'
+import { useState } from 'react'
+import Spinner from '~/components/Spinner'
 
 function SignIn() {
+  const [check, setCheck] = useState(false)
   const {
     register,
     handleSubmit,
@@ -15,6 +19,7 @@ function SignIn() {
 
   const onSubmit = async (values: FieldValues) => {
     try {
+      setCheck(true)
       const { error, data } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password
@@ -47,6 +52,7 @@ function SignIn() {
               placeholder="Email"
               {...register('email', { required: true })}
               autoComplete="off"
+              disabled={check}
             />
           </div>
           <div className="pl-2">
@@ -66,6 +72,7 @@ function SignIn() {
               className="px-2 py-2 w-full outline-none mr-2"
               type="password"
               placeholder="Password"
+              disabled={check}
               {...register('password', { required: true })}
             />
           </div>
@@ -76,24 +83,22 @@ function SignIn() {
           )}
         </div>
         <div className="text-end mr-2 text-gray-600 ">
-          <Link to="/forgot-password" className="mt-2">
+          <Link to={config.routes.recoverPassword} className="mt-2">
             Forgot password?
           </Link>
         </div>
 
         <button
           type="submit"
-          className="mx-auto block  bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-2"
+          className="mx-auto flex justify-center  bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-2"
         >
-          Sign in
+          {check ? <Spinner /> : 'Sign in'}
         </button>
         <div className="ml-1 font-normal text-gray-600  text-center my-4">
-          <p className="font-normal text-base">
+          <Link to={config.routes.signUp} className="font-normal text-base">
             Don't have an account?
-            <a href="" className=" text-[#0e64f1] ml-2 ">
-              Sign up
-            </a>
-          </p>
+            <a href="" className=" text-[#0e64f1] ml-2 "></a>
+          </Link>
         </div>
       </form>
     </div>
