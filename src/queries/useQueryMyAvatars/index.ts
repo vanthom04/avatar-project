@@ -9,10 +9,7 @@ const fetchMyAvatarOptions = async (id: number | string): Promise<AvatarOption[]
     .select('base, hair, eyes, mouth, accessory, shirt, hand, background, color')
     .eq('my_avatar_id', id)
 
-  if (errorAvatarOptions) {
-    console.log(errorAvatarOptions)
-    return []
-  }
+  if (errorAvatarOptions) return []
 
   const result = avatarOptions.map((option) => ({
     base: option.base ?? '',
@@ -29,13 +26,13 @@ const fetchMyAvatarOptions = async (id: number | string): Promise<AvatarOption[]
   return result
 }
 
-const fetchMyAvatars = async (userId?: string) => {
+const fetchMyAvatars = async (userId: string) => {
   const { data: myAvatars, error: errorMyAvatar } = await supabase
     .from('my_avatars')
     .select('*')
-    .eq('user_id', userId ?? 1)
+    .eq('user_id', userId)
   if (errorMyAvatar) {
-    return console.log(errorMyAvatar)
+    return console.error(errorMyAvatar)
   }
 
   const results: MyAvatar[] = []
@@ -68,9 +65,10 @@ const fetchMyAvatars = async (userId?: string) => {
   return results
 }
 
-export function useQueryMyAvatars() {
+export function useQueryMyAvatars(userId: string) {
   return useQuery({
-    queryKey: ['my-avatars'],
-    queryFn: () => fetchMyAvatars()
+    queryKey: ['my-avatars', userId],
+    queryFn: () => fetchMyAvatars(userId),
+    enabled: !!userId
   })
 }
