@@ -14,6 +14,7 @@ import CustomAvatar from '~/pages/CustomAvatar'
 
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
+import { Fragment } from 'react/jsx-runtime'
 
 const router = createBrowserRouter([
   {
@@ -31,9 +32,13 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
       { path: config.routes.template, element: <Template /> },
-      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatars /> },
-      { path: config.routes.customAvatar, element: <CustomAvatar /> }
+      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatars /> }
     ]
+  },
+  {
+    path: '/',
+    element: <PrivateRoute element={Fragment} />,
+    children: [{ path: config.routes.customAvatar, element: <CustomAvatar /> }]
   },
   {
     path: config.routes.notFound,

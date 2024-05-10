@@ -1,18 +1,16 @@
-import { IoAddOutline } from 'react-icons/io5'
-import { useNavigate } from 'react-router-dom'
+import config from '~/config'
+import { useRouter } from '~/hooks'
 
 function ManagerMyAvatars() {
-  const navigate = useNavigate()
+  const router = useRouter()
 
-  const handleEditAvatar = () => {
-    navigate('/custom-avatar', { replace: true })
-  }
   return (
     <div className="p-4">
       <div className="flex justify-end">
         <button
+          onClick={() => router.push(config.routes.customAvatar)}
           type="button"
-          className="flex justify-center items-center cursor-pointer text-white bg-[#138e1b] hover:bg-green-800 rounded-md px-3 py-1 me-2 mb-4 focus:outline-none "
+          className="flex justify-center items-center cursor-pointer text-white bg-[#138e1b] hover:bg-green-800 rounded-md px-3.5 py-1 me-2 mb-4 focus:outline-none "
         >
           <span className="mr-2 text-[25px] text-center font-light">+</span>
           <span className="uppercase text-sm">Create avatar</span>
@@ -52,11 +50,7 @@ function ManagerMyAvatars() {
               <td className="px-6 py-4">$2999</td>
               <td className="px-6 py-4">$2999</td>
               <td className="px-6 py-4">
-                <a
-                  onClick={handleEditAvatar}
-                  href="#"
-                  className="font-medium text-blue-600  hover:underline"
-                >
+                <a href="#" className="font-medium text-blue-600  hover:underline">
                   Edit
                 </a>
                 <span className="px-1">/</span>
@@ -74,11 +68,7 @@ function ManagerMyAvatars() {
               <td className="px-6 py-4">$1999</td>
               <td className="px-6 py-4">$2999</td>
               <td className="px-6 py-4">
-                <a
-                  onClick={handleEditAvatar}
-                  href="#"
-                  className="font-medium text-blue-600  hover:underline"
-                >
+                <a href="#" className="font-medium text-blue-600  hover:underline">
                   Edit
                 </a>
                 <span className="px-1">/</span>
@@ -96,11 +86,7 @@ function ManagerMyAvatars() {
               <td className="px-6 py-4">$99</td>
               <td className="px-6 py-4">$2999</td>
               <td className="px-6 py-4">
-                <a
-                  onClick={handleEditAvatar}
-                  href="#"
-                  className="font-medium text-blue-600  hover:underline"
-                >
+                <a href="#" className="font-medium text-blue-600  hover:underline">
                   Edit
                 </a>
                 <span className="px-1">/</span>
