@@ -89,15 +89,16 @@ function SignIn() {
         </div>
 
         <button
+          disabled={check}
           type="submit"
           className="mx-auto flex justify-center  bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-2"
         >
-          {check ? <Spinner /> : 'Sign in'}
+          {check ? <Spinner className="w-5 h-5" /> : 'Sign in'}
         </button>
-        <div className="ml-1 font-normal text-gray-600  text-center my-4">
-          <Link to={config.routes.signUp} className="font-normal text-base">
-            Don't have an account?
-            <a href="" className=" text-[#0e64f1] ml-2 "></a>
+        <div className="ml-4 font-normal text-gray-600  my-4 m">
+          You don't have a account?
+          <Link to={config.routes.signUp} className="font-normal text-base ml-1 text-blue-400">
+            Sign up
           </Link>
         </div>
       </form>

@@ -14,10 +14,8 @@ import CustomAvatar from '~/pages/CustomAvatar'
 
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
-import SignIn from '~/pages/SignIn/sign-in'
-import SignUp from '~/components/SignUp'
-import RecoverPassword from '~/components/RecoverPassword'
-import UpdatePassword from '~/components/UpdatePassword'
+import RecoverPassword from '~/pages/RecoverPassword'
+import UpdatePassword from '~/pages/UpdatePassword'
 
 const router = createBrowserRouter([
   {
@@ -45,23 +43,6 @@ const router = createBrowserRouter([
     path: config.routes.notFound,
     element: <NotFoundPage />
   },
-  {
-    path: config.routes.signIn,
-    element: <SignIn />
-  },
-  {
-    path: config.routes.signUp,
-    element: <SignUp />
-  },
-  {
-    path: config.routes.recoverPassword,
-    element: <RecoverPassword />
-  },
-  {
-    path: config.routes.updatePassword,
-    element: <UpdatePassword />
-  },
-
   {
     path: '*',
     element: <Navigate to={config.routes.notFound} replace />
