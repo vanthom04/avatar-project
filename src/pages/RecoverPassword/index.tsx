@@ -1,5 +1,6 @@
 import { FieldValues, useForm } from 'react-hook-form'
 import { CiMail } from 'react-icons/ci'
+import config from '~/config'
 
 import { supabase } from '~/config/supabase'
 
@@ -13,7 +14,7 @@ function RecoverPassword() {
   const onSubmit = async (values: FieldValues) => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: '/update-password'
+        redirectTo: config.routes.updatePassword
       })
 
       if (error) throw error
