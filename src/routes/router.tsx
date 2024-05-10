@@ -18,8 +18,8 @@ const router = createBrowserRouter([
     path: '/',
     element: <PublicRoute />,
     children: [
-      { path: '/sign-in', element: <SignInPage /> },
-      { path: '/sign-up', element: <SignUpPage /> }
+      { path: config.routes.signIn, element: <SignInPage /> },
+      { path: config.routes.signUp, element: <SignUpPage /> }
     ]
   },
   {
