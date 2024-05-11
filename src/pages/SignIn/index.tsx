@@ -2,14 +2,19 @@ import { FieldValues, useForm } from 'react-hook-form'
 import { supabase } from '~/config/supabase'
 import toast from 'react-hot-toast'
 import { CiMail } from 'react-icons/ci'
-import { IoKeyOutline } from 'react-icons/io5'
+import { IoKeyOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
 import { Link } from 'react-router-dom'
 import config from '~/config'
 import { useState } from 'react'
 import Spinner from '~/components/Spinner'
 
 function SignIn() {
-  const [check, setCheck] = useState(false)
+  const [loading, setCheck] = useState(false)
+  const [showPassword, setshowPassWord] = useState(true)
+
+  const togglePasswordVisibility = () => {
+    setshowPassWord(!showPassword)
+  }
   const {
     register,
     handleSubmit,
@@ -31,8 +36,10 @@ function SignIn() {
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      reset()
+      false
     }
-    reset()
   }
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -52,7 +59,7 @@ function SignIn() {
               placeholder="Email"
               {...register('email', { required: true })}
               autoComplete="off"
-              disabled={check}
+              disabled={loading}
             />
           </div>
           <div className="pl-2">
@@ -69,12 +76,20 @@ function SignIn() {
               <IoKeyOutline size={20} color="gray" />
             </div>
             <input
+              autoComplete="off"
               className="px-2 py-2 w-full outline-none mr-2"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
-              disabled={check}
+              disabled={loading}
               {...register('password', { required: true })}
             />
+            <div onClick={togglePasswordVisibility} className="pr-2">
+              {showPassword ? (
+                <IoEyeOutline color="gray" size={20} />
+              ) : (
+                <IoEyeOffOutline color="gray" size={20} />
+              )}
+            </div>
           </div>
           {errors.password && (
             <div className="flex items-center">
@@ -89,14 +104,14 @@ function SignIn() {
         </div>
 
         <button
-          disabled={check}
+          disabled={loading}
           type="submit"
           className="mx-auto flex justify-center  bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-2"
         >
-          {check ? <Spinner className="w-5 h-5" /> : 'Sign in'}
+          {loading ? <Spinner className="w-5 h-5" /> : 'Sign in'}
         </button>
-        <div className="ml-4 font-normal text-gray-600  my-4 m text-center">
-          You don't have a account?
+        <div className="ml-4 font-normal text-gray-600  my-4 m flex justify-center">
+          You don't have an account?
           <Link to={config.routes.signUp} className="font-normal text-base ml-1 text-blue-400">
             Sign up
           </Link>
