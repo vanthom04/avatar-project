@@ -7,11 +7,13 @@ type UserContextType = {
   accessToken: string | null
   user: User | null
   userDetails: UserMetadata | null
+  isLoading: boolean
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isLoading, setIsLoading] = useState(true)
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [userDetails, setUserDetails] = useState<UserMetadata | null>(null)
@@ -40,6 +42,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       setAccessToken(session?.access_token || null)
       setUser(user || null)
       setUserDetails(user?.user_metadata || null)
+      setIsLoading(false)
     })
 
     return () => subscription.unsubscribe()
@@ -48,7 +51,8 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
   const value: UserContextType = {
     accessToken,
     user,
-    userDetails
+    userDetails,
+    isLoading
   }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>

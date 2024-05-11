@@ -20,16 +20,6 @@ import UpdatePassword from '~/pages/UpdatePassword'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PublicRoute />,
-    children: [
-      { path: config.routes.signIn, element: <SignInPage /> },
-      { path: config.routes.signUp, element: <SignUpPage /> },
-      { path: config.routes.recoverPassword, element: <RecoverPassword /> },
-      { path: config.routes.updatePassword, element: <UpdatePassword /> }
-    ]
-  },
-  {
-    path: '/',
     element: <PrivateRoute element={Layout} />,
     children: [
       { index: true, element: <HomePage /> },
@@ -37,6 +27,15 @@ const router = createBrowserRouter([
       { path: config.routes.template, element: <Template /> },
       { path: config.routes.managerMyAvatars, element: <ManagerMyAvatars /> },
       { path: config.routes.customAvatar, element: <CustomAvatar /> }
+    ]
+  },
+  {
+    element: <PublicRoute />,
+    children: [
+      { path: config.routes.signIn, element: <SignInPage /> },
+      { path: config.routes.signUp, element: <SignUpPage /> },
+      { path: config.routes.recoverPassword, element: <RecoverPassword /> },
+      { path: config.routes.updatePassword, element: <UpdatePassword /> }
     ]
   },
   {
