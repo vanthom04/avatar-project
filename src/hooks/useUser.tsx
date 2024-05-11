@@ -19,6 +19,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     const checkTokenAndAuthorize = async (token: string | undefined) => {
       try {
+        if (!token) return null
         const { data, error } = await supabase.auth.getUser(token)
 
         if (error) {
@@ -36,15 +37,9 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       data: { subscription }
     } = supabase.auth.onAuthStateChange(async (_, session) => {
       const user = await checkTokenAndAuthorize(session?.access_token)
-      if (user) {
-        setAccessToken(session?.access_token || null)
-        setUser(user || null)
-        setUserDetails(user?.user_metadata || null)
-      } else {
-        setAccessToken(null)
-        setUser(null)
-        setUserDetails(null)
-      }
+      setAccessToken(session?.access_token || null)
+      setUser(user || null)
+      setUserDetails(user?.user_metadata || null)
     })
 
     return () => subscription.unsubscribe()

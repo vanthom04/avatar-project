@@ -65,6 +65,6 @@ const fetchMyAvatars = async () => {
 export function useQueryMyAvatars() {
   return useQuery({
     queryKey: ['my-avatars'],
-    queryFn: () => fetchMyAvatars()
+    queryFn: fetchMyAvatars
   })
 }
