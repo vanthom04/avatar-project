@@ -2,6 +2,7 @@ import { IconType } from 'react-icons'
 import { HiOutlineHome } from 'react-icons/hi'
 
 import NavbarItem from './common/NavbarItem'
+import config from '~/config'
 
 export interface MenuItemType {
   id: number
@@ -13,8 +14,8 @@ export interface MenuItemType {
 const MENU_ITEMS: MenuItemType[] = [
   {
     id: 1,
-    to: '/menu-item-1',
-    title: 'Menu item #1',
+    to: config.routes.managerMyAvatars,
+    title: 'My avatar',
     icon: HiOutlineHome
   },
   {

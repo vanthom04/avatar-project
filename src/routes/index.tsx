@@ -11,6 +11,8 @@ import NotFoundPage from '~/pages/NotFound'
 import Template from '~/pages/Template'
 import ManagerMyAvatars from '~/pages/ManagerMyAvatars'
 import CustomAvatar from '~/pages/CustomAvatar'
+import RecoverPassword from '~/pages/RecoverPassword'
+import UpdatePassword from '~/pages/UpdatePassword'
 
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'

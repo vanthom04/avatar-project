@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 import clsx from 'clsx'
 import { useRouter } from '~/hooks'
+import { fabric } from 'fabric'
 
 function CustomAvatar() {
   const [isEdit, setIsEdit] = useState(false)
@@ -9,6 +10,30 @@ function CustomAvatar() {
   const router = useRouter()
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  useEffect(() => {
+    if (!canvasRef.current) return
+
+    const canvas = new fabric.Canvas(canvasRef.current, {
+      width: 580,
+      height: 580,
+      backgroundColor: '#fff'
+    })
+
+    fabric.Image.fromURL(
+      'https://gcs.tripi.vn/public-tripi/tripi-feed/img/474015GCy/anh-gai-xinh-4.jpg',
+      (image) => {
+        image.scaleToWidth(canvas.getWidth())
+        image.scaleToHeight(canvas.getHeight())
+
+        canvas.add(image)
+      }
+    )
+
+    return () => {
+      canvas.dispose()
+    }
+  }, [])
 
   const handleSaveNameAvatar = (e: React.KeyboardEvent) => {
     e.preventDefault()
@@ -29,7 +54,9 @@ function CustomAvatar() {
             <IoIosArrowRoundBack size={22} />
             Back
           </button>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg active:scale-95 transition-transform duration-300">
+            Save
+          </button>
         </div>
         <div className="relative">
           <h1
@@ -58,9 +85,9 @@ function CustomAvatar() {
         <div className="h-full flex flex-col items-center gap-y-4 mr-2">
           <canvas
             ref={canvasRef}
-            className="w-[600px] h-[600px] pointer-events-none border border-gray-500 rounded-lg"
+            className="pointer-events-none border border-gray-500 rounded-lg"
           ></canvas>
-          <button className="px-3.5 py-2 bg-blue-500 font-medium rounded-lg text-white active:scale-95 transition-all duration-300">
+          <button className="px-3.5 py-2 bg-blue-500 font-medium rounded-lg text-white active:scale-95 transition-transform duration-300">
             Download
           </button>
         </div>
@@ -68,6 +95,15 @@ function CustomAvatar() {
           <div className="h-[500px] flex flex-col gap-y-4 overflow-y-auto">
             <div className="flex flex-col gap-y-1">
               <label className="text-base font-medium">Color</label>
+              <input
+                type="color"
+                width={30}
+                height={30}
+                className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer relative"
+              />
+            </div>
+            <div className="flex flex-col gap-y-1">
+              <label className="text-base font-medium">Background</label>
               <input
                 type="color"
                 width={30}
