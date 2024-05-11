@@ -26,11 +26,8 @@ const fetchMyAvatarOptions = async (id: number | string): Promise<AvatarOption[]
   return result
 }
 
-const fetchMyAvatars = async (userId: string) => {
-  const { data: myAvatars, error: errorMyAvatar } = await supabase
-    .from('my_avatars')
-    .select('*')
-    .eq('user_id', userId)
+const fetchMyAvatars = async () => {
+  const { data: myAvatars, error: errorMyAvatar } = await supabase.from('my_avatars').select('*')
   if (errorMyAvatar) {
     return console.error(errorMyAvatar)
   }
@@ -65,10 +62,9 @@ const fetchMyAvatars = async (userId: string) => {
   return results
 }
 
-export function useQueryMyAvatars(userId: string) {
+export function useQueryMyAvatars() {
   return useQuery({
-    queryKey: ['my-avatars', userId],
-    queryFn: () => fetchMyAvatars(userId),
-    enabled: !!userId
+    queryKey: ['my-avatars'],
+    queryFn: () => fetchMyAvatars()
   })
 }
