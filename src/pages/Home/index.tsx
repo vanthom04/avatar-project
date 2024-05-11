@@ -1,22 +1,9 @@
 import { templates } from '~/_mock'
 import { useRouter } from '~/hooks'
-import { useQueryMyAvatars } from '~/queries'
 import TemplateItem from './TemplateItem'
 
 function HomePage() {
   const router = useRouter()
-
-  const { data } = useQueryMyAvatars('1')
-  console.log(
-    data?.map((item) => {
-      return {
-        id: item.id,
-        name: item.name,
-        thumbnail: item.thumbnail,
-        options: item.options
-      }
-    })
-  )
 
   const handleClick = (id: number) => {
     router.push('/templates/' + id)
