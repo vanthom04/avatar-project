@@ -7,7 +7,9 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ element: Element }) => {
-  const { user } = useUser()
+  const { user, isLoading } = useUser()
+
+  if (isLoading) return null
 
   return user ? (
     <Element>

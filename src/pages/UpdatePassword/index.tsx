@@ -4,7 +4,6 @@ import { supabase } from '~/config/supabase'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
 import { useState } from 'react'
-
 function UpdatePassword() {
   const {
     register,
@@ -21,7 +20,6 @@ function UpdatePassword() {
     if (values.password === values.confirmPassword) {
       try {
         const { error } = await supabase.auth.updateUser({ password: values.password })
-
         if (error) throw error
       } catch (error) {
         console.log(error)
@@ -54,6 +52,7 @@ function UpdatePassword() {
                 <IoKeyOutline color="gray" size={20} />
               </div>
               <input
+                autoComplete="off"
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="**********"

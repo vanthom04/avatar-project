@@ -19,3 +19,12 @@ export interface MyAvatar {
   created_at: Date | string
   updated_at: Date | string
 }
+
+export interface Templates {
+  id: number | string
+  name: string
+  thumbnail: string
+  options: AvatarOption
+  created_at: Date | string
+  updated_at: Date | string
+}

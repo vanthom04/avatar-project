@@ -19,16 +19,6 @@ import { Fragment } from 'react/jsx-runtime'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PublicRoute />,
-    children: [
-      { path: config.routes.signIn, element: <SignInPage /> },
-      { path: config.routes.signUp, element: <SignUpPage /> },
-      { path: config.routes.recoverPassword, element: <RecoverPassword /> },
-      { path: config.routes.updatePassword, element: <UpdatePassword /> }
-    ]
-  },
-  {
-    path: '/',
     element: <PrivateRoute element={Layout} />,
     children: [
       { index: true, element: <HomePage /> },

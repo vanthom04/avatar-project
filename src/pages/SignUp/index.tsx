@@ -118,7 +118,7 @@ function SignUpPage() {
           )}
         </div>
         <button className="py-2 px-4 mb-2 w-full text-center bg-[#0e64f1] text-white rounded-lg justify-center flex">
-          {loading ? <Spinner /> : 'Sign up'}
+          {loading ? <Spinner className="w-5 h-5" /> : 'Sign up'}
         </button>
         <p className="text-center text-sm">
           Already have an account?
