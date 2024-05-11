@@ -1,5 +1,6 @@
 import { User, UserMetadata } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
+
 import { supabase } from '~/config'
 
 type UserContextType = {
@@ -16,12 +17,34 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
   const [userDetails, setUserDetails] = useState<UserMetadata | null>(null)
 
   useEffect(() => {
+    const checkTokenAndAuthorize = async (token: string | undefined) => {
+      try {
+        const { data, error } = await supabase.auth.getUser(token)
+
+        if (error) {
+          console.error('Invalid token:', error.message)
+          return null
+        }
+        return data.user
+      } catch (error) {
+        console.error('Error token:', error)
+        return null
+      }
+    }
+
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((_, session) => {
-      setAccessToken(session?.access_token || null)
-      setUser(session?.user || null)
-      setUserDetails(session?.user?.user_metadata || null)
+    } = supabase.auth.onAuthStateChange(async (_, session) => {
+      const user = await checkTokenAndAuthorize(session?.access_token)
+      if (user) {
+        setAccessToken(session?.access_token || null)
+        setUser(user || null)
+        setUserDetails(user?.user_metadata || null)
+      } else {
+        setAccessToken(null)
+        setUser(null)
+        setUserDetails(null)
+      }
     })
 
     return () => subscription.unsubscribe()
