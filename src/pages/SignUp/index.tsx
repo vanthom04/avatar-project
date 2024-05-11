@@ -12,7 +12,7 @@ import config from '~/config'
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const navigate = useRouter()
   const {

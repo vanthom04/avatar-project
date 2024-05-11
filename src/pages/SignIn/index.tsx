@@ -9,8 +9,8 @@ import { useState } from 'react'
 import Spinner from '~/components/Spinner'
 
 function SignIn() {
-  const [loading, setCheck] = useState(false)
-  const [showPassword, setshowPassWord] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setshowPassWord] = useState(false)
 
   const togglePasswordVisibility = () => {
     setshowPassWord(!showPassword)
@@ -24,22 +24,21 @@ function SignIn() {
 
   const onSubmit = async (values: FieldValues) => {
     try {
-      setCheck(true)
+      setLoading(true)
       const { error, data } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password
       })
       if (error) throw error
-      console.log(data)
       if (data.user) {
-        toast.success('login successful')
+        toast.success('Login successfully')
       }
     } catch (error) {
       console.log(error)
     } finally {
-      reset()
-      false
+      setLoading(false)
     }
+    reset()
   }
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -83,13 +82,13 @@ function SignIn() {
               disabled={loading}
               {...register('password', { required: true })}
             />
-            <div onClick={togglePasswordVisibility} className="pr-2">
+            <button onClick={togglePasswordVisibility} className="pr-2">
               {showPassword ? (
                 <IoEyeOutline color="gray" size={20} />
               ) : (
                 <IoEyeOffOutline color="gray" size={20} />
               )}
-            </div>
+            </button>
           </div>
           {errors.password && (
             <div className="flex items-center">
@@ -97,7 +96,7 @@ function SignIn() {
             </div>
           )}
         </div>
-        <div className="text-end mr-2 text-gray-600 ">
+        <div className="text-end mr-2 text-gray-600 text-sm">
           <Link to={config.routes.recoverPassword} className="mt-2">
             Forgot password?
           </Link>
@@ -106,12 +105,12 @@ function SignIn() {
         <button
           disabled={loading}
           type="submit"
-          className="mx-auto flex justify-center  bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-2"
+          className="mx-auto flex justify-center bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-4"
         >
           {loading ? <Spinner className="w-5 h-5" /> : 'Sign in'}
         </button>
         <div className="ml-4 font-normal text-gray-600  my-4 m flex justify-center">
-          You don't have an account?
+          Don't have an account?
           <Link to={config.routes.signUp} className="font-normal text-base ml-1 text-blue-400">
             Sign up
           </Link>
