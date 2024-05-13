@@ -10,7 +10,7 @@ import Spinner from '~/components/Spinner'
 
 function SignIn() {
   const [loading, setCheck] = useState(false)
-  const [showPassword, setshowPassWord] = useState(true)
+  const [showPassword, setshowPassWord] = useState(false)
 
   const togglePasswordVisibility = () => {
     setshowPassWord(!showPassword)
