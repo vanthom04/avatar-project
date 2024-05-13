@@ -1,7 +1,6 @@
 import { FieldValues, useForm } from 'react-hook-form'
 import { CiMail } from 'react-icons/ci'
 import config from '~/config'
-
 import { supabase } from '~/config/supabase'
 
 function RecoverPassword() {
@@ -16,13 +15,11 @@ function RecoverPassword() {
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: config.routes.updatePassword
       })
-
       if (error) throw error
     } catch (error) {
       console.log(error)
     }
   }
-
   return (
     <div className="h-screen flex justify-center items-center bg-white">
       <div className="w-[400px] bg-[#eff1f2] p-5 rounded-xl">

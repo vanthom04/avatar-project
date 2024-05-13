@@ -4,6 +4,11 @@ import { supabase } from '~/config/supabase'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
 import { useState } from 'react'
+<<<<<<< HEAD
+=======
+import config from '~/config'
+
+>>>>>>> ui/SignIn
 function UpdatePassword() {
   const {
     register,
@@ -19,7 +24,15 @@ function UpdatePassword() {
   const onSubmit = async (values: FieldValues) => {
     if (values.password === values.confirmPassword) {
       try {
+<<<<<<< HEAD
         const { error } = await supabase.auth.updateUser({ password: values.password })
+=======
+        const { error } = await supabase.auth.updateUser(
+          { password: values.password },
+          { emailRedirectTo: config.routes.home }
+        )
+
+>>>>>>> ui/SignIn
         if (error) throw error
       } catch (error) {
         console.log(error)
