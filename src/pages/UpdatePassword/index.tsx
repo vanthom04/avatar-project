@@ -23,7 +23,7 @@ function UpdatePassword() {
       try {
         const { error } = await supabase.auth.updateUser(
           { password: values.password },
-          { emailRedirectTo: config.routes.signIn }
+          { emailRedirectTo: config.routes.home }
         )
 
         if (error) throw error
