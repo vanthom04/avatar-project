@@ -9,11 +9,7 @@ import { useState } from 'react'
 import Spinner from '~/components/Spinner'
 
 function SignIn() {
-<<<<<<< HEAD
   const [loading, setLoading] = useState(false)
-=======
-  const [loading, setCheck] = useState(false)
->>>>>>> ui/SignIn
   const [showPassword, setshowPassWord] = useState(false)
 
   const togglePasswordVisibility = () => {
@@ -79,7 +75,6 @@ function SignIn() {
               <IoKeyOutline size={20} color="gray" />
             </div>
             <input
-              autoComplete="off"
               autoComplete="off"
               className="px-2 py-2 w-full outline-none mr-2"
               type={showPassword ? 'text' : 'password'}
