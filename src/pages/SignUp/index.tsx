@@ -14,7 +14,7 @@ function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const navigate = useRouter()
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -37,7 +37,7 @@ function SignUpPage() {
 
       if (data.user) {
         toast.success('SignUp successfully')
-        navigate.push(config.routes.signIn)
+        router.push(config.routes.signIn)
       }
     } catch (error) {
       console.error(error)
@@ -65,6 +65,7 @@ function SignUpPage() {
               <CiUser color="gray" size={20} />
             </div>
             <input
+              autoComplete="off"
               disabled={loading}
               placeholder="Enter your full name"
               type="text"
@@ -83,6 +84,7 @@ function SignUpPage() {
               <CiMail color="gray" size={20} />
             </div>
             <input
+              autoComplete="off"
               disabled={loading}
               placeholder="Enter your email "
               type="text"
@@ -99,6 +101,7 @@ function SignUpPage() {
               <IoKeyOutline color="gray" size={20} />
             </div>
             <input
+              autoComplete="off"
               disabled={loading}
               placeholder="Enter your password"
               type={showPassword ? 'text' : 'password'}
