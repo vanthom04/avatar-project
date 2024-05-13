@@ -80,6 +80,7 @@ function SignIn() {
             </div>
             <input
               autoComplete="off"
+              autoComplete="off"
               className="px-2 py-2 w-full outline-none mr-2"
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
