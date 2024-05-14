@@ -27,16 +27,17 @@ function UpdatePassword() {
         setLoading(true)
         const { error } = await supabase.auth.updateUser(
           { password: values.password },
-          { emailRedirectTo: (window.location.href = config.routes.home) }
+          { emailRedirectTo: config.routes.home }
         )
+        window.location.href = config.routes.home
         if (error) throw error
       } catch (error) {
         console.log(error)
       } finally {
         setLoading(false)
+        reset()
       }
     }
-    reset()
   }
 
   const togglePasswordVisibility = () => {

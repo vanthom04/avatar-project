@@ -82,7 +82,7 @@ function SignIn() {
               disabled={loading}
               {...register('password', { required: true })}
             />
-            <button onClick={togglePasswordVisibility} className="pr-2">
+            <button type="button" onClick={togglePasswordVisibility} className="pr-2" >
               {showPassword ? (
                 <IoEyeOutline color="gray" size={20} />
               ) : (
