@@ -34,9 +34,9 @@ function UpdatePassword() {
         console.log(error)
       } finally {
         setLoading(false)
-        reset()
       }
     }
+    reset()
   }
 
   const togglePasswordVisibility = () => {
