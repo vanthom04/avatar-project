@@ -20,27 +20,26 @@ function UpdatePassword() {
       confirmPassword: ''
     }
   })
-
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
   const onSubmit = async (values: FieldValues) => {
     if (values.password === values.confirmPassword) {
       try {
         setLoading(true)
         const { error } = await supabase.auth.updateUser(
           { password: values.password },
-          { emailRedirectTo: (window.location.href = config.routes.home) }
+          { emailRedirectTo: config.routes.home }
         )
         if (error) throw error
+        window.location.href = config.routes.home
       } catch (error) {
         console.log(error)
       } finally {
         setLoading(false)
+        reset()
       }
     }
-    reset()
-  }
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
   }
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword)
