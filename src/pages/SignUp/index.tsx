@@ -69,7 +69,7 @@ function SignUpPage() {
               disabled={loading}
               placeholder="Enter your full name"
               type="text"
-              className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight rounded-lg outline-none"
+              className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('fullName', { required: true })}
             />
           </div>
@@ -88,7 +88,7 @@ function SignUpPage() {
               disabled={loading}
               placeholder="Enter your email "
               type="text"
-              className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight rounded-lg outline-none"
+              className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('email', { required: true })}
             />
           </div>
@@ -105,7 +105,7 @@ function SignUpPage() {
               disabled={loading}
               placeholder="Enter your password"
               type={showPassword ? 'text' : 'password'}
-              className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight rounded-lg outline-none"
+              className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('password', { required: true })}
             />
             <div className="pr-2" onClick={togglePassword}>
