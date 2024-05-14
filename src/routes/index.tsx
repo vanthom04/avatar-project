@@ -17,6 +17,7 @@ import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
 import RecoverPassword from '~/pages/RecoverPassword'
 import UpdatePassword from '~/pages/UpdatePassword'
+import { Fragment } from 'react/jsx-runtime'
 
 const router = createBrowserRouter([
   {
