@@ -1,3 +1,4 @@
+import { Fragment } from 'react/jsx-runtime'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 
 import config from '~/config'
@@ -16,6 +17,15 @@ import { Fragment } from 'react/jsx-runtime'
 const router = createBrowserRouter([
   {
     path: '/',
+    element: <PublicRoute />,
+    children: [
+      { path: config.routes.signIn, element: <SignInPage /> },
+      { path: config.routes.signUp, element: <SignUpPage /> },
+      { path: config.routes.recoverPassword, element: <RecoverPassword /> }
+    ]
+  },
+  {
+    path: '/',
     element: <PrivateRoute element={Layout} />,
     children: [
       { index: true, element: <HomePage /> },
@@ -25,9 +35,8 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: '/',
     element: <PrivateRoute element={Fragment} />,
-    children: [{ path: config.routes.customAvatar, element: <CustomAvatar /> }]
+    children: [{ path: config.routes.updatePassword, element: <UpdatePassword /> }]
   },
   {
     path: config.routes.notFound,
