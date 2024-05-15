@@ -1,20 +1,21 @@
-import { FieldValues, useForm } from 'react-hook-form'
-import { supabase } from '~/config/supabase'
-import toast from 'react-hot-toast'
-import { CiMail } from 'react-icons/ci'
-import { IoKeyOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
-import { Link } from 'react-router-dom'
-import config from '~/config'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
+import { FieldValues, useForm } from 'react-hook-form'
+import { IoKeyOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
+import { CiMail } from 'react-icons/ci'
+
+import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
 
 function SignIn() {
   const [loading, setLoading] = useState(false)
-  const [showPassword, setshowPassWord] = useState(false)
+  const [showPassword, setShowPassWord] = useState(false)
 
   const togglePasswordVisibility = () => {
-    setshowPassWord(!showPassword)
+    setShowPassWord(!showPassword)
   }
+
   const {
     register,
     handleSubmit,
@@ -30,7 +31,9 @@ function SignIn() {
         password: values.password
       })
       if (error) throw error
+
       if (data.user) {
+        reset()
         toast.success('Login successfully')
       }
     } catch (error) {
@@ -38,12 +41,12 @@ function SignIn() {
     } finally {
       setLoading(false)
     }
-    reset()
   }
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <form onSubmit={handleSubmit(onSubmit)} className="rounded-lg p-4 bg-[#eff1f2] w-[400px]">
-        <h1 className=" mb-4 text-[30px] text-[#0e64f1] flex items-center justify-center font-medium">
+        <h1 className="mb-4 text-[30px] text-[#0e64f1] flex items-center justify-center font-medium">
           Sign in
         </h1>
 
@@ -82,7 +85,7 @@ function SignIn() {
               disabled={loading}
               {...register('password', { required: true })}
             />
-            <button onClick={togglePasswordVisibility} className="pr-2">
+            <button className="pr-2" onClick={togglePasswordVisibility}>
               {showPassword ? (
                 <IoEyeOutline color="gray" size={20} />
               ) : (
@@ -109,7 +112,7 @@ function SignIn() {
         >
           {loading ? <Spinner className="w-5 h-5" /> : 'Sign in'}
         </button>
-        <div className="ml-4 font-normal text-gray-600  my-4 m flex justify-center">
+        <div className="ml-4 font-normal text-gray-600  my-4 flex justify-center">
           Don't have an account?
           <Link to={config.routes.signUp} className="font-normal text-base ml-1 text-blue-400">
             Sign up
@@ -119,4 +122,5 @@ function SignIn() {
     </div>
   )
 }
+
 export default SignIn

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { FieldValues, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { FieldValues, useForm } from 'react-hook-form'
 import { CiMail } from 'react-icons/ci'
 import Spinner from '~/components/Spinner'
 
@@ -24,14 +24,15 @@ function RecoverPassword() {
       })
       if (error) throw error
 
+      reset()
       toast.success('Successfully, check your mail inbox!')
     } catch (error) {
       console.log(error)
     } finally {
       setLoading(false)
     }
-    reset()
   }
+
   return (
     <div className="h-screen flex justify-center items-center bg-white">
       <div className="w-[400px] bg-[#eff1f2] p-5 rounded-xl">
@@ -61,9 +62,10 @@ function RecoverPassword() {
           </div>
           <button
             type="submit"
+            disabled={loading}
             className="bg-[#007bff] text-white w-full p-2 rounded-lg font-semibold hover:opacity-85 flex justify-center"
           >
-            {loading ? <Spinner className="w-6 h-6" /> : 'Send'}
+            {loading ? <Spinner className="w-5 h-5" /> : 'Send'}
           </button>
         </form>
       </div>

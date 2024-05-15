@@ -1,12 +1,14 @@
+import { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
-import { supabase } from '~/config/supabase'
-
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
-import { useState } from 'react'
-import config from '~/config'
+
+import config, { supabase } from '~/config'
 
 function UpdatePassword() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -17,6 +19,13 @@ function UpdatePassword() {
       confirmPassword: ''
     }
   })
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword)
+  }
 
   const onSubmit = async (values: FieldValues) => {
     if (values.password === values.confirmPassword) {
@@ -30,16 +39,6 @@ function UpdatePassword() {
         console.log(error)
       }
     }
-  }
-
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword)
   }
 
   return (

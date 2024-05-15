@@ -94,24 +94,59 @@ export type Database = {
           }
         ]
       }
+      options: {
+        Row: {
+          created_at: string
+          id: string
+          image_path: string | null
+          name: string | null
+          template_options_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          name?: string | null
+          template_options_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          name?: string | null
+          template_options_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'options_template_options_id_fkey'
+            columns: ['template_options_id']
+            isOneToOne: false
+            referencedRelation: 'template_options'
+            referencedColumns: ['id']
+          }
+        ]
+      }
       template_options: {
         Row: {
           created_at: string
           id: string
           name: string | null
           template_id: string | null
+          type: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name?: string | null
           template_id?: string | null
+          type?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string | null
           template_id?: string | null
+          type?: string | null
         }
         Relationships: [
           {

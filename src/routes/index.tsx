@@ -50,8 +50,8 @@ const router = createBrowserRouter([
     element: <NotFoundPage />
   },
   {
-    // path: '*',
-    // element: <Navigate to={config.routes.notFound} replace />
+    path: '*',
+    element: <Navigate to={config.routes.notFound} replace />
   }
 ])
 

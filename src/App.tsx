@@ -1,6 +1,6 @@
 import { RouterProvider } from 'react-router-dom'
 import router from '~/routes'
-import ModalProvider from './providers/ModalProvider'
+import ModalProvider from '~/providers/ModalProvider'
 import ToasterProvider from '~/providers/ToasterProvider'
 
 function App() {

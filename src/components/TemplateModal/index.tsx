@@ -4,36 +4,49 @@ import { IoMdClose } from 'react-icons/io'
 import { GoPencil } from 'react-icons/go'
 import { PiSpinner } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
+import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
 import { supabase } from '~/config'
-import { slugify } from '~/utils'
+import { slugify, months } from '~/utils'
 import { useTemplateModal, useFormData } from '~/hooks'
 import TabHead from './TabHead'
-import toast from 'react-hot-toast'
 
 interface TemplateModalProps {}
 
 const TemplateModal: React.FC<TemplateModalProps> = () => {
   const [name, setName] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
+  const [createdAt, setCreatedAt] = useState<Date | string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isEditName, setIsEditName] = useState<boolean>(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  const templateModal = useTemplateModal()
   const formData = useFormData()
+  const templateModal = useTemplateModal()
 
   const inputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (templateModal.mode === 'edit') {
-      setName('Edit template')
-    } else {
+    if (templateModal.mode === 'create') {
       setName('Create new template')
+    } else {
+      setName(templateModal.template?.name ?? '')
+      setCreatedAt(templateModal.template?.created_at ?? '')
+      setSelectedImage(templateModal.template?.image_url ?? '')
+      templateModal.template?.categories.forEach((category) => {
+        const options = category.options.map((option) => ({
+          id: option.id,
+          name: option.name ?? '',
+          image_path: option.image_path ?? '',
+          image_url: option.image_url ?? ''
+        }))
+        formData.setOptions(category.type, options)
+      })
     }
-  }, [templateModal.mode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateModal.mode, templateModal.template])
 
   const handleSelectImage = () => {
     if (fileInputRef.current) {
@@ -55,7 +68,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
 
   const handleSaveTemplate = async () => {
     if (templateModal.mode === 'create') {
-      if (!name || !file) return toast.error('No template!')
+      if (!name || !file || !formData.data) return toast.error('No template!')
       setIsLoading(true)
 
       const templateId = uuidv4()
@@ -70,7 +83,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
         return console.log(errorTemplate)
       }
 
-      const { data: dataUpload, error: errorUpload } = await supabase.storage
+      const { error: errorUpload } = await supabase.storage
         .from('templates')
         .upload(imagePath, file, {
           cacheControl: '3600',
@@ -105,7 +118,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
             return console.log(errorOptions)
           }
 
-          const { data: dataUpload, error: errorUploadOption } = await supabase.storage
+          const { error: errorUploadOption } = await supabase.storage
             .from('template_options')
             .upload(option.image_path, option.file, {
               cacheControl: '3600',
@@ -114,12 +127,15 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
           if (errorUploadOption) {
             return console.log(errorUploadOption)
           }
-
-          console.log(dataUpload)
         }
       }
+
+      toast.success('Create new template successfully')
     } else {
       // Todo: handle edit template
+      console.log('handle edit template')
+
+      toast.success('Updated template successfully')
     }
 
     setIsLoading(false)
@@ -128,6 +144,8 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
   const handleClose = () => {
     setSelectedImage(null)
     setFile(null)
+    formData.reset()
+    templateModal.setTemplate(null)
     templateModal.onClose()
   }
 
@@ -197,7 +215,12 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
               onChange={handleImageChange}
             />
             <div>
-              <p>Thời gian tạo: 20 May 2024</p>
+              <p>
+                Created at:{' '}
+                {createdAt
+                  ? `${new Date(createdAt).getDate()} ${months[new Date(createdAt).getMonth()]} ${new Date(createdAt).getFullYear()}`
+                  : 'No date'}
+              </p>
             </div>
             <div className="w-full h-full">
               <TabHead />

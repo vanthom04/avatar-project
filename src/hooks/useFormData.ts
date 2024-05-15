@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 export interface Option {
+  id?: string | null
   name: string
   image_path: string
   image_url: string
@@ -18,8 +19,8 @@ interface FormDataStore {
   image_url?: string | null
   image_path?: string | null
   file?: File | null
-  data: FormDataItem[]
-  setOption: (type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand', options: Option[]) => void
+  data: FormDataItem[] | null
+  setOptions: (type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand', options: Option[]) => void
   reset: () => void
 }
 
@@ -57,9 +58,9 @@ const useFormData = create<FormDataStore>((set) => ({
   image_path: null,
   file: null,
   data: initialData,
-  setOption: (type, options) =>
+  setOptions: (type, options) =>
     set((state) => ({
-      data: state.data.map((item) => (item.type === type ? { ...item, options } : item))
+      data: state.data?.map((item) => (item.type === type ? { ...item, options } : item))
     })),
   reset: () =>
     set({
