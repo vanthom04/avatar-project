@@ -1,14 +1,14 @@
-import { FieldValues, useForm } from 'react-hook-form'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CiMail, CiUser } from 'react-icons/ci'
-import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
-import { supabase } from '~/config/supabase'
-import { IoEyeOutline } from 'react-icons/io5'
 import { Link } from 'react-router-dom'
-import Spinner from '~/components/Spinner'
+import { FieldValues, useForm } from 'react-hook-form'
+import { CiMail, CiUser } from 'react-icons/ci'
+import { IoEyeOutline } from 'react-icons/io5'
+import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
+
+import config, { supabase } from '~/config'
 import { useRouter } from '~/hooks'
-import config from '~/config'
+import Spinner from '~/components/Spinner'
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)

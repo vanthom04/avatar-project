@@ -1,10 +1,8 @@
+import { Template } from '~/queries/useQueryTemplates/fetch'
+
 interface TemplateItemProps {
-  data: {
-    id: number
-    name: string
-    image_url: string
-  }
-  onClick?: (id: number) => void
+  data: Template
+  onClick?: (id: string) => void
 }
 
 const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
