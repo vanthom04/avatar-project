@@ -3,70 +3,6 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      categories: {
-        Row: {
-          created_at: string
-          id: number
-          name: string | null
-          template_id: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          name?: string | null
-          template_id?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          name?: string | null
-          template_id?: number | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'categories_template_id_fkey'
-            columns: ['template_id']
-            isOneToOne: false
-            referencedRelation: 'templates'
-            referencedColumns: ['id']
-          }
-        ]
-      }
-      category_image_paths: {
-        Row: {
-          category_id: number | null
-          created_at: string
-          id: number
-          image_path: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          category_id?: number | null
-          created_at?: string
-          id?: number
-          image_path?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          category_id?: number | null
-          created_at?: string
-          id?: number
-          image_path?: number | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'category_image_paths_category_id_fkey'
-            columns: ['category_id']
-            isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
-          }
-        ]
-      }
       my_avatar_options: {
         Row: {
           accessory: string | null
@@ -130,7 +66,7 @@ export type Database = {
           image_path: string | null
           name: string | null
           updated_at: string | null
-          user_id: number | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -138,7 +74,7 @@ export type Database = {
           image_path?: string | null
           name?: string | null
           updated_at?: string | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -146,59 +82,40 @@ export type Database = {
           image_path?: string | null
           name?: string | null
           updated_at?: string | null
-          user_id?: number | null
-        }
-        Relationships: []
-      }
-      template_options: {
-        Row: {
-          accessory: string | null
-          background: string | null
-          base: string | null
-          color: string | null
-          created_at: string
-          eyes: string | null
-          hair: string | null
-          hand: string | null
-          id: number
-          mouth: string | null
-          shirt: string | null
-          template_id: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          accessory?: string | null
-          background?: string | null
-          base?: string | null
-          color?: string | null
-          created_at?: string
-          eyes?: string | null
-          hair?: string | null
-          hand?: string | null
-          id?: number
-          mouth?: string | null
-          shirt?: string | null
-          template_id?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          accessory?: string | null
-          background?: string | null
-          base?: string | null
-          color?: string | null
-          created_at?: string
-          eyes?: string | null
-          hair?: string | null
-          hand?: string | null
-          id?: number
-          mouth?: string | null
-          shirt?: string | null
-          template_id?: number | null
-          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'options_template_id_fkey'
+            foreignKeyName: 'my_avatars_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      template_options: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+          template_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          template_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'template_options_template_id_fkey'
             columns: ['template_id']
             isOneToOne: false
             referencedRelation: 'templates'
@@ -209,21 +126,21 @@ export type Database = {
       templates: {
         Row: {
           created_at: string
-          id: number
+          id: string
           image_path: string | null
           name: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           image_path?: string | null
           name?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           image_path?: string | null
           name?: string | null
           updated_at?: string | null
