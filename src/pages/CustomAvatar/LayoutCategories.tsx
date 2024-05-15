@@ -1,7 +1,6 @@
 import { IconType } from 'react-icons'
 import CategoryOptions from './CategoryOptions'
 import { FunctionComponent, useState } from 'react'
-import { IoGlassesOutline } from 'react-icons/io5'
 import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
 import clsx from 'clsx'
 
@@ -36,20 +35,14 @@ const AVATAR_OPTIONS: AvatarOptionType[] = [
     id: 'hand',
     title: 'Hand',
     icon: HandIcon
-  },
-  {
-    id: 'color',
-    title: 'Color',
-    icon: IoGlassesOutline
-  },
-  {
-    id: 'background',
-    title: 'Background',
-    icon: IoGlassesOutline
   }
 ]
 
-function LayoutCategories() {
+interface LayoutCategoryProps {
+  onSelect: (id: string, value: string) => void
+}
+
+function LayoutCategories({ onSelect }: LayoutCategoryProps) {
   const [tab, setTab] = useState<string>('hair')
 
   return (
@@ -60,10 +53,9 @@ function LayoutCategories() {
             key={id}
             title={title}
             className={clsx(
-              'basis-1/6 flex flex-col items-center w-full justify-center cursor-pointer',
+              'basis-1/5 flex flex-col items-center w-full justify-center cursor-pointer',
               {
-                'bg-[#252627]': tab === id,
-                '!rounded-lg': tab !== id
+                'bg-[#252627]': tab === id
               }
             )}
             onClick={() => setTab(id)}
@@ -74,7 +66,7 @@ function LayoutCategories() {
         ))}
       </div>
       <div className="w-[calc(100%-90px)] h-full p-4">
-        <CategoryOptions tab={tab} />
+        <CategoryOptions tab={tab} onSelect={onSelect} />
       </div>
     </div>
   )

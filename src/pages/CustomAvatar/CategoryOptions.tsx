@@ -3,9 +3,10 @@ import { dataOptions } from '~/_mock'
 
 interface CategoryOptionProps {
   tab: string
+  onSelect: (id: string, value: string) => void
 }
 
-function CategoryOptions({ tab }: CategoryOptionProps) {
+function CategoryOptions({ tab, onSelect }: CategoryOptionProps) {
   const [options, setOptions] = useState<{ name: string; value: string }[]>([])
 
   useEffect(() => {
@@ -21,6 +22,7 @@ function CategoryOptions({ tab }: CategoryOptionProps) {
           className="object-cover w-20 h-20 rounded-md border border-black bg-white cursor-pointer"
           src={option.value}
           alt=""
+          onClick={() => onSelect(tab, option.value)}
         />
       ))}
     </div>

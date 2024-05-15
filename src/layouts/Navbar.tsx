@@ -14,14 +14,14 @@ export interface MenuItemType {
 const MENU_ITEMS: MenuItemType[] = [
   {
     id: 1,
-    to: config.routes.managerMyAvatars,
-    title: 'My avatar',
+    to: '/menu-item-1',
+    title: 'Menu item #1',
     icon: HiOutlineHome
   },
   {
     id: 2,
-    to: '/menu-item-2',
-    title: 'Menu item #2',
+    to: config.routes.managerMyAvatars,
+    title: 'My Avatar',
     icon: HiOutlineHome
   },
   {
