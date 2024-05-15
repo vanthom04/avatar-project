@@ -1,5 +1,7 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { supabase } from '~/config'
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -26,6 +28,15 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const handleDelete = async () => {
+    const { error } = await supabase.from('my_avatars').delete().eq('id', id)
+    if (error) {
+      toast.error('Delete task failed!')
+    }
+
+    toast.success('Delete task successfully!')
+  }
 
   return (
     <tr className="bg-white border-b">
@@ -126,6 +137,7 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
                 <button
                   type="button"
                   className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
+                  onClick={handleDelete}
                 >
                   Yes, I'm sure
                 </button>
