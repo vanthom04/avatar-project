@@ -118,6 +118,8 @@ function CustomAvatar() {
     })
   }
 
+  const handleSaveAvatar = async () => {}
+
   return (
     <div className="max-h-screen h-screen">
       <div className="h-[60px] px-6 py-2 font-medium">
@@ -149,7 +151,10 @@ function CustomAvatar() {
             >
               <ul className="py-2">
                 <li>
-                  <button className="flex flex-row w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-200">
+                  <button
+                    className="flex flex-row w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
+                    onClick={handleSaveAvatar}
+                  >
                     <BsCloudCheck size={22} />
                     <span className="ml-2">Save</span>
                   </button>

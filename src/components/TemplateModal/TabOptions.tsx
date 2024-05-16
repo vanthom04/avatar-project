@@ -48,7 +48,7 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
   }
 
   return (
-    <div className="mt-2 w-full h-36 max-h-36 grid grid-cols-8 xl:grid-cols-11 gap-2 lg:gap-3 overflow-y-auto">
+    <div className="mt-2 w-full h- max-h-3 grid grid-cols-8 xl:grid-cols-11 gap-2 lg:gap-3 overflow-y-auto">
       {category?.options.map((option, index) => (
         <div
           key={index}
