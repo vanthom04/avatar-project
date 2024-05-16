@@ -22,8 +22,8 @@ const MENU_ITEMS: MenuItemType[] = [
   },
   {
     id: 2,
-    to: '/menu-item-2',
-    title: 'Menu item #2',
+    to: config.routes.managerMyAvatars,
+    title: 'My Avatar',
     icon: HiOutlineHome
   },
   {
