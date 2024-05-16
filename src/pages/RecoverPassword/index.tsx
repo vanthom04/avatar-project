@@ -1,24 +1,35 @@
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { FieldValues, useForm } from 'react-hook-form'
 import { CiMail } from 'react-icons/ci'
+import Spinner from '~/components/Spinner'
 
 import { supabase } from '~/config/supabase'
 
 function RecoverPassword() {
+  const [loading, setLoading] = useState(false)
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm({ defaultValues: { email: '' } })
 
   const onSubmit = async (values: FieldValues) => {
     try {
+      setLoading(true)
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: '/update-password'
+        redirectTo: 'http://localhost:6200/update-password'
       })
-
       if (error) throw error
+
+      reset()
+      toast.success('Successfully, check your mail inbox!')
     } catch (error) {
       console.log(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -36,6 +47,7 @@ function RecoverPassword() {
                 <CiMail color="gray" size={20} />
               </div>
               <input
+                disabled={loading}
                 id="email"
                 type="email"
                 autoComplete="off"
@@ -50,9 +62,10 @@ function RecoverPassword() {
           </div>
           <button
             type="submit"
-            className="bg-[#007bff] text-white w-full p-2 rounded-lg font-semibold hover:opacity-85"
+            disabled={loading}
+            className="bg-[#007bff] text-white w-full p-2 rounded-lg font-semibold hover:opacity-85 flex justify-center"
           >
-            Send
+            {loading ? <Spinner className="w-5 h-5" /> : 'Send'}
           </button>
         </form>
       </div>
