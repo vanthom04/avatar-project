@@ -4,14 +4,17 @@ import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
 
 import config, { supabase } from '~/config'
+import Spinner from '~/components/Spinner'
 
 function UpdatePassword() {
+  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -23,22 +26,28 @@ function UpdatePassword() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
   }
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword)
-  }
 
   const onSubmit = async (values: FieldValues) => {
     if (values.password === values.confirmPassword) {
       try {
+        setLoading(true)
         const { error } = await supabase.auth.updateUser(
           { password: values.password },
           { emailRedirectTo: config.routes.home }
         )
         if (error) throw error
+        window.location.href = config.routes.home
       } catch (error) {
         console.log(error)
+      } finally {
+        setLoading(false)
+        reset()
       }
     }
+  }
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword)
   }
 
   return (
@@ -56,6 +65,7 @@ function UpdatePassword() {
                 <IoKeyOutline color="gray" size={20} />
               </div>
               <input
+                disabled={loading}
                 autoComplete="off"
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -85,6 +95,7 @@ function UpdatePassword() {
                 <IoKeyOutline color="gray" size={20} />
               </div>
               <input
+                disabled={loading}
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="**********"
@@ -104,10 +115,11 @@ function UpdatePassword() {
             )}
           </div>
           <button
+            disabled={loading}
             type="submit"
-            className="bg-[#007bff] text-white w-full p-2 rounded-lg font-semibold hover:opacity-85 outline-none"
+            className="mx-auto flex justify-center bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-4"
           >
-            Update
+            {loading ? <Spinner className="w-5 h-5" /> : 'Update'}
           </button>
         </form>
       </div>

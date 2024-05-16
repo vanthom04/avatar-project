@@ -36,14 +36,16 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
       { path: config.routes.managerMyAvatars, element: <ManagerMyAvatarsPage /> },
-      { path: config.routes.customAvatar, element: <CustomAvatarPage /> },
       { path: config.routes.templates, element: <TemplatesPage /> },
       { path: config.routes.managerTemplates, element: <ManagerTemplatesPage /> }
     ]
   },
   {
     element: <PrivateRoute element={Fragment} />,
-    children: [{ path: config.routes.updatePassword, element: <UpdatePasswordPage /> }]
+    children: [
+      { path: config.routes.updatePassword, element: <UpdatePasswordPage /> },
+      { path: config.routes.customAvatar, element: <CustomAvatarPage /> }
+    ]
   },
   {
     path: config.routes.notFound,

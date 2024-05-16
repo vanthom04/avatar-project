@@ -2,6 +2,7 @@ import { IconType } from 'react-icons'
 import { TbReport } from 'react-icons/tb'
 import { HiOutlineHome } from 'react-icons/hi'
 import { LuLayoutTemplate } from 'react-icons/lu'
+import { RxPerson } from 'react-icons/rx'
 
 import config from '~/config'
 import NavbarItem from './common/NavbarItem'
@@ -22,9 +23,9 @@ const MENU_ITEMS: MenuItemType[] = [
   },
   {
     id: 2,
-    to: '/menu-item-2',
-    title: 'Menu item #2',
-    icon: HiOutlineHome
+    to: config.routes.managerMyAvatars,
+    title: 'My Avatar',
+    icon: RxPerson
   },
   {
     id: 3,
