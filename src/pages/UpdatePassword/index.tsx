@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
-import { supabase } from '~/config/supabase'
-import Spinner from '~/components/Spinner'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
-import config from '~/config'
+
+import config, { supabase } from '~/config'
+import Spinner from '~/components/Spinner'
 
 function UpdatePassword() {
+  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -21,9 +22,11 @@ function UpdatePassword() {
       confirmPassword: ''
     }
   })
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
   }
+
   const onSubmit = async (values: FieldValues) => {
     if (values.password === values.confirmPassword) {
       try {
@@ -42,6 +45,7 @@ function UpdatePassword() {
       }
     }
   }
+
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword)
   }

@@ -225,7 +225,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
             <div className="w-full h-full">
               <TabHead />
             </div>
-            <div className="flex items-center justify-end gap-x-3">
+            <div className="relative right-0 bottom-0 flex items-center justify-end gap-x-3">
               <button
                 disabled={isLoading}
                 className={clsx(

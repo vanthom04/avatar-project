@@ -6,8 +6,8 @@ import { CiMail, CiUser } from 'react-icons/ci'
 import { IoEyeOutline } from 'react-icons/io5'
 import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
 
-import config, { supabase } from '~/config'
 import { useRouter } from '~/hooks'
+import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
 
 function SignUpPage() {
