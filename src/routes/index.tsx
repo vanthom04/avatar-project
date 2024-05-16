@@ -10,10 +10,10 @@ import SignInPage from '~/pages/SignIn'
 import ProfilePage from '~/pages/Profile'
 import NotFoundPage from '~/pages/NotFound'
 import TemplatesPage from '~/pages/Templates'
-import CustomAvatar from '~/pages/CustomAvatar'
-import UpdatePassword from '~/pages/UpdatePassword'
-import RecoverPassword from '~/pages/RecoverPassword'
-import ManagerMyAvatars from '~/pages/ManagerMyAvatars'
+import CustomAvatarPage from '~/pages/CustomAvatar'
+import UpdatePasswordPage from '~/pages/UpdatePassword'
+import RecoverPasswordPage from '~/pages/RecoverPassword'
+import ManagerMyAvatarsPage from '~/pages/ManagerMyAvatars'
 import ManagerTemplatesPage from '~/pages/ManagerTemplates'
 
 import PublicRoute from './PublicRoute'
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     children: [
       { path: config.routes.signIn, element: <SignInPage /> },
       { path: config.routes.signUp, element: <SignUpPage /> },
-      { path: config.routes.recoverPassword, element: <RecoverPassword /> }
+      { path: config.routes.recoverPassword, element: <RecoverPasswordPage /> }
     ]
   },
   {
@@ -35,15 +35,15 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
-      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatars /> },
-      { path: config.routes.customAvatar, element: <CustomAvatar /> },
+      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatarsPage /> },
+      { path: config.routes.customAvatar, element: <CustomAvatarPage /> },
       { path: config.routes.templates, element: <TemplatesPage /> },
       { path: config.routes.managerTemplates, element: <ManagerTemplatesPage /> }
     ]
   },
   {
     element: <PrivateRoute element={Fragment} />,
-    children: [{ path: config.routes.updatePassword, element: <UpdatePassword /> }]
+    children: [{ path: config.routes.updatePassword, element: <UpdatePasswordPage /> }]
   },
   {
     path: config.routes.notFound,
