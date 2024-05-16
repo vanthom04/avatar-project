@@ -10,7 +10,7 @@ interface AvatarOptionType {
   icon: IconType | FunctionComponent
 }
 
-const AVATAR_OPTIONS: AvatarOptionType[] = [
+export const AVATAR_OPTIONS: AvatarOptionType[] = [
   {
     id: 'hair',
     title: 'Hair',

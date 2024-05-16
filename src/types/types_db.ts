@@ -7,7 +7,6 @@ export type Database = {
         Row: {
           accessory: string | null
           background: string | null
-          base: string | null
           color: string | null
           created_at: string
           eyes: string | null
@@ -16,13 +15,11 @@ export type Database = {
           id: number
           mouth: string | null
           my_avatar_id: number | null
-          shirt: string | null
           updated_at: string | null
         }
         Insert: {
           accessory?: string | null
           background?: string | null
-          base?: string | null
           color?: string | null
           created_at?: string
           eyes?: string | null
@@ -31,13 +28,11 @@ export type Database = {
           id?: number
           mouth?: string | null
           my_avatar_id?: number | null
-          shirt?: string | null
           updated_at?: string | null
         }
         Update: {
           accessory?: string | null
           background?: string | null
-          base?: string | null
           color?: string | null
           created_at?: string
           eyes?: string | null
@@ -46,7 +41,6 @@ export type Database = {
           id?: number
           mouth?: string | null
           my_avatar_id?: number | null
-          shirt?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -65,6 +59,7 @@ export type Database = {
           id: number
           image_path: string | null
           name: string | null
+          template_id: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -73,6 +68,7 @@ export type Database = {
           id?: number
           image_path?: string | null
           name?: string | null
+          template_id?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -81,10 +77,18 @@ export type Database = {
           id?: number
           image_path?: string | null
           name?: string | null
+          template_id?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: 'my_avatars_template_id_fkey'
+            columns: ['template_id']
+            isOneToOne: false
+            referencedRelation: 'templates'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'my_avatars_user_id_fkey'
             columns: ['user_id']

@@ -5,18 +5,16 @@ import { AvatarOption, MyAvatar } from '~/types'
 const fetchMyAvatarOptions = async (id: number | string): Promise<AvatarOption[]> => {
   const { data: avatarOptions, error: errorAvatarOptions } = await supabase
     .from('my_avatar_options')
-    .select('base, hair, eyes, mouth, accessory, shirt, hand, background, color')
+    .select('hair, eyes, mouth, accessory, hand, background, color')
     .eq('my_avatar_id', id)
 
   if (errorAvatarOptions) return []
 
   const result = avatarOptions.map((option) => ({
-    base: option.base ?? '',
     hair: option.hair ?? '',
     eyes: option.eyes ?? '',
     mouth: option.mouth ?? '',
     accessory: option.accessory ?? '',
-    shirt: option.shirt ?? '',
     hand: option.hand ?? '',
     background: option.background ?? '',
     color: option.color ?? ''
@@ -25,10 +23,11 @@ const fetchMyAvatarOptions = async (id: number | string): Promise<AvatarOption[]
   return result
 }
 
-export const fetchMyAvatars = async () => {
+export const fetchMyAvatars = async (): Promise<MyAvatar[]> => {
   const { data: myAvatars, error: errorMyAvatar } = await supabase.from('my_avatars').select('*')
   if (errorMyAvatar) {
-    return console.error(errorMyAvatar)
+    console.error(errorMyAvatar)
+    return []
   }
 
   const results: MyAvatar[] = []
@@ -50,6 +49,7 @@ export const fetchMyAvatars = async () => {
     results.push({
       id: avatar.id,
       user_id: avatar.user_id ?? '',
+      template_id: avatar.template_id ?? '',
       name: avatar.name ?? '',
       thumbnail: getImageUrl('my_avatars', avatar.image_path ?? ''),
       options,
