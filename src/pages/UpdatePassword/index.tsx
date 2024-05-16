@@ -4,8 +4,8 @@ import { supabase } from '~/config/supabase'
 import Spinner from '~/components/Spinner'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
-import { useState } from 'react'
 import config from '~/config'
+
 function UpdatePassword() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
