@@ -32,10 +32,10 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
   const handleDelete = async () => {
     const { error } = await supabase.from('my_avatars').delete().eq('id', id)
     if (error) {
-      toast.error('Delete task failed!')
+      toast.error('Delete avatar failed!')
     }
 
-    toast.success('Delete task successfully!')
+    toast.success('Delete avatar successfully!')
   }
 
   return (
@@ -137,7 +137,10 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
                 <button
                   type="button"
                   className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-                  onClick={handleDelete}
+                  onClick={() => {
+                    handleDelete()
+                    setIsDelete(false)
+                  }}
                 >
                   Yes, I'm sure
                 </button>

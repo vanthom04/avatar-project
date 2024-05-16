@@ -9,17 +9,21 @@ import ProfilePage from '~/pages/Profile'
 import NotFoundPage from '~/pages/NotFound'
 import Template from '~/pages/Template'
 import ManagerMyAvatars from '~/pages/ManagerMyAvatars'
-import CustomAvatar from '~/pages/CustomAvatar'
+import SignIn from '~/pages/SignIn'
+import SignUpPage from '~/pages/SignUp'
+import RecoverPassword from '~/pages/RecoverPassword'
+import UpdatePassword from '~/pages/UpdatePassword'
 
 import PrivateRoute from './PrivateRoute'
-import { Fragment } from 'react/jsx-runtime'
+import PublicRoute from './PublicRoute'
+import CustomAvatar from '~/pages/CustomAvatar'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <PublicRoute />,
     children: [
-      { path: config.routes.signIn, element: <SignInPage /> },
+      { path: config.routes.signIn, element: <SignIn /> },
       { path: config.routes.signUp, element: <SignUpPage /> },
       { path: config.routes.recoverPassword, element: <RecoverPassword /> }
     ]
@@ -36,7 +40,10 @@ const router = createBrowserRouter([
   },
   {
     element: <PrivateRoute element={Fragment} />,
-    children: [{ path: config.routes.updatePassword, element: <UpdatePassword /> }]
+    children: [
+      { path: config.routes.updatePassword, element: <UpdatePassword /> },
+      { path: config.routes.customAvatar, element: <CustomAvatar /> }
+    ]
   },
   {
     path: config.routes.notFound,

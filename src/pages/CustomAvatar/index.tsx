@@ -167,9 +167,9 @@ function CustomAvatar() {
             </div>
           </div>
         </div>
-        <div className="relative">
+        <div className="relative select-none cursor-default">
           <h1
-            onDoubleClick={() => setIsEdit(true)}
+            onClick={() => setIsEdit(true)}
             className={clsx(
               'text-2xl absolute translate-x-[600px] translate-y-[-40px] text-black',
               {
