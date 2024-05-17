@@ -5,6 +5,7 @@ import Spinner from '~/components/Spinner'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
 import config from '~/config'
+import toast from 'react-hot-toast'
 function UpdatePassword() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -33,8 +34,9 @@ function UpdatePassword() {
         )
         if (error) throw error
         window.location.href = config.routes.home
+        toast.success('Update password successfully')
       } catch (error) {
-        console.log(error)
+        toast.error((error as Error).message)
       } finally {
         setLoading(false)
         reset()
