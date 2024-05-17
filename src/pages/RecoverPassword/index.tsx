@@ -2,9 +2,9 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { FieldValues, useForm } from 'react-hook-form'
 import { CiMail } from 'react-icons/ci'
-import Spinner from '~/components/Spinner'
 
 import { supabase } from '~/config/supabase'
+import Spinner from '~/components/Spinner'
 
 function RecoverPassword() {
   const [loading, setLoading] = useState(false)
@@ -28,6 +28,7 @@ function RecoverPassword() {
       toast.success('Successfully, check your mail inbox!')
     } catch (error) {
       console.log(error)
+      toast.error((error as Error).message)
     } finally {
       setLoading(false)
     }

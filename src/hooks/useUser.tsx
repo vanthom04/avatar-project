@@ -23,14 +23,12 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       try {
         if (!token) return null
         const { data, error } = await supabase.auth.getUser(token)
-
         if (error) {
           console.error('Invalid token:', error.message)
           return null
         }
         return data.user
       } catch (error) {
-        console.error('Error token:', error)
         return null
       }
     }
@@ -45,7 +43,9 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       setIsLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const value: UserContextType = {

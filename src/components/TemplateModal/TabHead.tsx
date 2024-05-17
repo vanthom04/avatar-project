@@ -4,7 +4,7 @@ import { useState } from 'react'
 import TabOptions from './TabOptions'
 import { AVATAR_OPTIONS } from '~/pages/CustomAvatar/LayoutCategories'
 
-function TabHead() {
+const TabHead: React.FC = () => {
   const [tab, setTab] = useState<'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'>('hair')
 
   return (
