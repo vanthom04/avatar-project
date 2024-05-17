@@ -36,11 +36,12 @@ function SignUpPage() {
       if (error) throw error
 
       if (data.user) {
-        toast.success('SignUp successfully')
+        toast.success('Sign up successfully')
         router.push(config.routes.signIn)
       }
     } catch (error) {
       console.error(error)
+      toast.error((error as Error).message)
     } finally {
       setLoading(false)
     }
