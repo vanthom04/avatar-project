@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
 import Spinner from '~/components/Spinner'
@@ -36,8 +37,9 @@ function UpdatePassword() {
         )
         if (error) throw error
         window.location.href = config.routes.home
+        toast.success('Update password successfully')
       } catch (error) {
-        console.log(error)
+        toast.error((error as Error).message)
       } finally {
         setLoading(false)
         reset()

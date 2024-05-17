@@ -37,7 +37,7 @@ function SignIn() {
         toast.success('Login successfully')
       }
     } catch (error) {
-      console.log(error)
+      toast.error('Email or password do not match, please try again')
     } finally {
       setLoading(false)
     }
@@ -85,7 +85,7 @@ function SignIn() {
               disabled={loading}
               {...register('password', { required: true })}
             />
-            <button className="pr-2" onClick={togglePasswordVisibility}>
+            <button type="button" className="pr-2" onClick={togglePasswordVisibility}>
               {showPassword ? (
                 <IoEyeOutline color="gray" size={20} />
               ) : (
@@ -100,7 +100,10 @@ function SignIn() {
           )}
         </div>
         <div className="text-end mr-2 text-gray-600 text-sm">
-          <Link to={config.routes.recoverPassword} className="mt-2">
+          <Link
+            to={config.routes.recoverPassword}
+            className="mt-2 hover:underline hover:text-red-500"
+          >
             Forgot password?
           </Link>
         </div>
