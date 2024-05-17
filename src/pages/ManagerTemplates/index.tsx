@@ -4,6 +4,8 @@ import { useTemplateModal } from '~/hooks'
 import { useQueryTemplates } from '~/queries'
 import Spinner from '~/components/Spinner'
 import TemplateTableRow from './TemplateTableRow'
+import TemplateTableEmptyRow from './TemplateTableEmptyRow'
+import { Template } from '~/queries/useQueryTemplates/fetch'
 
 function ManagerTemplatesPage() {
   const templateModal = useTemplateModal()
@@ -64,10 +66,12 @@ function ManagerTemplatesPage() {
                   <Spinner className="mx-auto" />
                 </td>
               </tr>
-            ) : (
+            ) : (templates as Template[]).length > 0 ? (
               templates?.map((template) => (
                 <TemplateTableRow key={template.id} template={template} />
               ))
+            ) : (
+              <TemplateTableEmptyRow />
             )}
           </tbody>
         </table>

@@ -8,7 +8,7 @@ export interface Option {
   file?: File | null
 }
 
-interface FormDataItem {
+export interface Category {
   type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'
   name: string
   options: Option[]
@@ -19,12 +19,12 @@ interface FormDataStore {
   image_url?: string | null
   image_path?: string | null
   file?: File | null
-  data: FormDataItem[] | null
+  data: Category[] | null
   setOptions: (type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand', options: Option[]) => void
   reset: () => void
 }
 
-const initialData: FormDataItem[] = [
+export const initialData: Category[] = [
   {
     type: 'hair',
     name: 'Hair',
@@ -52,7 +52,7 @@ const initialData: FormDataItem[] = [
   }
 ]
 
-const useFormData = create<FormDataStore>((set) => ({
+const useFormData: () => FormDataStore = create<FormDataStore>((set) => ({
   name: '',
   image_url: null,
   image_path: null,

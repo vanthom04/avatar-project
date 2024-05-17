@@ -1,28 +1,47 @@
+import clsx from 'clsx'
 import { useEffect, useState } from 'react'
-import { dataOptions } from '~/_mock'
+import { Template, Category } from '~/queries/useQueryTemplates/fetch'
+import { OptionType } from '.'
 
 interface CategoryOptionProps {
   tab: string
-  onSelect: (id: string, value: string) => void
+  template: Template
+  options: OptionType[]
+  onSelect: (
+    id: string,
+    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
+    value: string
+  ) => void
 }
 
-function CategoryOptions({ tab, onSelect }: CategoryOptionProps) {
-  const [options, setOptions] = useState<{ name: string; value: string }[]>([])
+function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionProps) {
+  const [category, setCategory] = useState<Category>({} as Category)
 
   useEffect(() => {
-    const data = dataOptions.filter((opt) => opt.id === tab)[0]
-    setOptions(data.options)
-  }, [tab])
+    const category = template.categories?.filter((category) => category.type === tab)[0]
+    setCategory(category)
+  }, [tab, template.categories])
 
   return (
     <div className="flex flex-row flex-wrap gap-8">
-      {options.map((option) => (
+      {category?.options?.map((option) => (
         <img
-          key={option.value}
-          className="object-cover w-20 h-20 rounded-md border border-black bg-white cursor-pointer"
-          src={option.value}
-          alt=""
-          onClick={() => onSelect(tab, option.value)}
+          key={option.id}
+          className={clsx(
+            'object-cover w-20 h-20 rounded-md border border-black bg-white cursor-pointer',
+            {
+              'border-2 border-red-500': option && options.find((opt) => opt.id === option.id)
+            }
+          )}
+          src={option.image_url ?? ''}
+          alt={option.name ?? ''}
+          onClick={() =>
+            onSelect(
+              option.id ?? '',
+              tab as 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
+              option.image_url ?? ''
+            )
+          }
         />
       ))}
     </div>

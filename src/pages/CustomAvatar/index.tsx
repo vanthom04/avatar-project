@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { IoIosArrowRoundBack, IoMdArrowDropdown } from 'react-icons/io'
-import clsx from 'clsx'
-import { fabric } from 'fabric'
-import { BsCloudCheck } from 'react-icons/bs'
-
-import { useDebounce, useRouter } from '~/hooks'
-import LayoutCategories from './LayoutCategories'
 import { GoDownload } from 'react-icons/go'
+import { BsCloudCheck } from 'react-icons/bs'
+import { v4 as uuidv4 } from 'uuid'
+import toast from 'react-hot-toast'
+import { fabric } from 'fabric'
+import clsx from 'clsx'
+
+import { supabase } from '~/config'
+import { downloadBase64Image, slugify } from '~/utils'
+import { useDebounce, useRouter, useUser } from '~/hooks'
 import { VscSymbolColor } from 'react-icons/vsc'
 import { IoColorFillOutline } from 'react-icons/io5'
-import { downloadBase64Image } from '~/utils'
+import { Template } from '~/queries/useQueryTemplates/fetch'
+import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
+import LayoutCategories from './LayoutCategories'
+import { MyAvatar } from '~/types'
 
 const colors = [
   '#FF0000',
@@ -24,6 +31,12 @@ const colors = [
   '#FFFFFF'
 ]
 
+export interface OptionType {
+  id?: string
+  type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand' | 'color' | 'background'
+  value: string
+}
+
 function CustomAvatar() {
   const [isEdit, setIsEdit] = useState(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -31,17 +44,60 @@ function CustomAvatar() {
   const [isOpenBackgroundColor, setIsOpenBackgroundColor] = useState<boolean>(false)
   const [color, setColor] = useState<string>('#000000')
   const [bgColor, setBgColor] = useState<string>('#ffffff')
-  const [categories, setCategories] = useState<{ id: string; value: string }[]>([])
-
-  const handleOpen = () => setIsOpen(!isOpen)
-  const handleOpenColor = () => setIsOpenColor(!isOpenColor)
-  const handleOpenBackgroundColor = () => setIsOpenBackgroundColor(!isOpenBackgroundColor)
+  const [options, setOptions] = useState<OptionType[]>([])
+  const [name, setName] = useState('Custom Avatar')
+  const [template, setTemplate] = useState<Template>({} as Template)
+  const [avatar, setAvatar] = useState<MyAvatar>({} as MyAvatar)
 
   const router = useRouter()
-
+  const { user } = useUser()
   const debouncedColor = useDebounce(color, 300)
+  const debouncedBgColor = useDebounce(bgColor, 300)
+  const params = useParams<{ mode: 'create' | 'edit'; templateId: string; id?: string }>()
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const inputTimer = useRef<NodeJS.Timeout | null>(null)
+
+  const { data: myAvatars } = useQueryMyAvatars()
+  const { data: templates } = useQueryTemplates()
+
+  useEffect(() => {
+    if (params.mode === 'edit') {
+      const avatar = myAvatars?.filter((avatar) => avatar.id === Number(params.id))[0]
+      const template = templates?.filter((template) => template.id === params.templateId)[0]
+      template && setTemplate(template)
+      avatar && setAvatar(avatar)
+      avatar?.options && setOptions(avatar.options as unknown as OptionType[])
+    } else {
+      const template = templates?.filter((template) => template.id === params.templateId)[0]
+      template && setTemplate(template)
+
+      const defaultOptions: OptionType[] = []
+      template?.categories.forEach((category) => {
+        const option = category.options[0]
+        option &&
+          defaultOptions.push({
+            id: option.id ?? '',
+            type: category.type,
+            value: option.image_url ?? ''
+          })
+      })
+
+      setOptions([
+        ...defaultOptions,
+        {
+          type: 'background',
+          value: '#fff'
+        },
+        {
+          type: 'color',
+          value: '#000000'
+        }
+      ])
+    }
+    console.log('re render')
+  }, [params.mode, params.templateId, params.id, myAvatars, templates])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -49,48 +105,83 @@ function CustomAvatar() {
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: 620,
       height: 620,
-      backgroundColor: bgColor
+      backgroundColor: options.filter((opt) => opt.type === 'background')[0]?.value || '#ffffff'
     })
-
     fabricCanvasRef.current = canvas
 
-    categories.forEach((category) => {
-      fabric.Image.fromURL(
-        category.value,
-        (image) => {
-          image.scaleToWidth(canvas.getWidth())
-          image.scaleToHeight(canvas.getHeight())
-          canvas.add(image)
-        },
-        { crossOrigin: 'anonymous' }
-      )
-    })
+    options
+      .filter((opt) => !['color', 'background'].includes(opt.type))
+      .forEach((option) => {
+        fabric.Image.fromURL(
+          option.value,
+          (image) => {
+            image.scaleToWidth(canvas.getWidth())
+            image.scaleToHeight(canvas.getHeight())
+            canvas.add(image)
+
+            image.filters?.push(
+              new fabric.Image.filters.BlendColor({
+                color: options.filter((opt) => opt.type === 'color')[0]?.value || '#000000',
+                mode: 'tint'
+              })
+            )
+
+            image.applyFilters()
+          },
+          { crossOrigin: 'anonymous' }
+        )
+      })
+    canvas.renderAll()
 
     return () => {
       canvas.dispose()
     }
-  }, [bgColor, categories])
+  }, [options])
 
   useEffect(() => {
-    if (!fabricCanvasRef.current) return
-    fabricCanvasRef.current.forEachObject((obj) => {
-      if (obj instanceof fabric.Image) {
-        obj.filters?.push(
-          new fabric.Image.filters.BlendColor({
-            color: debouncedColor,
-            mode: 'tint'
-          })
-        )
-        obj.applyFilters()
+    setOptions((prevOptions) => {
+      const index = options.findIndex((opt) => opt.type === 'color')
+      if (index !== -1) {
+        options[index].value = debouncedColor
       }
+      return [...prevOptions]
     })
-    fabricCanvasRef.current.renderAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedColor])
 
-  const handleSaveNameAvatar = (e: React.KeyboardEvent) => {
-    e.preventDefault()
+  useEffect(() => {
+    setOptions((prevOptions) => {
+      const index = options.findIndex((opt) => opt.type === 'background')
+      if (index !== -1) {
+        options[index].value = debouncedBgColor
+      }
+      return [...prevOptions]
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedBgColor])
 
+  const handleOpen = () => setIsOpen(!isOpen)
+  const handleOpenColor = () => setIsOpenColor(!isOpenColor)
+  const handleOpenBackgroundColor = () => setIsOpenBackgroundColor(!isOpenBackgroundColor)
+  const handleClickEdit = () => {
+    setIsEdit(true)
+    setName('')
+
+    if (inputTimer.current) {
+      clearTimeout(inputTimer.current)
+    }
+
+    inputTimer.current = setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
+  }
+
+  const handleSaveNameAvatar = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault()
+      if (!name) {
+        setName('Custom Avatar')
+      }
       setIsEdit(false)
     }
   }
@@ -100,28 +191,115 @@ function CustomAvatar() {
     downloadBase64Image(dataUrl, 'custom_avatar.png')
   }
 
-  const handleSelect = (id: string, value: string) => {
-    setCategories((prevState) => {
-      const selectedIndex = categories.findIndex((c) => c.id === id)
+  const handleSelect = (
+    id: string,
+    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
+    value: string
+  ) => {
+    setOptions((prevOptions) => {
+      const selectedIndex = options.findIndex((opt) => opt.type === type)
       if (selectedIndex !== -1) {
-        categories[selectedIndex].value = value
-        return [...prevState]
+        options[selectedIndex].id = id
+        options[selectedIndex].value = value
+        return [...prevOptions]
       } else {
-        return [
-          ...prevState,
-          {
-            id,
-            value
-          }
-        ]
+        return [...prevOptions, { type, id, value }]
       }
     })
   }
 
-  const handleSaveAvatar = async () => {}
+  const handleSaveAvatar = async () => {
+    /**
+     * table my_avatars: id, user_id, template_id, name, image_path, created_at
+     */
+    if (params.mode === 'create') {
+      // handle create new avatar
+
+      const uid = uuidv4()
+      const slug = slugify(name)
+      const imagePath = `${slug}/${slug}-${uid}.png`
+
+      const { error: errorSaveAvatar } = await supabase.from('my_avatars').insert({
+        name,
+        user_id: user?.id,
+        template_id: template.id,
+        image_path: imagePath,
+        options
+      })
+      if (errorSaveAvatar) {
+        return console.log(errorSaveAvatar)
+      }
+
+      const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+      if (!dataUrl) {
+        return console.error('Failed to generate data URL from canvas.')
+      }
+
+      const blob = await fetch(dataUrl).then((res) => res.blob())
+      const file = new File([blob], 'canvas-image.png', { type: 'image/png' })
+      const { data: dataUploadAvatar, error: errorUploadAvatar } = await supabase.storage
+        .from('my_avatars')
+        .upload(imagePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      if (errorUploadAvatar) {
+        return console.log(errorSaveAvatar)
+      }
+
+      console.log(dataUploadAvatar)
+      toast.success('Save avatar successfully')
+    } else {
+      // handle update avatar
+      const uid = uuidv4()
+      const slug = slugify(name)
+      const imagePath = `${slug}/${slug}-${uid}.png`
+
+      const { error: errorSaveAvatar } = await supabase
+        .from('my_avatars')
+        .update({
+          name,
+          user_id: user?.id,
+          template_id: template.id,
+          image_path: imagePath,
+          options
+        })
+        .eq('id', params.id ?? '')
+      if (errorSaveAvatar) {
+        return console.log(errorSaveAvatar)
+      }
+
+      const { error: errorRemoveImageAvatar } = await supabase.storage
+        .from('my_avatars')
+        .remove([avatar.image_path])
+      if (errorRemoveImageAvatar) {
+        return console.log(errorRemoveImageAvatar)
+      }
+
+      const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+      if (!dataUrl) {
+        return console.error('Failed to generate data URL from canvas.')
+      }
+
+      const blob = await fetch(dataUrl).then((res) => res.blob())
+      const file = new File([blob], 'canvas-image.png', { type: 'image/png' })
+
+      const { error: errorUploadAvatar } = await supabase.storage
+        .from('my_avatars')
+        .upload(imagePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      if (errorUploadAvatar) {
+        return console.log(errorSaveAvatar)
+      }
+
+      toast.success('Save avatar successfully')
+    }
+  }
 
   return (
-    <div className="max-h-screen h-screen">
+    <div className="max-h-screen h-screen select-none">
       <div className="h-[60px] px-6 py-2 font-medium">
         <div className="flex justify-between">
           <button
@@ -174,41 +352,40 @@ function CustomAvatar() {
         </div>
         <div className="relative select-none cursor-default">
           <h1
-            onClick={() => setIsEdit(true)}
             className={clsx(
-              'text-2xl absolute translate-x-[600px] translate-y-[-40px] text-black',
-              {
-                hidden: isEdit
-              }
+              'text-2xl absolute translate-x-[600px] translate-y-[-40px] py-1 px-2 border border-transparent rounded-md hover:border-gray-300 text-black hover:cursor-pointer transition-colors duration-300',
+              { hidden: isEdit }
             )}
+            onClick={handleClickEdit}
           >
-            Custom Avatar
+            {name}
           </h1>
           <input
-            value={'Custom Avatar'}
+            ref={inputRef}
+            value={name}
             type="text"
             className={clsx(
-              'outline-none text-2xl absolute translate-x-[600px] translate-y-[-40px] hidden',
-              {
-                '!block': isEdit
-              }
+              'w-52 text-2xl absolute translate-x-[600px] translate-y-[-40px] py-1 px-2 outline-none border border-gray-500 rounded hidden',
+              { '!block': isEdit }
             )}
+            onChange={(e) => setName(e.target.value)}
             onKeyDown={handleSaveNameAvatar}
-            onChange={() => {}}
           />
         </div>
       </div>
       <div className="w-full h-[calc(100vh-60px)] bg-[#252627] flex">
         {/* LayoutCategories */}
-        <LayoutCategories onSelect={handleSelect} />
+        <LayoutCategories template={template} options={options} onSelect={handleSelect} />
 
         <div className="w-full basis-3/5 flex justify-center pl-4 flex-col items-center bg-[#ebecf0] relative">
-          <div className="absolute left-6 top-6 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300">
+          <div
+            className="absolute left-6 top-6 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
+            onClick={handleOpenColor}
+          >
             <button
               id="button-user-menu"
               className="flex flex-row justify-center items-center"
               type="button"
-              onClick={handleOpenColor}
             >
               <span>
                 <VscSymbolColor size={24} />
@@ -249,12 +426,14 @@ function CustomAvatar() {
               </div>
             </div>
           </div>
-          <div className="absolute left-6 top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300">
+          <div
+            className="absolute left-6 top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
+            onClick={handleOpenBackgroundColor}
+          >
             <button
               id="button-user-menu"
               className="flex flex-row justify-center items-center"
               type="button"
-              onClick={handleOpenBackgroundColor}
             >
               <span>
                 <IoColorFillOutline size={24} />

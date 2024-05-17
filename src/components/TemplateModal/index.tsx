@@ -12,9 +12,9 @@ import { slugify, months } from '~/utils'
 import { useTemplateModal, useFormData } from '~/hooks'
 import TabHead from './TabHead'
 
-interface TemplateModalProps {}
+const initialName = 'Create new template'
 
-const TemplateModal: React.FC<TemplateModalProps> = () => {
+const TemplateModal: React.FC = () => {
   const [name, setName] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
   const [createdAt, setCreatedAt] = useState<Date | string | null>(null)
@@ -26,27 +26,32 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
   const templateModal = useTemplateModal()
 
   const inputRef = useRef<HTMLInputElement>(null)
+  const inputTimer = useRef<NodeJS.Timeout | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (templateModal.mode === 'create') {
-      setName('Create new template')
+      setName(initialName)
     } else {
       setName(templateModal.template?.name ?? '')
       setCreatedAt(templateModal.template?.created_at ?? '')
       setSelectedImage(templateModal.template?.image_url ?? '')
-      templateModal.template?.categories.forEach((category) => {
-        const options = category.options.map((option) => ({
-          id: option.id,
-          name: option.name ?? '',
-          image_path: option.image_path ?? '',
-          image_url: option.image_url ?? ''
-        }))
-        formData.setOptions(category.type, options)
-      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateModal.mode, templateModal.template])
+
+  const handleClickEditName = () => {
+    setIsEditName(true)
+
+    if (inputTimer.current) {
+      clearTimeout(inputTimer.current)
+    }
+
+    inputTimer.current = setTimeout(() => {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }, 0)
+  }
 
   const handleSelectImage = () => {
     if (fileInputRef.current) {
@@ -68,13 +73,13 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
 
   const handleSaveTemplate = async () => {
     if (templateModal.mode === 'create') {
-      if (!name || !file || !formData.data) return toast.error('No template!')
+      if (!name || !file || !formData.data) return toast.error('No data!')
       setIsLoading(true)
 
       const templateId = uuidv4()
       const slugName = slugify(name)
       const imagePath = `${slugName}/${slugName}-${templateId}.${file?.type.split('/')[1]}`
-      const { error: errorTemplate } = await supabase.from('templates').upsert({
+      const { error: errorTemplate } = await supabase.from('templates').insert({
         id: templateId,
         name,
         image_path: imagePath
@@ -95,7 +100,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
 
       for (const data of formData.data) {
         const templateOptionsId = uuidv4()
-        const { error: errorTemplateOptions } = await supabase.from('template_options').upsert({
+        const { error: errorTemplateOptions } = await supabase.from('template_options').insert({
           id: templateOptionsId,
           template_id: templateId,
           name: data.name,
@@ -108,7 +113,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
         for (const option of data.options) {
           if (!option.file) return
 
-          const { error: errorOptions } = await supabase.from('options').upsert({
+          const { error: errorOptions } = await supabase.from('options').insert({
             id: uuidv4(),
             template_options_id: templateOptionsId,
             name: option.name,
@@ -133,7 +138,74 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
       toast.success('Create new template successfully')
     } else {
       // Todo: handle edit template
-      console.log('handle edit template')
+      if (!name || !formData.data) return toast.error('No data!')
+      setIsLoading(true)
+
+      const { template } = templateModal
+      const { data: categories } = formData
+      if (!template || !categories) return
+
+      const slug = slugify(name)
+      const imagePath = `${slug}/${slug}-${template.id}.${template.image_path.split('.')[1]}`
+      const { error: errorUpdateTemplate } = await supabase
+        .from('templates')
+        .update({
+          name,
+          image_path: imagePath
+        })
+        .eq('id', template.id)
+      if (errorUpdateTemplate) {
+        return console.log(errorUpdateTemplate)
+      }
+
+      if (file) {
+        const { error: errorUploadTemplate } = await supabase.storage
+          .from('templates')
+          .upload(imagePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          })
+        if (errorUploadTemplate) {
+          return console.log(errorUploadTemplate)
+        }
+        await supabase.storage.from('templates').remove([template.image_path])
+      } else {
+        const { error: errorMoveImageTemplate } = await supabase.storage
+          .from('templates')
+          .move(template.image_path, imagePath)
+        if (errorMoveImageTemplate) {
+          return console.log(errorMoveImageTemplate)
+        }
+      }
+
+      for (const data of categories) {
+        const id = template.categories.filter((c) => c.type === data.type)[0].id
+        for (const option of data.options) {
+          if (!option.file) return
+
+          if (!option?.id) {
+            const { error: errorOptions } = await supabase.from('options').insert({
+              id: uuidv4(),
+              template_options_id: id,
+              name: option.name,
+              image_path: option.image_path
+            })
+            if (errorOptions) {
+              return console.log(errorOptions)
+            }
+
+            const { error: errorUploadOption } = await supabase.storage
+              .from('template_options')
+              .upload(option.image_path, option.file, {
+                cacheControl: '3600',
+                upsert: false
+              })
+            if (errorUploadOption) {
+              return console.log(errorUploadOption)
+            }
+          }
+        }
+      }
 
       toast.success('Updated template successfully')
     }
@@ -142,6 +214,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
   }
 
   const handleClose = () => {
+    setName(initialName)
     setSelectedImage(null)
     setFile(null)
     formData.reset()
@@ -163,7 +236,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
               {name}
               <div
                 className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 cursor-pointer p-2 hover:bg-gray-200 hover:rounded-full transition-all duration-300 select-none"
-                onClick={() => setIsEditName(true)}
+                onClick={handleClickEditName}
               >
                 <GoPencil className="w-5 h-5" />
               </div>
@@ -182,7 +255,10 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
                 }
               )}
               onChange={(e) => setName(e.target.value)}
-              onBlur={() => setIsEditName(false)}
+              onBlur={() => {
+                setIsEditName(false)
+                !name && setName(initialName)
+              }}
             />
           </div>
           <div className="flex flex-col gap-y-2">
@@ -190,7 +266,7 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
               <img
                 className="w-full h-full rounded-md shadow-sm object-cover border-none cursor-pointer fill-slate-500"
                 src={selectedImage || '/assets/images/no-image.png'}
-                alt=""
+                alt={name}
               />
               <div
                 className={clsx(
@@ -222,10 +298,10 @@ const TemplateModal: React.FC<TemplateModalProps> = () => {
                   : 'No date'}
               </p>
             </div>
-            <div className="w-full h-full">
+            <div className="w-full">
               <TabHead />
             </div>
-            <div className="relative right-0 bottom-0 flex items-center justify-end gap-x-3">
+            <div className="absolute right-[16px] bottom-[16px] flex items-center justify-end gap-x-3">
               <button
                 disabled={isLoading}
                 className={clsx(

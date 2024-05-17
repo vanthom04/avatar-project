@@ -8,7 +8,7 @@ export const routes = {
   updatePassword: '/update-password',
   notFound: '/404',
   managerMyAvatars: '/manager-my-avatars',
-  customAvatar: '/custom-avatar',
+  customAvatar: '/custom-avatar/:mode/:templateId/:id?',
   templates: '/templates',
   managerTemplates: '/manager-templates'
 }
