@@ -73,6 +73,7 @@ const TemplateModal: React.FC = () => {
 
   const handleSaveTemplate = async () => {
     if (templateModal.mode === 'create') {
+      // Todo: handle create new template
       if (!name || !file || !formData.data) return toast.error('No data!')
       setIsLoading(true)
 
@@ -85,6 +86,8 @@ const TemplateModal: React.FC = () => {
         image_path: imagePath
       })
       if (errorTemplate) {
+        setIsLoading(false)
+        toast.error(errorTemplate.message)
         return console.log(errorTemplate)
       }
 
@@ -95,18 +98,22 @@ const TemplateModal: React.FC = () => {
           upsert: false
         })
       if (errorUpload) {
+        setIsLoading(false)
+        toast.error(errorUpload.message)
         return console.log(errorUpload)
       }
 
       for (const data of formData.data) {
         const templateOptionsId = uuidv4()
-        const { error: errorTemplateOptions } = await supabase.from('template_options').insert({
+        const { error: errorTemplateOptions } = await supabase.from('categories').insert({
           id: templateOptionsId,
           template_id: templateId,
           name: data.name,
           type: data.type
         })
         if (errorTemplateOptions) {
+          setIsLoading(false)
+          toast.error(errorTemplateOptions.message)
           return console.log(errorTemplateOptions)
         }
 
@@ -120,6 +127,8 @@ const TemplateModal: React.FC = () => {
             image_path: option.image_path
           })
           if (errorOptions) {
+            setIsLoading(false)
+            toast.error(errorOptions.message)
             return console.log(errorOptions)
           }
 
@@ -130,6 +139,8 @@ const TemplateModal: React.FC = () => {
               upsert: false
             })
           if (errorUploadOption) {
+            setIsLoading(false)
+            toast.error(errorUploadOption.message)
             return console.log(errorUploadOption)
           }
         }
@@ -155,6 +166,8 @@ const TemplateModal: React.FC = () => {
         })
         .eq('id', template.id)
       if (errorUpdateTemplate) {
+        setIsLoading(false)
+        toast.error(errorUpdateTemplate.message)
         return console.log(errorUpdateTemplate)
       }
 
@@ -166,6 +179,8 @@ const TemplateModal: React.FC = () => {
             upsert: true
           })
         if (errorUploadTemplate) {
+          setIsLoading(false)
+          toast.error(errorUploadTemplate.message)
           return console.log(errorUploadTemplate)
         }
         await supabase.storage.from('templates').remove([template.image_path])
@@ -174,6 +189,8 @@ const TemplateModal: React.FC = () => {
           .from('templates')
           .move(template.image_path, imagePath)
         if (errorMoveImageTemplate) {
+          setIsLoading(false)
+          toast.error(errorMoveImageTemplate.message)
           return console.log(errorMoveImageTemplate)
         }
       }
@@ -191,6 +208,8 @@ const TemplateModal: React.FC = () => {
               image_path: option.image_path
             })
             if (errorOptions) {
+              setIsLoading(false)
+              toast.error(errorOptions.message)
               return console.log(errorOptions)
             }
 
@@ -201,6 +220,8 @@ const TemplateModal: React.FC = () => {
                 upsert: false
               })
             if (errorUploadOption) {
+              setIsLoading(false)
+              toast.error(errorUploadOption.message)
               return console.log(errorUploadOption)
             }
           }
@@ -250,9 +271,7 @@ const TemplateModal: React.FC = () => {
               autoComplete="off"
               className={clsx(
                 'absolute left-0 top-0 outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
-                {
-                  '!block': isEditName
-                }
+                { '!block': isEditName }
               )}
               onChange={(e) => setName(e.target.value)}
               onBlur={() => {
@@ -271,9 +290,7 @@ const TemplateModal: React.FC = () => {
               <div
                 className={clsx(
                   'absolute top-0 left-0 right-0 bottom-0 bg-gray-900 bg-opacity-35 items-center justify-center hidden group-hover:flex',
-                  {
-                    'cursor-not-allowed': isLoading
-                  }
+                  { 'cursor-not-allowed': isLoading }
                 )}
                 onClick={handleSelectImage}
               >
@@ -329,9 +346,7 @@ const TemplateModal: React.FC = () => {
               disabled={isLoading}
               className={clsx(
                 'p-1.5 text-neutral-900 absolute top-[16px] right-[16px] inline-flex appearance-none items-center justify-center rounded-full focus:outline-none hover:bg-neutral-300 transition-colors duration-300',
-                {
-                  'cursor-not-allowed hover:bg-transparent': isLoading
-                }
+                { 'cursor-not-allowed hover:bg-transparent': isLoading }
               )}
               onClick={handleClose}
             >
