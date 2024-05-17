@@ -1,6 +1,10 @@
 import { IconType } from 'react-icons'
+import { TbReport } from 'react-icons/tb'
 import { HiOutlineHome } from 'react-icons/hi'
+import { LuLayoutTemplate } from 'react-icons/lu'
+import { RxPerson } from 'react-icons/rx'
 
+import config from '~/config'
 import NavbarItem from './common/NavbarItem'
 
 export interface MenuItemType {
@@ -13,33 +17,27 @@ export interface MenuItemType {
 const MENU_ITEMS: MenuItemType[] = [
   {
     id: 1,
-    to: '/menu-item-1',
-    title: 'Menu item #1',
+    to: config.routes.home,
+    title: 'Home',
     icon: HiOutlineHome
   },
   {
     id: 2,
-    to: '/menu-item-2',
-    title: 'Menu item #2',
-    icon: HiOutlineHome
+    to: config.routes.managerMyAvatars,
+    title: 'My Avatar',
+    icon: RxPerson
   },
   {
     id: 3,
-    to: '/menu-item-3',
-    title: 'Menu item #3',
-    icon: HiOutlineHome
+    to: config.routes.templates,
+    title: 'Templates',
+    icon: LuLayoutTemplate
   },
   {
     id: 4,
-    to: '/menu-item-4',
-    title: 'Menu item #4',
-    icon: HiOutlineHome
-  },
-  {
-    id: 5,
-    to: '/menu-item-5',
-    title: 'Menu item #5',
-    icon: HiOutlineHome
+    to: config.routes.managerTemplates,
+    title: 'Manager templates',
+    icon: TbReport
   }
 ]
 

@@ -3,55 +3,129 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      avatar: {
+      categories: {
         Row: {
           created_at: string
-          id: number
-          image: string | null
+          id: string
           name: string | null
-          options: Json | null
-          updated_at: string | null
+          template_id: string | null
+          type: string | null
         }
         Insert: {
           created_at?: string
-          id?: number
-          image?: string | null
+          id?: string
           name?: string | null
-          options?: Json | null
-          updated_at?: string | null
+          template_id?: string | null
+          type?: string | null
         }
         Update: {
           created_at?: string
-          id?: number
-          image?: string | null
+          id?: string
           name?: string | null
-          options?: Json | null
+          template_id?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'template_options_template_id_fkey'
+            columns: ['template_id']
+            isOneToOne: false
+            referencedRelation: 'templates'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      my_avatar_options: {
+        Row: {
+          accessory: string | null
+          background: string | null
+          color: string | null
+          created_at: string
+          eyes: string | null
+          hair: string | null
+          hand: string | null
+          id: number
+          mouth: string | null
+          my_avatar_id: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          accessory?: string | null
+          background?: string | null
+          color?: string | null
+          created_at?: string
+          eyes?: string | null
+          hair?: string | null
+          hand?: string | null
+          id?: number
+          mouth?: string | null
+          my_avatar_id?: number | null
           updated_at?: string | null
         }
-        Relationships: []
+        Update: {
+          accessory?: string | null
+          background?: string | null
+          color?: string | null
+          created_at?: string
+          eyes?: string | null
+          hair?: string | null
+          hand?: string | null
+          id?: number
+          mouth?: string | null
+          my_avatar_id?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'my_avatar_options_my_avatar_id_fkey'
+            columns: ['my_avatar_id']
+            isOneToOne: false
+            referencedRelation: 'my_avatars'
+            referencedColumns: ['id']
+          }
+        ]
       }
-      my_todo: {
+      my_avatars: {
         Row: {
           created_at: string
           id: number
-          task: string | null
+          image_path: string | null
+          name: string | null
+          options: Json | null
+          template_id: string | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: number
-          task?: string | null
+          image_path?: string | null
+          name?: string | null
+          options?: Json | null
+          template_id?: string | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: number
-          task?: string | null
+          image_path?: string | null
+          name?: string | null
+          options?: Json | null
+          template_id?: string | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'public_my_todo_user_id_fkey'
+            foreignKeyName: 'my_avatars_template_id_fkey'
+            columns: ['template_id']
+            isOneToOne: false
+            referencedRelation: 'templates'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'my_avatars_user_id_fkey'
             columns: ['user_id']
             isOneToOne: false
             referencedRelation: 'users'
@@ -59,64 +133,109 @@ export type Database = {
           }
         ]
       }
-      posts: {
-        Row: {
-          body: string | null
-          created_at: string
-          id: number
-          title: string | null
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string
-          id?: number
-          title?: string | null
-        }
-        Update: {
-          body?: string | null
-          created_at?: string
-          id?: number
-          title?: string | null
-        }
-        Relationships: []
-      }
-      template: {
+      options: {
         Row: {
           created_at: string
-          id: number
+          id: string
+          image_path: string | null
+          name: string | null
+          template_options_id: string | null
         }
         Insert: {
           created_at?: string
+          id?: string
+          image_path?: string | null
+          name?: string | null
+          template_options_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          name?: string | null
+          template_options_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'options_template_options_id_fkey'
+            columns: ['template_options_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string
+          id: number
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
           id?: number
+          name?: string | null
         }
         Update: {
           created_at?: string
           id?: number
+          name?: string | null
         }
         Relationships: []
       }
-      todo_list: {
+      templates: {
+        Row: {
+          created_at: string
+          id: string
+          image_path: string | null
+          name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
         Row: {
           created_at: string
           id: number
-          task: string | null
+          role_id: number | null
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: number
-          task?: string | null
+          role_id?: number | null
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: number
-          task?: string | null
+          role_id?: number | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'public_todo_list_user_id_fkey'
+            foreignKeyName: 'user_roles_role_id_fkey'
+            columns: ['role_id']
+            isOneToOne: false
+            referencedRelation: 'roles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_roles_user_id_fkey'
             columns: ['user_id']
             isOneToOne: false
             referencedRelation: 'users'
@@ -126,7 +245,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_roles_view: {
+        Row: {
+          email: string | null
+          roles: string[] | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_roles_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

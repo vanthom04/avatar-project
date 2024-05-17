@@ -1,16 +1,20 @@
+import { Fragment } from 'react/jsx-runtime'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 
 import config from '~/config'
 import Layout from '~/layouts'
 
 import HomePage from '~/pages/Home'
+import SignUpPage from '~/pages/SignUp'
 import SignInPage from '~/pages/SignIn'
 import ProfilePage from '~/pages/Profile'
-import SignUpPage from '~/pages/SignUp'
 import NotFoundPage from '~/pages/NotFound'
-import Template from '~/pages/Template'
-import ManagerMyAvatars from '~/pages/ManagerMyAvatars'
-import CustomAvatar from '~/pages/CustomAvatar'
+import TemplatesPage from '~/pages/Templates'
+import CustomAvatarPage from '~/pages/CustomAvatar'
+import UpdatePasswordPage from '~/pages/UpdatePassword'
+import RecoverPasswordPage from '~/pages/RecoverPassword'
+import ManagerMyAvatarsPage from '~/pages/ManagerMyAvatars'
+import ManagerTemplatesPage from '~/pages/ManagerTemplates'
 
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
@@ -21,7 +25,8 @@ const router = createBrowserRouter([
     element: <PublicRoute />,
     children: [
       { path: config.routes.signIn, element: <SignInPage /> },
-      { path: config.routes.signUp, element: <SignUpPage /> }
+      { path: config.routes.signUp, element: <SignUpPage /> },
+      { path: config.routes.recoverPassword, element: <RecoverPasswordPage /> }
     ]
   },
   {
@@ -30,9 +35,16 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
-      { path: config.routes.template, element: <Template /> },
-      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatars /> },
-      { path: config.routes.customAvatar, element: <CustomAvatar /> }
+      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatarsPage /> },
+      { path: config.routes.templates, element: <TemplatesPage /> },
+      { path: config.routes.managerTemplates, element: <ManagerTemplatesPage /> }
+    ]
+  },
+  {
+    element: <PrivateRoute element={Fragment} />,
+    children: [
+      { path: config.routes.updatePassword, element: <UpdatePasswordPage /> },
+      { path: config.routes.customAvatar, element: <CustomAvatarPage /> }
     ]
   },
   {

@@ -1,20 +1,20 @@
-import { FieldValues, useForm } from 'react-hook-form'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CiMail, CiUser } from 'react-icons/ci'
-import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
-import { supabase } from '~/config/supabase'
-import { IoEyeOutline } from 'react-icons/io5'
 import { Link } from 'react-router-dom'
-import Spinner from '~/components/Spinner'
+import { FieldValues, useForm } from 'react-hook-form'
+import { CiMail, CiUser } from 'react-icons/ci'
+import { IoEyeOutline } from 'react-icons/io5'
+import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
+
 import { useRouter } from '~/hooks'
-import config from '~/config'
+import config, { supabase } from '~/config'
+import Spinner from '~/components/Spinner'
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const navigate = useRouter()
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -36,11 +36,12 @@ function SignUpPage() {
       if (error) throw error
 
       if (data.user) {
-        toast.success('SignUp successfully')
-        navigate.push(config.routes.signIn)
+        toast.success('Sign up successfully')
+        router.push(config.routes.signIn)
       }
     } catch (error) {
       console.error(error)
+      toast.error((error as Error).message)
     } finally {
       setLoading(false)
     }
@@ -65,10 +66,11 @@ function SignUpPage() {
               <CiUser color="gray" size={20} />
             </div>
             <input
+              autoComplete="off"
               disabled={loading}
               placeholder="Enter your full name"
               type="text"
-              className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight rounded-lg outline-none"
+              className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('fullName', { required: true })}
             />
           </div>
@@ -83,10 +85,11 @@ function SignUpPage() {
               <CiMail color="gray" size={20} />
             </div>
             <input
+              autoComplete="off"
               disabled={loading}
               placeholder="Enter your email "
               type="text"
-              className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight rounded-lg outline-none"
+              className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('email', { required: true })}
             />
           </div>
@@ -99,10 +102,11 @@ function SignUpPage() {
               <IoKeyOutline color="gray" size={20} />
             </div>
             <input
+              autoComplete="off"
               disabled={loading}
               placeholder="Enter your password"
               type={showPassword ? 'text' : 'password'}
-              className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight rounded-lg outline-none"
+              className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('password', { required: true })}
             />
             <div className="pr-2" onClick={togglePassword}>
@@ -118,7 +122,7 @@ function SignUpPage() {
           )}
         </div>
         <button className="py-2 px-4 mb-2 w-full text-center bg-[#0e64f1] text-white rounded-lg justify-center flex">
-          {loading ? <Spinner /> : 'Sign up'}
+          {loading ? <Spinner className="w-5 h-5" /> : 'Sign up'}
         </button>
         <p className="text-center text-sm">
           Already have an account?
@@ -130,5 +134,4 @@ function SignUpPage() {
     </div>
   )
 }
-
 export default SignUpPage
