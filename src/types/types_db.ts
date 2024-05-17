@@ -91,6 +91,7 @@ export type Database = {
           id: number
           image_path: string | null
           name: string | null
+          options: Json | null
           template_id: string | null
           updated_at: string | null
           user_id: string | null
@@ -100,6 +101,7 @@ export type Database = {
           id?: number
           image_path?: string | null
           name?: string | null
+          options?: Json | null
           template_id?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -109,6 +111,7 @@ export type Database = {
           id?: number
           image_path?: string | null
           name?: string | null
+          options?: Json | null
           template_id?: string | null
           updated_at?: string | null
           user_id?: string | null

@@ -224,7 +224,11 @@ function CustomAvatar() {
         user_id: user?.id,
         template_id: template.id,
         image_path: imagePath,
-        options
+        options: options.map((option) => ({
+          id: option.id ?? null,
+          type: option.type,
+          value: option.value
+        }))
       })
       if (errorSaveAvatar) {
         return console.log(errorSaveAvatar)
@@ -262,7 +266,11 @@ function CustomAvatar() {
           user_id: user?.id,
           template_id: template.id,
           image_path: imagePath,
-          options
+          options: options.map((option) => ({
+            id: option.id ?? null,
+            type: option.type,
+            value: option.value
+          }))
         })
         .eq('id', params.id ?? '')
       if (errorSaveAvatar) {

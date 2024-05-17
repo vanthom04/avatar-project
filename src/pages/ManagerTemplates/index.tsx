@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast'
 import { FaPlus } from 'react-icons/fa6'
 
 import { useTemplateModal, useUser } from '~/hooks'
@@ -7,7 +8,6 @@ import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
 import { Template } from '~/queries/useQueryTemplates/fetch'
 import { getRole } from '~/utils'
-import toast from 'react-hot-toast'
 
 function ManagerTemplatesPage() {
   const { user } = useUser()

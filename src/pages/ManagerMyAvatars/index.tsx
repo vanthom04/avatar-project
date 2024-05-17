@@ -1,11 +1,11 @@
+import { FaPlus } from 'react-icons/fa6'
 import config from '~/config'
+import { MyAvatar } from '~/types'
 import { useRouter } from '~/hooks'
 import { useQueryMyAvatars } from '~/queries'
-import AvatarTableRow from './AvatarTableRow'
 import Spinner from '~/components/Spinner'
+import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
-import { MyAvatar } from '~/types'
-import { FaPlus } from 'react-icons/fa6'
 
 function ManagerMyAvatars() {
   const router = useRouter()

@@ -1,3 +1,5 @@
+import { Json } from './types_db'
+
 export interface AvatarOption {
   hair: string
   eyes: string
@@ -15,7 +17,7 @@ export interface MyAvatar {
   name: string
   image_path: string
   thumbnail: string
-  options: AvatarOption
+  options: Json
   created_at: Date | string
   updated_at: Date | string
 }
