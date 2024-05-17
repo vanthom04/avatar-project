@@ -1,20 +1,32 @@
-import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { supabase } from '~/config'
+import clsx from 'clsx'
 
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+import { months } from '~/utils'
+import { useRouter } from '~/hooks'
+import { supabase } from '~/config'
 
 interface AvatarTableRowProps {
   id: number | string
+  template_id: string
   name: string
+  image_path: string
   thumbnail: string
   created_at: Date | string
 }
 
-function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps) {
+function AvatarTableRow({
+  id,
+  template_id,
+  name,
+  image_path,
+  thumbnail,
+  created_at
+}: AvatarTableRowProps) {
   const [isPreview, setIsPreview] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
+
+  const router = useRouter()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -29,13 +41,29 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
     }
   }, [])
 
-  const handleDelete = async () => {
-    const { error } = await supabase.from('my_avatars').delete().eq('id', id)
-    if (error) {
-      toast.error('Delete avatar failed!')
+  const handleDeleteMyAvatar = async () => {
+    const { error: errorDeleteOptionsMyAvatar } = await supabase
+      .from('my_avatar_options')
+      .delete()
+      .eq('my_avatar_id', id)
+    if (errorDeleteOptionsMyAvatar) {
+      toast.error(errorDeleteOptionsMyAvatar.message)
+      return console.log(errorDeleteOptionsMyAvatar)
+    }
+    const { error: errorDeleteMyAvatar } = await supabase.from('my_avatars').delete().eq('id', id)
+    if (errorDeleteMyAvatar) {
+      toast.error(errorDeleteMyAvatar.message)
+      return console.log(errorDeleteMyAvatar)
+    }
+    const { error: errorRemoveImageAvatar } = await supabase.storage
+      .from('my_avatars')
+      .remove([image_path])
+    if (errorRemoveImageAvatar) {
+      return console.log(errorRemoveImageAvatar)
     }
 
-    toast.success('Delete avatar successfully!')
+    toast.success('Avatar deleted successfully')
+    setIsDelete(false)
   }
 
   return (
@@ -74,7 +102,12 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
         ${new Date(created_at).getFullYear()}`}
       </td>
       <td className="px-6 py-4">
-        <button className="font-medium text-blue-600 hover:underline">Edit</button>
+        <button
+          className="font-medium text-blue-600 hover:underline"
+          onClick={() => router.push(`/custom-avatar/edit/${template_id}/${id}`)}
+        >
+          Edit
+        </button>
         <span className="px-1">/</span>
         <button
           className="font-medium text-red-600 hover:underline"
@@ -84,12 +117,17 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
         </button>
 
         <div
-          id="popup-modal"
+          className={clsx(
+            'fixed top-0 left-0 right-0 bottom-0 bg-neutral-800/45 backdrop-blur-sm hidden',
+            { '!block': isDelete }
+          )}
+        ></div>
+        <div
           className={clsx(
             'overflow-y-auto overflow-x-hidden fixed top-0 left-1/2 -translate-x-1/2 z-50 transition-transform duration-500',
             {
               'translate-y-0 opacity-100': isDelete,
-              '!-translate-y-56 duration-500': !isDelete
+              '-translate-y-96 md:-translate-y-64 duration-500': !isDelete
             }
           )}
         >
@@ -137,10 +175,7 @@ function AvatarTableRow({ id, name, thumbnail, created_at }: AvatarTableRowProps
                 <button
                   type="button"
                   className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-                  onClick={() => {
-                    handleDelete()
-                    setIsDelete(false)
-                  }}
+                  onClick={handleDeleteMyAvatar}
                 >
                   Yes, I'm sure
                 </button>

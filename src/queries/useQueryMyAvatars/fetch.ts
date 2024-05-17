@@ -51,8 +51,9 @@ export const fetchMyAvatars = async (): Promise<MyAvatar[]> => {
       user_id: avatar.user_id ?? '',
       template_id: avatar.template_id ?? '',
       name: avatar.name ?? '',
+      image_path: avatar.image_path ?? '',
       thumbnail: getImageUrl('my_avatars', avatar.image_path ?? ''),
-      options,
+      options: avatar.options,
       created_at: avatar.created_at ?? '',
       updated_at: avatar.updated_at ?? ''
     })

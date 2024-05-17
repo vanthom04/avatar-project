@@ -1,7 +1,7 @@
 import { supabase } from '~/config'
 import { getImageUrl } from '~/utils'
 
-interface Option {
+export interface Option {
   id: string | null
   template_options_id: string | null
   name: string | null
@@ -9,7 +9,7 @@ interface Option {
   image_url: string | null
 }
 
-interface Category {
+export interface Category {
   id: string | null
   template_id: string | null
   type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'
@@ -66,7 +66,7 @@ const getOptions = async (id: string): Promise<Option[]> => {
 
 const getTemplateOptions = async (id: string): Promise<Category[]> => {
   const { data: dataCategories, error: errorCategories } = await supabase
-    .from('template_options')
+    .from('categories')
     .select('*')
     .eq('template_id', id)
   if (errorCategories) {

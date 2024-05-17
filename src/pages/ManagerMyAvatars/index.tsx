@@ -3,21 +3,24 @@ import { useRouter } from '~/hooks'
 import { useQueryMyAvatars } from '~/queries'
 import AvatarTableRow from './AvatarTableRow'
 import Spinner from '~/components/Spinner'
+import AvatarTableEmpty from './AvatarTableEmpty'
+import { MyAvatar } from '~/types'
+import { FaPlus } from 'react-icons/fa6'
 
 function ManagerMyAvatars() {
   const router = useRouter()
-  const { data, isLoading } = useQueryMyAvatars()
+  const { data: myAvatars, isLoading } = useQueryMyAvatars()
 
   return (
-    <div className="p-4">
+    <div className="select-none">
       <div className="flex justify-end mb-4">
         <button
           onClick={() => router.push(config.routes.customAvatar)}
           type="button"
-          className="flex justify-center items-center cursor-pointer text-white bg-[#138e1b] hover:bg-green-800 rounded-md px-3.5 py-1"
+          className="bg-[#138e1b] hover:bg-green-800 flex items-center justify-center text-white px-2.5 py-2 lg:px-3 lg:py-2.5 rounded-md active:scale-95 transition-all duration-300"
         >
-          <span className="mr-2 text-[25px] text-center font-light">+</span>
-          <span className="uppercase text-sm">new avatar</span>
+          <FaPlus className="w-[16px] h-[16px] lg:w-[18px] lg:h-[18px] mr-1" />
+          <span>New avatar</span>
         </button>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg  bg-gray-300">
@@ -48,16 +51,20 @@ function ManagerMyAvatars() {
                   <Spinner className="mx-auto text-white" />
                 </th>
               </tr>
-            ) : (
-              data?.map((data) => (
+            ) : (myAvatars as MyAvatar[]).length > 0 ? (
+              myAvatars?.map((avatar) => (
                 <AvatarTableRow
-                  key={data.id}
-                  id={data.id}
-                  name={data.name}
-                  thumbnail={data.thumbnail}
-                  created_at={data.created_at}
+                  key={avatar.id}
+                  id={avatar.id}
+                  template_id={avatar.template_id}
+                  name={avatar.name}
+                  image_path={avatar.image_path}
+                  thumbnail={avatar.thumbnail}
+                  created_at={avatar.created_at}
                 />
               ))
+            ) : (
+              <AvatarTableEmpty />
             )}
           </tbody>
         </table>

@@ -13,6 +13,7 @@ export interface MyAvatar {
   user_id: number | string
   template_id: string
   name: string
+  image_path: string
   thumbnail: string
   options: AvatarOption
   created_at: Date | string

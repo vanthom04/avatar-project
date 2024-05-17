@@ -3,6 +3,8 @@ import CategoryOptions from './CategoryOptions'
 import { FunctionComponent, useState } from 'react'
 import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
 import clsx from 'clsx'
+import { Template } from '~/queries/useQueryTemplates/fetch'
+import { OptionType } from '.'
 
 interface AvatarOptionType {
   id: string
@@ -39,10 +41,16 @@ export const AVATAR_OPTIONS: AvatarOptionType[] = [
 ]
 
 interface LayoutCategoryProps {
-  onSelect: (id: string, value: string) => void
+  template: Template
+  options: OptionType[]
+  onSelect: (
+    id: string,
+    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
+    value: string
+  ) => void
 }
 
-function LayoutCategories({ onSelect }: LayoutCategoryProps) {
+function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) {
   const [tab, setTab] = useState<string>('hair')
 
   return (
@@ -66,7 +74,7 @@ function LayoutCategories({ onSelect }: LayoutCategoryProps) {
         ))}
       </div>
       <div className="w-[calc(100%-90px)] h-full p-4">
-        <CategoryOptions tab={tab} onSelect={onSelect} />
+        <CategoryOptions tab={tab} template={template} options={options} onSelect={onSelect} />
       </div>
     </div>
   )

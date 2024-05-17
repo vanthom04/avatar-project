@@ -20,7 +20,7 @@ function TemplatesPage() {
             <TemplateItem
               key={template.id}
               data={template}
-              onClick={(id) => router.push(id.toString())}
+              onClick={(id) => router.push('/custom-avatar/create/' + id)}
             />
           ))}
         </div>
