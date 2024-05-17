@@ -8,7 +8,7 @@ import SignInPage from '~/pages/SignIn'
 import ProfilePage from '~/pages/Profile'
 import SignUpPage from '~/pages/SignUp'
 import NotFoundPage from '~/pages/NotFound'
-import Template from '~/pages/Template'
+import Template from '~/pages/Templates'
 
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
-      { path: config.routes.template, element: <Template /> }
+      { path: config.routes.templates, element: <Template /> }
     ]
   },
   {
