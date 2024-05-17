@@ -66,7 +66,7 @@ const getOptions = async (id: string): Promise<Option[]> => {
 
 const getTemplateOptions = async (id: string): Promise<Category[]> => {
   const { data: dataCategories, error: errorCategories } = await supabase
-    .from('template_options')
+    .from('categories')
     .select('*')
     .eq('template_id', id)
   if (errorCategories) {

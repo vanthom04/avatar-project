@@ -37,4 +37,9 @@ yarn-error.log*
 
 # lock
 yarn.lock
+pnpm-lock.yaml
 package-lock.json
+
+avatar-project.sql
+table_policies.sql
+storage_policies.sql
