@@ -7,6 +7,7 @@ import { getRole } from '~/utils'
 function ProfilePage() {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
+  const [phone, setPhone] = useState<string>('')
   const [role, setRole] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<string>('')
 
@@ -26,6 +27,7 @@ function ProfilePage() {
     if (userDetails) {
       setName(userDetails.full_name)
       setEmail(userDetails.email)
+      setPhone(user?.phone ?? '')
       setSelectedImage(userDetails.avatar_url)
       fetchData()
     }
@@ -48,14 +50,19 @@ function ProfilePage() {
     }
   }
 
+  const handleErrorImage = () => {
+    setSelectedImage('/assets/images/no-avatar.jpg')
+  }
+
   return (
     <div className="w-full h-full flex flex-row">
       <div className="basis-2/5 flex flex-col items-center justify-center">
         <div className="mb-6 w-[180px] h-[180px] rounded-full relative cursor-pointer overflow-hidden border-[4px] border-[#f0eeff] select-none group">
           <img
             className="w-full h-full object-cover"
-            src={selectedImage || '/avatar-customize.png'}
+            src={selectedImage || '/assets/images/no-avatar.jpg'}
             alt={name}
+            onError={handleErrorImage}
           />
           <div
             className="absolute top-0 left-0 right-0 bottom-0 bg-gray-700 bg-opacity-40 hidden items-center justify-center group-hover:flex"
@@ -97,7 +104,7 @@ function ProfilePage() {
               Phone
             </label>
             <span className="mx-20">:</span>
-            <p className="basis-1/2">+84 373927206</p>
+            <p className="basis-1/2">{phone || 'No phone'}</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
             <label htmlFor="" className="basis-1/2">
