@@ -12,7 +12,7 @@ import { getRole } from '~/utils'
 function ManagerTemplatesPage() {
   const { user } = useUser()
   const templateModal = useTemplateModal()
-  const { data: templates, isLoading } = useQueryTemplates()
+  const { data: templates, isLoading, refetch } = useQueryTemplates()
 
   const handleCreateNewTemplate = async () => {
     const role = await getRole(user?.id ?? '')
@@ -76,7 +76,7 @@ function ManagerTemplatesPage() {
               </tr>
             ) : (templates as Template[]).length > 0 ? (
               templates?.map((template) => (
-                <TemplateTableRow key={template.id} template={template} />
+                <TemplateTableRow key={template.id} template={template} onRefetch={refetch} />
               ))
             ) : (
               <TemplateTableEmptyRow />

@@ -71,6 +71,15 @@ const TemplateModal: React.FC = () => {
     }
   }
 
+  const handleClose = () => {
+    setName(initialName)
+    setSelectedImage(null)
+    setFile(null)
+    formData.reset()
+    templateModal.setTemplate(null)
+    templateModal.onClose()
+  }
+
   const handleSaveTemplate = async () => {
     if (templateModal.mode === 'create') {
       // Todo: handle create new template
@@ -232,15 +241,7 @@ const TemplateModal: React.FC = () => {
     }
 
     setIsLoading(false)
-  }
-
-  const handleClose = () => {
-    setName(initialName)
-    setSelectedImage(null)
-    setFile(null)
-    formData.reset()
-    templateModal.setTemplate(null)
-    templateModal.onClose()
+    handleClose()
   }
 
   return (
@@ -334,7 +335,12 @@ const TemplateModal: React.FC = () => {
               </button>
               <button
                 disabled={isLoading}
-                className="px-4 py-2 min-w-20 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-lg text-white active:scale-95 transition-all duration-300"
+                className={clsx(
+                  'px-4 py-2 min-w-20 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-lg text-white active:scale-95 transition-all duration-300',
+                  {
+                    'cursor-not-allowed hover:!bg-blue-500': isLoading
+                  }
+                )}
                 onClick={handleSaveTemplate}
               >
                 {isLoading ? <PiSpinner className="w-6 h-6 animate-spin" /> : <span>Save</span>}

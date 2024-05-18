@@ -1,4 +1,6 @@
 import { useId, useEffect, useState } from 'react'
+import { RefetchOptions } from '@tanstack/react-query'
+import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
@@ -9,9 +11,11 @@ import { supabase } from '~/config'
 
 interface TemplateTableRowProps {
   template: Template
+  onRefetch?: (options?: RefetchOptions | undefined) => void
 }
 
-function TemplateTableRow({ template }: TemplateTableRowProps) {
+function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
   const [isPreview, setIsPreview] = useState<boolean>(false)
 
@@ -51,6 +55,7 @@ function TemplateTableRow({ template }: TemplateTableRowProps) {
   }
 
   const handleDeleteTemplate = async () => {
+    setIsLoading(true)
     for (const category of template.categories) {
       for (const option of category.options) {
         // handle delete option in table options
@@ -101,6 +106,8 @@ function TemplateTableRow({ template }: TemplateTableRowProps) {
 
     toast.success('Delete template successfully')
     setIsDelete(false)
+    setIsLoading(false)
+    onRefetch?.()
   }
 
   return (
@@ -183,7 +190,13 @@ function TemplateTableRow({ template }: TemplateTableRowProps) {
             <div className="relative bg-white rounded-lg shadow">
               <button
                 type="button"
-                className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                disabled={isLoading}
+                className={clsx(
+                  'absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center',
+                  {
+                    'cursor-not-allowed': isLoading
+                  }
+                )}
                 onClick={() => setIsDelete(false)}
               >
                 <svg
@@ -220,20 +233,38 @@ function TemplateTableRow({ template }: TemplateTableRowProps) {
                 <h3 className="mb-5 text-lg font-normal text-gray-500">
                   Are you sure you want to delete "{template.name}"?
                 </h3>
-                <button
-                  type="button"
-                  className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-                  onClick={handleDeleteTemplate}
-                >
-                  Yes, I'm sure
-                </button>
-                <button
-                  type="button"
-                  className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
-                  onClick={() => setIsDelete(false)}
-                >
-                  No, cancel
-                </button>
+                <div className="w-full flex items-center justify-center">
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    className={clsx(
+                      'min-w-24 h-10 text-white bg-red-600 hover:bg-red-700 font-normal rounded-lg text-sm flex items-center justify-center',
+                      {
+                        'cursor-not-allowed hover:!bg-red-600': isLoading
+                      }
+                    )}
+                    onClick={handleDeleteTemplate}
+                  >
+                    {isLoading ? (
+                      <PiSpinner className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <span>Yes, I'm sure</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    className={clsx(
+                      'min-w-24 h-10 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700',
+                      {
+                        'cursor-not-allowed hover:text-gray-900 hover:bg-white': isLoading
+                      }
+                    )}
+                    onClick={() => setIsDelete(false)}
+                  >
+                    No, cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
