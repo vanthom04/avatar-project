@@ -79,7 +79,11 @@ function CustomAvatar() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (e.target instanceof Element && !e.target.closest('#button-menu-options')) {
+      if (
+        e.target instanceof Element &&
+        !e.target.closest('#button-menu-options') &&
+        !e.target.closest('#menu-options')
+      ) {
         setIsOpenOptions(false)
       }
 
@@ -377,6 +381,7 @@ function CustomAvatar() {
               <IoMdArrowDropdown size={24} />
             </button>
             <div
+              id="menu-options"
               className={clsx(
                 'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
                 { hidden: !isOpenOptions }
