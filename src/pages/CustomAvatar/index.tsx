@@ -17,6 +17,7 @@ import { Template } from '~/queries/useQueryTemplates/fetch'
 import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
 import LayoutCategories from './LayoutCategories'
 import { MyAvatar } from '~/types'
+import { PiSpinner } from 'react-icons/pi'
 
 const colors = [
   '#FF0000',
@@ -31,6 +32,19 @@ const colors = [
   '#FFFFFF'
 ]
 
+const bgColors = [
+  '#FF0000',
+  '#00FF00',
+  '#0000FF',
+  '#FFFF00',
+  '#FF00FF',
+  '#00FFFF',
+  '#000000',
+  '#808080',
+  '#C0C0C0',
+  '#fff'
+]
+
 export interface OptionType {
   id?: string
   type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand' | 'color' | 'background'
@@ -39,11 +53,12 @@ export interface OptionType {
 
 function CustomAvatar() {
   const [isEdit, setIsEdit] = useState(false)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isOpenOptions, setIsOpenOptions] = useState<boolean>(false)
   const [isOpenColor, setIsOpenColor] = useState<boolean>(false)
   const [isOpenBackgroundColor, setIsOpenBackgroundColor] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [color, setColor] = useState<string>('#000000')
-  const [bgColor, setBgColor] = useState<string>('#ffffff')
+  const [bgColor, setBgColor] = useState<string>('#fff')
   const [options, setOptions] = useState<OptionType[]>([])
   const [name, setName] = useState('Custom Avatar')
   const [template, setTemplate] = useState<Template>({} as Template)
@@ -61,6 +76,26 @@ function CustomAvatar() {
 
   const { data: myAvatars } = useQueryMyAvatars()
   const { data: templates } = useQueryTemplates()
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        e.target instanceof Element &&
+        (!e.target.closest('#button-user-menu') ||
+          !e.target.closest('#button-select-color') ||
+          !e.target.closest('#button-select-bg-color'))
+      ) {
+        setIsOpenOptions(false)
+        setIsOpenColor(false)
+        setIsOpenBackgroundColor(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     if (params.mode === 'edit') {
@@ -96,7 +131,6 @@ function CustomAvatar() {
         }
       ])
     }
-    console.log('re render')
   }, [params.mode, params.templateId, params.id, myAvatars, templates])
 
   useEffect(() => {
@@ -105,7 +139,7 @@ function CustomAvatar() {
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: 620,
       height: 620,
-      backgroundColor: options.filter((opt) => opt.type === 'background')[0]?.value || '#ffffff'
+      backgroundColor: options.filter((opt) => opt.type === 'background')[0]?.value || '#fff'
     })
     fabricCanvasRef.current = canvas
 
@@ -160,7 +194,7 @@ function CustomAvatar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedBgColor])
 
-  const handleOpen = () => setIsOpen(!isOpen)
+  const handleOpenOptions = () => setIsOpenOptions(!isOpenOptions)
   const handleOpenColor = () => setIsOpenColor(!isOpenColor)
   const handleOpenBackgroundColor = () => setIsOpenBackgroundColor(!isOpenBackgroundColor)
   const handleClickEdit = () => {
@@ -184,6 +218,13 @@ function CustomAvatar() {
       }
       setIsEdit(false)
     }
+  }
+
+  const handleBlurInput = () => {
+    if (!name) {
+      setName('Custom Avatar')
+    }
+    setIsEdit(false)
   }
 
   const handleDownload = () => {
@@ -241,7 +282,7 @@ function CustomAvatar() {
 
       const blob = await fetch(dataUrl).then((res) => res.blob())
       const file = new File([blob], 'canvas-image.png', { type: 'image/png' })
-      const { data: dataUploadAvatar, error: errorUploadAvatar } = await supabase.storage
+      const { error: errorUploadAvatar } = await supabase.storage
         .from('my_avatars')
         .upload(imagePath, file, {
           cacheControl: '3600',
@@ -250,9 +291,6 @@ function CustomAvatar() {
       if (errorUploadAvatar) {
         return console.log(errorSaveAvatar)
       }
-
-      console.log(dataUploadAvatar)
-      toast.success('Save avatar successfully')
     } else {
       // handle update avatar
       const uid = uuidv4()
@@ -301,9 +339,10 @@ function CustomAvatar() {
       if (errorUploadAvatar) {
         return console.log(errorSaveAvatar)
       }
-
-      toast.success('Save avatar successfully')
     }
+    toast.success('Save avatar successfully')
+    setIsLoading(false)
+    setIsOpenOptions(false)
   }
 
   return (
@@ -323,7 +362,7 @@ function CustomAvatar() {
               id="button-user-menu"
               className="flex flex-row justify-center items-center bg-blue-500 text-white py-2 px-3 rounded-md outline-none hover:bg-blue-700 active:scale-95 transition-transform duration-300"
               type="button"
-              onClick={handleOpen}
+              onClick={handleOpenOptions}
             >
               <span>Options</span>
               <IoMdArrowDropdown size={24} />
@@ -332,17 +371,27 @@ function CustomAvatar() {
               id="menu-options"
               className={clsx(
                 'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
-                { hidden: !isOpen }
+                { hidden: !isOpenOptions }
               )}
             >
               <ul className="py-2">
                 <li>
                   <button
+                    disabled={isLoading}
                     className="flex flex-row w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
-                    onClick={handleSaveAvatar}
+                    onClick={() => {
+                      setIsLoading(true)
+                      handleSaveAvatar()
+                    }}
                   >
-                    <BsCloudCheck size={22} />
-                    <span className="ml-2">Save</span>
+                    {isLoading ? (
+                      <PiSpinner className="w-6 h-6 animate-spin mx-auto" />
+                    ) : (
+                      <div className="flex flex-row justify-center">
+                        <BsCloudCheck size={22} />
+                        <span className="ml-2">Save</span>
+                      </div>
+                    )}
                   </button>
                 </li>
                 <li>
@@ -378,6 +427,7 @@ function CustomAvatar() {
             )}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleSaveNameAvatar}
+            onBlur={handleBlurInput}
           />
         </div>
       </div>
@@ -387,14 +437,11 @@ function CustomAvatar() {
 
         <div className="w-full basis-3/5 flex justify-center pl-4 flex-col items-center bg-[#ebecf0] relative">
           <div
+            id="button-select-color"
             className="absolute left-6 top-6 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
             onClick={handleOpenColor}
           >
-            <button
-              id="button-user-menu"
-              className="flex flex-row justify-center items-center"
-              type="button"
-            >
+            <button className="flex flex-row justify-center items-center" type="button">
               <span>
                 <VscSymbolColor size={24} />
               </span>
@@ -426,7 +473,14 @@ function CustomAvatar() {
                     <div
                       key={color}
                       style={{ backgroundColor: color }}
-                      className="flex flex-row w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
+                      className={clsx(
+                        'flex flex-row w-14 h-14 bg-clip-content border rounded-md bg-white border-gray-500 cursor-pointer',
+                        {
+                          'p-1 border-2 !border-blue-500':
+                            color &&
+                            options.find((opt) => opt.type === 'color' && opt.value === color)
+                        }
+                      )}
                       onClick={() => setColor(color)}
                     ></div>
                   ))}
@@ -435,6 +489,7 @@ function CustomAvatar() {
             </div>
           </div>
           <div
+            id="button-select-bg-color"
             className="absolute left-6 top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
             onClick={handleOpenBackgroundColor}
           >
@@ -470,12 +525,21 @@ function CustomAvatar() {
                   <h2 className="w-full text-left font-medium ml-2 mb-2">Màu sắc mặc định</h2>
                 </div>
                 <div className="grid grid-cols-4 w-[280px] gap-3">
-                  {colors.map((color) => (
+                  {bgColors.map((bgColor) => (
                     <button
-                      key={color}
-                      style={{ backgroundColor: color }}
-                      className="flex flex-row w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
-                      onClick={() => setBgColor(color)}
+                      key={bgColor}
+                      style={{ backgroundColor: bgColor }}
+                      className={clsx(
+                        'flex flex-row w-14 h-14 bg-clip-content border rounded-md bg-white border-gray-500 cursor-pointer',
+                        {
+                          'p-1 border-2 !border-blue-500':
+                            bgColor &&
+                            options.find(
+                              (opt) => opt.type === 'background' && opt.value === bgColor
+                            )
+                        }
+                      )}
+                      onClick={() => setBgColor(bgColor)}
                     ></button>
                   ))}
                 </div>

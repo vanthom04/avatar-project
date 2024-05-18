@@ -5,7 +5,7 @@ import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
 
 function ManagerMyAvatars() {
-  const { data: myAvatars, isLoading } = useQueryMyAvatars()
+  const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars()
 
   return (
     <div className="select-none">
@@ -47,6 +47,7 @@ function ManagerMyAvatars() {
                   image_path={avatar.image_path}
                   thumbnail={avatar.thumbnail}
                   created_at={avatar.created_at}
+                  onRefetch={refetch}
                 />
               ))
             ) : (
