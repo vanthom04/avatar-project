@@ -9,7 +9,6 @@ function TemplatesPage() {
 
   return (
     <div className="w-full h-full flex flex-col gap-y-4">
-      <h1 className="text-3xl font-normal">Templates</h1>
       {isLoading ? (
         <div className="w-full h-full flex items-center justify-center">
           <Spinner className="w-12 h-12" />
