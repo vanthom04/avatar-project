@@ -79,14 +79,23 @@ function CustomAvatar() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (e.target instanceof Element && !e.target.closest('#button-menu-options')) {
+        setIsOpenOptions(false)
+      }
+
       if (
         e.target instanceof Element &&
-        (!e.target.closest('#button-user-menu') ||
-          !e.target.closest('#button-select-color') ||
-          !e.target.closest('#button-select-bg-color'))
+        !e.target.closest('#button-select-color') &&
+        !e.target.closest('#menu-color-options')
       ) {
-        setIsOpenOptions(false)
         setIsOpenColor(false)
+      }
+
+      if (
+        e.target instanceof Element &&
+        !e.target.closest('#button-select-bg-color') &&
+        !e.target.closest('#menu-bg-color-options')
+      ) {
         setIsOpenBackgroundColor(false)
       }
     }
@@ -359,7 +368,7 @@ function CustomAvatar() {
 
           <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <button
-              id="button-user-menu"
+              id="button-menu-options"
               className="flex flex-row justify-center items-center bg-blue-500 text-white py-2 px-3 rounded-md outline-none hover:bg-blue-700 active:scale-95 transition-transform duration-300"
               type="button"
               onClick={handleOpenOptions}
@@ -368,7 +377,6 @@ function CustomAvatar() {
               <IoMdArrowDropdown size={24} />
             </button>
             <div
-              id="menu-options"
               className={clsx(
                 'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
                 { hidden: !isOpenOptions }
@@ -447,7 +455,7 @@ function CustomAvatar() {
               </span>
             </button>
             <div
-              id="menu-options"
+              id="menu-color-options"
               className={clsx(
                 'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
                 { hidden: !isOpenColor }
@@ -489,12 +497,11 @@ function CustomAvatar() {
             </div>
           </div>
           <div
-            id="button-select-bg-color"
             className="absolute left-6 top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
             onClick={handleOpenBackgroundColor}
           >
             <button
-              id="button-user-menu"
+              id="button-select-bg-color"
               className="flex flex-row justify-center items-center"
               type="button"
             >
@@ -503,7 +510,7 @@ function CustomAvatar() {
               </span>
             </button>
             <div
-              id="menu-options"
+              id="menu-bg-color-options"
               className={clsx(
                 'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
                 { hidden: !isOpenBackgroundColor }
