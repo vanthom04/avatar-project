@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { PiSpinner } from 'react-icons/pi'
+import { RefetchOptions } from '@tanstack/react-query'
 import clsx from 'clsx'
 
 import { months } from '~/utils'
@@ -13,6 +15,7 @@ interface AvatarTableRowProps {
   image_path: string
   thumbnail: string
   created_at: Date | string
+  onRefetch?: (option?: RefetchOptions | undefined) => void
 }
 
 function AvatarTableRow({
@@ -21,10 +24,12 @@ function AvatarTableRow({
   name,
   image_path,
   thumbnail,
-  created_at
+  created_at,
+  onRefetch
 }: AvatarTableRowProps) {
   const [isPreview, setIsPreview] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -64,6 +69,7 @@ function AvatarTableRow({
 
     toast.success('Avatar deleted successfully')
     setIsDelete(false)
+    onRefetch?.()
   }
 
   return (
@@ -172,20 +178,31 @@ function AvatarTableRow({
                 <h3 className="mb-5 text-lg font-normal text-gray-500">
                   Are you sure you want to delete "{name}" ?
                 </h3>
-                <button
-                  type="button"
-                  className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-                  onClick={handleDeleteMyAvatar}
-                >
-                  Yes, I'm sure
-                </button>
-                <button
-                  type="button"
-                  className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
-                  onClick={() => setIsDelete(false)}
-                >
-                  No, cancel
-                </button>
+                <div className="w-full flex flex-row items-center justify-center">
+                  <button
+                    disabled={isLoading}
+                    type="button"
+                    className="min-w-24 h-10 text-white bg-red-600 hover:bg-red-700 font-normal rounded-lg text-sm flex items-center justify-center"
+                    onClick={() => {
+                      setIsLoading(true)
+                      handleDeleteMyAvatar()
+                    }}
+                  >
+                    {isLoading ? (
+                      <PiSpinner className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <span>Yes, I'm sure</span>
+                    )}
+                  </button>
+                  <button
+                    disabled={isLoading}
+                    type="button"
+                    className="min-w-24 h-10 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+                    onClick={() => setIsDelete(false)}
+                  >
+                    No, cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
