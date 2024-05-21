@@ -1,10 +1,10 @@
 import { IconType } from 'react-icons'
 import CategoryOptions from './CategoryOptions'
 import { FunctionComponent, useState } from 'react'
-import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
 import clsx from 'clsx'
-import { Template } from '~/queries/useQueryTemplates/fetch'
 import { OptionType } from '.'
+import { Template } from '~/types'
+import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
 
 interface AvatarOptionType {
   id: string

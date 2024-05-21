@@ -3,9 +3,11 @@ import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
+import { useUser } from '~/hooks'
 
 function ManagerMyAvatars() {
-  const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars()
+  const { accessToken } = useUser()
+  const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
 
   return (
     <div className="select-none">
@@ -45,7 +47,7 @@ function ManagerMyAvatars() {
                   template_id={avatar.template_id}
                   name={avatar.name}
                   image_path={avatar.image_path}
-                  thumbnail={avatar.thumbnail}
+                  thumbnail={avatar.thumbnail ?? ''}
                   created_at={avatar.created_at}
                   onRefetch={refetch}
                 />

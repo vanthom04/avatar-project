@@ -1,4 +1,4 @@
-import { Template } from '~/queries/useQueryTemplates/fetch'
+import { Template } from '~/types'
 
 interface TemplateItemProps {
   data: Template

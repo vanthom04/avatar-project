@@ -6,13 +6,14 @@ import { useQueryTemplates } from '~/queries'
 import Spinner from '~/components/Spinner'
 import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
-import { Template } from '~/queries/useQueryTemplates/fetch'
 import { getRole } from '~/utils'
+import { Template } from '~/types'
 
 function ManagerTemplatesPage() {
   const { user } = useUser()
+  const { accessToken } = useUser()
   const templateModal = useTemplateModal()
-  const { data: templates, isLoading, refetch } = useQueryTemplates()
+  const { data: templates, isLoading, refetch } = useQueryTemplates(accessToken ?? '')
 
   const handleCreateNewTemplate = async () => {
     const role = await getRole(user?.id ?? '')

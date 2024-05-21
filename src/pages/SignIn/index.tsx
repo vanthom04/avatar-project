@@ -5,6 +5,7 @@ import { FieldValues, useForm } from 'react-hook-form'
 import { IoKeyOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
 import { CiMail } from 'react-icons/ci'
 
+// import { signIn } from '~/services/auth'
 import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
 
@@ -19,23 +20,18 @@ function SignIn() {
   const {
     register,
     handleSubmit,
-    reset,
+    // reset,
     formState: { errors }
   } = useForm()
 
   const onSubmit = async (values: FieldValues) => {
+    const { email, password } = values
     try {
       setLoading(true)
-      const { error, data } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password
-      })
+      // const res = await signIn(email, password)
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-
-      if (data.user) {
-        reset()
-        toast.success('Login successfully')
-      }
+      // console.log(res)
     } catch (error) {
       toast.error('Email or password do not match, please try again')
     } finally {
@@ -45,7 +41,7 @@ function SignIn() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <form onSubmit={handleSubmit(onSubmit)} className="rounded-lg p-4 bg-[#eff1f2] w-[400px]">
+      <form className="rounded-lg p-4 bg-[#eff1f2] w-[400px]" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="mb-4 text-[30px] text-[#0e64f1] flex items-center justify-center font-medium">
           Sign in
         </h1>
@@ -59,9 +55,9 @@ function SignIn() {
               className="px-2 py-2 w-full outline-none mr-2 "
               type="text"
               placeholder="Email"
-              {...register('email', { required: true })}
               autoComplete="off"
               disabled={loading}
+              {...register('email', { required: true })}
             />
           </div>
           <div className="pl-2">
@@ -95,7 +91,7 @@ function SignIn() {
           </div>
           {errors.password && (
             <div className="flex items-center">
-              <p className="text-red-500 italic text-sm"> Password is required!</p>
+              <p className="text-red-500 italic text-sm">Password is required!</p>
             </div>
           )}
         </div>

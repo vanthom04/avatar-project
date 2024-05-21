@@ -6,7 +6,6 @@ export const getRole = async (id: string) => {
     const { data: userRoles, error: errorUserRoles } = await supabase
       .from('user_roles')
       .select('user_id, role_id')
-      .eq('user_id', id)
       .single()
     if (errorUserRoles) {
       console.error('Error fetching user roles:', errorUserRoles)
@@ -33,11 +32,10 @@ export const getRole = async (id: string) => {
   }
 }
 
-export const getImageUrl = (bucketName: string, path: string): string => {
-  if (!bucketName || !path) return ''
-  const { data } = supabase.storage.from(bucketName).getPublicUrl(path)
-
-  return data.publicUrl
+//https://krfkbpxrguhkkchwzpnt.supabase.co/storage/v1/object/public/my_avatars/custom-avatar/custom-avatar-5eab223b-16de-41e3-a354-716400555276.png
+export const getImageUrl = (folder: string, path: string): string => {
+  if (!folder || !path) return ''
+  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${folder}/${path}`
 }
 
 export const downloadBase64Image = (dataUrl: string, filename: string) => {

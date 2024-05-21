@@ -43,7 +43,7 @@ const MENU_ITEMS: MenuItemType[] = [
 
 function Navbar() {
   return (
-    <aside className="basis-2/6 lg:basis-1/5 p-4 flex flex-col gap-y-3">
+    <aside className="basis-2/6 lg:basis-1/5 p-4 flex flex-col gap-y-3 border-r">
       {MENU_ITEMS.map(({ id, to, title, icon }) => (
         <NavbarItem key={id} to={to} title={title} icon={icon} />
       ))}

@@ -7,7 +7,8 @@ import { IoEyeOutline } from 'react-icons/io5'
 import { IoEyeOffOutline, IoKeyOutline } from 'react-icons/io5'
 
 import { useRouter } from '~/hooks'
-import config, { supabase } from '~/config'
+import { signUp } from '~/services/auth'
+import config from '~/config'
 import Spinner from '~/components/Spinner'
 
 function SignUpPage() {
@@ -26,18 +27,12 @@ function SignUpPage() {
     const { fullName, email, password } = values
     try {
       setLoading(true)
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: { full_name: fullName }
-        }
-      })
-      if (error) throw error
+      const res = await signUp(email, password, { full_name: fullName })
 
-      if (data.user) {
+      if (res) {
         toast.success('Sign up successfully')
         router.push(config.routes.signIn)
+        reset()
       }
     } catch (error) {
       console.error(error)
@@ -45,7 +40,6 @@ function SignUpPage() {
     } finally {
       setLoading(false)
     }
-    reset()
   }
 
   const togglePassword = () => {

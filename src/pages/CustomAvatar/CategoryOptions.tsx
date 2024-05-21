@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
-import { Template, Category } from '~/queries/useQueryTemplates/fetch'
 import { OptionType } from '.'
+import { Category, Template } from '~/types'
 
 interface CategoryOptionProps {
   tab: string

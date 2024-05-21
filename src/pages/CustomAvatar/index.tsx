@@ -8,16 +8,20 @@ import toast from 'react-hot-toast'
 import { fabric } from 'fabric'
 import clsx from 'clsx'
 
-import { supabase } from '~/config'
 import { downloadBase64Image, slugify } from '~/utils'
-import { useDebounce, useRouter, useUser } from '~/hooks'
+import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
 import { VscSymbolColor } from 'react-icons/vsc'
 import { IoColorFillOutline } from 'react-icons/io5'
-import { Template } from '~/queries/useQueryTemplates/fetch'
 import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
 import LayoutCategories from './LayoutCategories'
-import { MyAvatar } from '~/types'
+import { MyAvatar, Template } from '~/types'
 import { PiSpinner } from 'react-icons/pi'
+import {
+  deleteImageAvatar,
+  insertMyAvatar,
+  updateMyAvatar,
+  uploadImageMyAvatar
+} from '~/services/avatars'
 
 const colors = [
   '#FF0000',
@@ -65,7 +69,7 @@ function CustomAvatar() {
   const [avatar, setAvatar] = useState<MyAvatar>({} as MyAvatar)
 
   const router = useRouter()
-  const { user } = useUser()
+  const { accessToken, user } = useUser()
   const debouncedColor = useDebounce(color, 300)
   const debouncedBgColor = useDebounce(bgColor, 300)
   const params = useParams<{ mode: 'create' | 'edit'; templateId: string; id?: string }>()
@@ -74,8 +78,9 @@ function CustomAvatar() {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const inputTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const { data: myAvatars } = useQueryMyAvatars()
-  const { data: templates } = useQueryTemplates()
+  const windowSize = useWindowSize()
+  const { data: myAvatars } = useQueryMyAvatars(accessToken ?? '')
+  const { data: templates } = useQueryTemplates(accessToken ?? '')
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -112,7 +117,7 @@ function CustomAvatar() {
 
   useEffect(() => {
     if (params.mode === 'edit') {
-      const avatar = myAvatars?.filter((avatar) => avatar.id === Number(params.id))[0]
+      const avatar = myAvatars?.filter((avatar) => +avatar.id === Number(params.id))[0]
       const template = templates?.filter((template) => template.id === params.templateId)[0]
       template && setTemplate(template)
       avatar && setAvatar(avatar)
@@ -150,8 +155,8 @@ function CustomAvatar() {
     if (!canvasRef.current) return
 
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: 620,
-      height: 620,
+      width: canvasRef.current.width,
+      height: canvasRef.current.height,
       backgroundColor: options.filter((opt) => opt.type === 'background')[0]?.value || '#fff'
     })
     fabricCanvasRef.current = canvas
@@ -266,6 +271,8 @@ function CustomAvatar() {
     /**
      * table my_avatars: id, user_id, template_id, name, image_path, created_at
      */
+    if (!accessToken) return
+    setIsLoading(true)
     if (params.mode === 'create') {
       // handle create new avatar
 
@@ -273,86 +280,79 @@ function CustomAvatar() {
       const slug = slugify(name)
       const imagePath = `${slug}/${slug}-${uid}.png`
 
-      const { error: errorSaveAvatar } = await supabase.from('my_avatars').insert({
-        name,
-        user_id: user?.id,
-        template_id: template.id,
-        image_path: imagePath,
-        options: options.map((option) => ({
-          id: option.id ?? null,
-          type: option.type,
-          value: option.value
-        }))
-      })
-      if (errorSaveAvatar) {
-        return console.log(errorSaveAvatar)
-      }
-
-      const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
-      if (!dataUrl) {
-        return console.error('Failed to generate data URL from canvas.')
-      }
-
-      const blob = await fetch(dataUrl).then((res) => res.blob())
-      const file = new File([blob], 'canvas-image.png', { type: 'image/png' })
-      const { error: errorUploadAvatar } = await supabase.storage
-        .from('my_avatars')
-        .upload(imagePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
-      if (errorUploadAvatar) {
-        return console.log(errorSaveAvatar)
-      }
-    } else {
-      // handle update avatar
-      const uid = uuidv4()
-      const slug = slugify(name)
-      const imagePath = `${slug}/${slug}-${uid}.png`
-
-      const { error: errorSaveAvatar } = await supabase
-        .from('my_avatars')
-        .update({
+      try {
+        await insertMyAvatar(accessToken, {
           name,
           user_id: user?.id,
           template_id: template.id,
           image_path: imagePath,
-          options: options.map((option) => ({
-            id: option.id ?? null,
-            type: option.type,
-            value: option.value
-          }))
+          options
         })
-        .eq('id', params.id ?? '')
-      if (errorSaveAvatar) {
-        return console.log(errorSaveAvatar)
+
+        // handle upload image my avatar
+        const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+        if (!dataUrl) {
+          setIsLoading(false)
+          return console.error('Failed to generate data URL from canvas.')
+        }
+
+        const blob = await fetch(dataUrl).then((res) => res.blob())
+        const file = new File([blob], `${slugify(name)}.png`, { type: 'image/png' })
+
+        try {
+          // upload image my avatar
+          await uploadImageMyAvatar(accessToken, file, imagePath)
+        } catch (error) {
+          setIsLoading(false)
+          return toast.error((error as Error).message)
+        }
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
       }
+    } else {
+      // handle update avatar
+      if (!params.id) return
+      const uid = uuidv4()
+      const slug = slugify(name)
+      const imagePath = `${slug}/${slug}-${uid}.png`
 
-      const { error: errorRemoveImageAvatar } = await supabase.storage
-        .from('my_avatars')
-        .remove([avatar.image_path])
-      if (errorRemoveImageAvatar) {
-        return console.log(errorRemoveImageAvatar)
-      }
-
-      const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
-      if (!dataUrl) {
-        return console.error('Failed to generate data URL from canvas.')
-      }
-
-      const blob = await fetch(dataUrl).then((res) => res.blob())
-      const file = new File([blob], 'canvas-image.png', { type: 'image/png' })
-
-      const { error: errorUploadAvatar } = await supabase.storage
-        .from('my_avatars')
-        .upload(imagePath, file, {
-          cacheControl: '3600',
-          upsert: false
+      try {
+        await updateMyAvatar(accessToken, params.id, {
+          name,
+          user_id: user?.id,
+          template_id: template.id,
+          image_path: imagePath,
+          options,
+          updated_at: new Date()
         })
-      if (errorUploadAvatar) {
-        return console.log(errorSaveAvatar)
+
+        // handle upload image my avatar
+        const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+        if (!dataUrl) {
+          setIsLoading(false)
+          return console.error('Failed to generate data URL from canvas.')
+        }
+
+        const blob = await fetch(dataUrl).then((res) => res.blob())
+        const file = new File([blob], `${slugify(name)}.png`, { type: 'image/png' })
+
+        try {
+          // delete image my avatar
+          await deleteImageAvatar(accessToken, avatar.image_path)
+
+          // upload image my avatar
+          await uploadImageMyAvatar(accessToken, file, imagePath)
+        } catch (error) {
+          setIsLoading(false)
+          return toast.error((error as Error).message)
+        }
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
       }
     }
+
     toast.success('Save avatar successfully')
     setIsLoading(false)
     setIsOpenOptions(false)
@@ -392,10 +392,7 @@ function CustomAvatar() {
                   <button
                     disabled={isLoading}
                     className="flex flex-row w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-200"
-                    onClick={() => {
-                      setIsLoading(true)
-                      handleSaveAvatar()
-                    }}
+                    onClick={handleSaveAvatar}
                   >
                     {isLoading ? (
                       <PiSpinner className="w-6 h-6 animate-spin mx-auto" />
@@ -433,6 +430,7 @@ function CustomAvatar() {
           <input
             ref={inputRef}
             value={name}
+            name="avatar"
             type="text"
             className={clsx(
               'w-52 text-2xl absolute translate-x-[600px] translate-y-[-40px] py-1 px-2 outline-none border border-gray-500 rounded hidden',
@@ -558,7 +556,12 @@ function CustomAvatar() {
               </div>
             </div>
           </div>
-          <canvas ref={canvasRef} className="pointer-events-none rounded-lg shadow-md"></canvas>
+          <canvas
+            ref={canvasRef}
+            width={windowSize.width > 1420 ? 620 : 520}
+            height={windowSize.width > 1420 ? 620 : 520}
+            className="pointer-events-none rounded-lg shadow-md"
+          ></canvas>
         </div>
       </div>
     </div>
