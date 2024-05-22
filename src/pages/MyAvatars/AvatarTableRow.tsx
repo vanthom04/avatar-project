@@ -82,6 +82,7 @@ function AvatarTableRow({
         <img
           src={thumbnail}
           alt={name}
+          loading="lazy"
           className="w-16 h-16 cursor-pointer"
           onClick={() => setIsPreview(true)}
         />
@@ -96,7 +97,12 @@ function AvatarTableRow({
             <div className="fixed inset-0 bg-gray-900 bg-opacity-30 transition-opacity"></div>
             <div className="rounded-lg inline-block overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-lg sm:w-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div id="model-image-preview" className="bg-white sm:p-6 sm:pb-4">
-                <img src={thumbnail} alt="Preview Image" className="w-full h-full object-cover" />
+                <img
+                  src={thumbnail}
+                  alt="Preview Image"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>

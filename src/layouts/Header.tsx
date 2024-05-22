@@ -5,7 +5,7 @@ import AccountPopover from './common/AccountPopover'
 function Header() {
   return (
     <header className="w-full h-[80px] flex items-center justify-between px-5 border-b border-gray-300">
-      <Link to={config.routes.home} className="cursor-pointer">
+      <Link to={config.routes.myAvatars} className="cursor-pointer">
         <img
           className="w-[55px] md:w-[65px]"
           src="/assets/logo2000x2000.png"

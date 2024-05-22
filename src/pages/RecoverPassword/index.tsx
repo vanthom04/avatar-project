@@ -54,6 +54,7 @@ function RecoverPassword() {
                 type="email"
                 autoComplete="off"
                 placeholder="Enter your email address"
+                spellCheck="false"
                 className="w-full outline-none pt-2 pb-2 mr-2"
                 {...register('email', { required: true })}
               />

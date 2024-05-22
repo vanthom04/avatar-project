@@ -1,27 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { IoIosArrowRoundBack, IoMdArrowDropdown } from 'react-icons/io'
-import { GoDownload } from 'react-icons/go'
+import { GoDownload, GoPencil } from 'react-icons/go'
 import { BsCloudCheck } from 'react-icons/bs'
 import { v4 as uuidv4 } from 'uuid'
-import toast from 'react-hot-toast'
+import { PiSpinner } from 'react-icons/pi'
+import { VscSymbolColor } from 'react-icons/vsc'
+import { IoColorFillOutline } from 'react-icons/io5'
 import { fabric } from 'fabric'
 import clsx from 'clsx'
 
-import { downloadBase64Image, slugify } from '~/utils'
-import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
-import { VscSymbolColor } from 'react-icons/vsc'
-import { IoColorFillOutline } from 'react-icons/io5'
-import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
-import LayoutCategories from './LayoutCategories'
 import { MyAvatar, Template } from '~/types'
-import { PiSpinner } from 'react-icons/pi'
+import { downloadBase64Image, slugify } from '~/utils'
+import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
+import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
 import {
   deleteImageAvatar,
   insertMyAvatar,
   updateMyAvatar,
   uploadImageMyAvatar
 } from '~/services/avatars'
+import LayoutCategories from './LayoutCategories'
 
 const colors = [
   '#FF0000',
@@ -152,7 +152,8 @@ function CustomAvatar() {
         }
       ])
     }
-  }, [params.id, params.mode, params.templateId, myAvatars, templates])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id, params.mode, params.templateId])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -160,7 +161,7 @@ function CustomAvatar() {
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: canvasRef.current.width,
       height: canvasRef.current.height,
-      backgroundColor: options.filter((opt) => opt.type === 'background')[0]?.value || '#fff'
+      backgroundColor: options.find((opt) => opt.type === 'background')?.value || '#fff'
     })
     fabricCanvasRef.current = canvas
 
@@ -172,16 +173,16 @@ function CustomAvatar() {
           (image) => {
             image.scaleToWidth(canvas.getWidth())
             image.scaleToHeight(canvas.getHeight())
-            canvas.add(image)
 
             image.filters?.push(
               new fabric.Image.filters.BlendColor({
-                color: options.filter((opt) => opt.type === 'color')[0]?.value || '#000000',
+                color: options.find((opt) => opt.type === 'color')?.value || '#000000',
                 mode: 'tint'
               })
             )
 
             image.applyFilters()
+            canvas.add(image)
           },
           { crossOrigin: 'anonymous' }
         )
@@ -220,7 +221,6 @@ function CustomAvatar() {
   const handleOpenBackgroundColor = () => setIsOpenBackgroundColor(!isOpenBackgroundColor)
   const handleClickEdit = () => {
     setIsEdit(true)
-    setName('')
 
     if (inputTimer.current) {
       clearTimeout(inputTimer.current)
@@ -228,6 +228,7 @@ function CustomAvatar() {
 
     inputTimer.current = setTimeout(() => {
       inputRef.current?.focus()
+      inputRef.current?.select()
     }, 0)
   }
 
@@ -271,9 +272,6 @@ function CustomAvatar() {
   }
 
   const handleSaveAvatar = async () => {
-    /**
-     * table my_avatars: id, user_id, template_id, name, image_path, created_at
-     */
     if (!accessToken) return
     setIsLoading(true)
     if (params.mode === 'create') {
@@ -364,7 +362,7 @@ function CustomAvatar() {
   return (
     <div className="max-h-screen h-screen select-none">
       <div className="h-[60px] px-6 py-2 font-medium">
-        <div className="flex justify-between">
+        <div className="flex flex-row item-center justify-between">
           <button
             className="flex flex-row items-center bg-gray-400 text-white px-3 py-2 rounded-md outline-none"
             onClick={() => router.back()}
@@ -372,6 +370,36 @@ function CustomAvatar() {
             <IoIosArrowRoundBack size={24} />
             Back
           </button>
+
+          <div className="relative min-w-56 flex justify-center items-center text-2xl">
+            <h1
+              className={clsx('absolute left-0 top-0 p-1 border border-transparent rounded', {
+                hidden: isEdit
+              })}
+            >
+              {name}
+              <div
+                className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 cursor-pointer p-2 hover:bg-gray-200 hover:rounded-full transition-all duration-300 select-none"
+                onClick={handleClickEdit}
+              >
+                <GoPencil className="w-5 h-5" />
+              </div>
+            </h1>
+            <input
+              ref={inputRef}
+              value={name}
+              name="avatar"
+              type="text"
+              spellCheck="false"
+              className={clsx(
+                'w-56 absolute left-0 top-0 outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                { '!block': isEdit }
+              )}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleSaveNameAvatar}
+              onBlur={handleBlurInput}
+            />
+          </div>
 
           <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <button
@@ -419,30 +447,6 @@ function CustomAvatar() {
               </ul>
             </div>
           </div>
-        </div>
-        <div className="relative select-none cursor-default">
-          <h1
-            className={clsx(
-              'text-2xl absolute translate-x-[600px] translate-y-[-40px] py-1 px-2 border border-transparent rounded-md hover:border-gray-300 text-black hover:cursor-pointer transition-colors duration-300',
-              { hidden: isEdit }
-            )}
-            onClick={handleClickEdit}
-          >
-            {name}
-          </h1>
-          <input
-            ref={inputRef}
-            value={name}
-            name="avatar"
-            type="text"
-            className={clsx(
-              'w-52 text-2xl absolute translate-x-[600px] translate-y-[-40px] py-1 px-2 outline-none border border-gray-500 rounded hidden',
-              { '!block': isEdit }
-            )}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={handleSaveNameAvatar}
-            onBlur={handleBlurInput}
-          />
         </div>
       </div>
       <div className="w-full h-[calc(100vh-60px)] bg-[#252627] flex">

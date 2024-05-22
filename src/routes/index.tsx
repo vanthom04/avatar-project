@@ -7,7 +7,6 @@ import Layout from '~/layouts'
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
 
-import HomePage from '~/pages/Home'
 import SignUpPage from '~/pages/SignUp'
 import SignInPage from '~/pages/SignIn'
 import ProfilePage from '~/pages/Profile'
@@ -16,8 +15,9 @@ import TemplatesPage from '~/pages/Templates'
 import CustomAvatarPage from '~/pages/CustomAvatar'
 import UpdatePasswordPage from '~/pages/UpdatePassword'
 import RecoverPasswordPage from '~/pages/RecoverPassword'
-import ManagerMyAvatarsPage from '~/pages/ManagerMyAvatars'
+import MyAvatarsPage from '~/pages/MyAvatars'
 import ManagerTemplatesPage from '~/pages/ManagerTemplates'
+import AdminRoute from './AdminRoute'
 
 const router = createBrowserRouter([
   {
@@ -33,12 +33,15 @@ const router = createBrowserRouter([
     path: '/',
     element: <PrivateRoute element={Layout} />,
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, path: config.routes.myAvatars, element: <MyAvatarsPage /> },
       { path: config.routes.profile, element: <ProfilePage /> },
-      { path: config.routes.managerMyAvatars, element: <ManagerMyAvatarsPage /> },
-      { path: config.routes.templates, element: <TemplatesPage /> },
-      { path: config.routes.managerTemplates, element: <ManagerTemplatesPage /> }
+      { path: config.routes.templates, element: <TemplatesPage /> }
     ]
+  },
+  {
+    path: '/',
+    element: <AdminRoute element={Layout} />,
+    children: [{ path: config.routes.managerTemplates, element: <ManagerTemplatesPage /> }]
   },
   {
     element: <PrivateRoute element={Fragment} />,

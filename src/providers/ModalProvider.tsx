@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import TemplateModal from '~/components/TemplateModal'
+import TemplateModal from '~/pages/ManagerTemplates/TemplateModal'
 
 const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false)

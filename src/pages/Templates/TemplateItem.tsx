@@ -16,6 +16,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
           className="w-full h-full object-center origin-center lg:hover:scale-105 transition-transform duration-300"
           src={data.image_url}
           alt={data.name}
+          loading="lazy"
         />
       </div>
       <h3 className="text-black text-xl font-medium text-center">{data.name}</h3>

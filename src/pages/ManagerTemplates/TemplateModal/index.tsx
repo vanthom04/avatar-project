@@ -262,13 +262,19 @@ const TemplateModal: React.FC = () => {
               spellCheck="false"
               autoComplete="off"
               className={clsx(
-                'absolute left-0 top-0 outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                'absolute left-0 top-0 w-auto outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
                 { '!block': isEditName }
               )}
               onChange={(e) => setName(e.target.value)}
               onBlur={() => {
                 setIsEditName(false)
                 !name && setName(initialName)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setIsEditName(false)
+                  !name && setName(initialName)
+                }
               }}
             />
           </div>

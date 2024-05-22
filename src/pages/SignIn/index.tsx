@@ -59,6 +59,7 @@ function SignIn() {
               placeholder="Email"
               autoComplete="off"
               disabled={loading}
+              spellCheck="false"
               {...register('email', { required: true })}
             />
           </div>
@@ -81,6 +82,7 @@ function SignIn() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               disabled={loading}
+              spellCheck="false"
               {...register('password', { required: true })}
             />
             <button type="button" className="pr-2" onClick={togglePasswordVisibility}>

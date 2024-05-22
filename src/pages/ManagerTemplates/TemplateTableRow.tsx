@@ -134,6 +134,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
           className="object-cover w-16 h-16 cursor-pointer"
           src={template.image_url}
           alt={template.name}
+          loading="lazy"
           onClick={() => setIsPreview(true)}
         />
         <div
@@ -151,6 +152,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
                 <img
                   src={template.image_url}
                   alt="Preview Image"
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               </div>

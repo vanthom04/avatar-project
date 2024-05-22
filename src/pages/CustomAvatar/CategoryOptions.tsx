@@ -35,6 +35,7 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
           )}
           src={option.image_url ?? ''}
           alt={option.name ?? ''}
+          loading="lazy"
           onClick={() =>
             onSelect(
               option.id ?? '',

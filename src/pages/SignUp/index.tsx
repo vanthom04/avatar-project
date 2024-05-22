@@ -66,10 +66,11 @@ function SignUpPage() {
               <CiUser color="gray" size={20} />
             </div>
             <input
-              autoComplete="off"
-              disabled={loading}
-              placeholder="Enter your full name"
               type="text"
+              disabled={loading}
+              autoComplete="off"
+              spellCheck="false"
+              placeholder="Enter your full name"
               className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('fullName', { required: true })}
             />
@@ -89,6 +90,7 @@ function SignUpPage() {
               disabled={loading}
               placeholder="Enter your email "
               type="text"
+              spellCheck="false"
               className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('email', { required: true })}
             />
@@ -102,10 +104,11 @@ function SignUpPage() {
               <IoKeyOutline color="gray" size={20} />
             </div>
             <input
-              autoComplete="off"
-              disabled={loading}
-              placeholder="Enter your password"
               type={showPassword ? 'text' : 'password'}
+              disabled={loading}
+              autoComplete="off"
+              spellCheck="false"
+              placeholder="Enter your password"
               className="appearance-none w-full py-2 px-3 text-gray-700 rounded-lg outline-none"
               {...register('password', { required: true })}
             />

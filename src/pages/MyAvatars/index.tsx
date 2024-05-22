@@ -5,7 +5,7 @@ import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
 import { useUser } from '~/hooks'
 
-function ManagerMyAvatars() {
+function MyAvatars() {
   const { accessToken } = useUser()
   const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
 
@@ -62,4 +62,4 @@ function ManagerMyAvatars() {
   )
 }
 
-export default ManagerMyAvatars
+export default MyAvatars

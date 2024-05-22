@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { CiCamera } from 'react-icons/ci'
 
 import { useUser } from '~/hooks'
+import { supabase } from '~/config'
+import { getImageUrl, slugify } from '~/utils'
 
 function ProfilePage() {
   const [name, setName] = useState<string>('')
@@ -17,7 +20,7 @@ function ProfilePage() {
       setName(userDetails.full_name)
       setEmail(userDetails.email)
       setPhone(user?.phone ?? '')
-      setSelectedImage(userDetails.avatar_url)
+      setSelectedImage(getImageUrl('profile', userDetails.avatar))
     }
   }, [user, userDetails])
 
@@ -27,7 +30,7 @@ function ProfilePage() {
     }
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
@@ -35,6 +38,28 @@ function ProfilePage() {
         setSelectedImage(e.target?.result as string)
       }
       reader.readAsDataURL(file)
+
+      // upload and update avatar user
+      const imagePath = `${slugify(name)}/${user?.id}.${file.type.split('.')[1]}`
+      // userDetails && userDetails.avatar = imagePath
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            avatar: imagePath
+          }
+        })
+
+        try {
+          await supabase.storage.from('profile').upload(imagePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          })
+        } catch (error) {
+          return toast.error((error as Error).message)
+        }
+      } catch (error) {
+        return toast.error((error as Error).message)
+      }
     }
   }
 

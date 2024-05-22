@@ -42,7 +42,7 @@ function UpdatePassword() {
 
         reset()
         toast.success('Update password successfully')
-        router.push(config.routes.managerMyAvatars)
+        router.push(config.routes.myAvatars)
       } catch (error) {
         toast.error((error as Error).message)
       } finally {
@@ -75,6 +75,7 @@ function UpdatePassword() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="**********"
+                spellCheck="false"
                 className="w-full p-2 rounded-lg outline-none"
                 {...register('password', { required: true })}
               />
@@ -104,6 +105,7 @@ function UpdatePassword() {
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="**********"
+                spellCheck="false"
                 className="w-full p-2 rounded-lg outline-none"
                 {...register('confirmPassword', { required: true })}
               />
