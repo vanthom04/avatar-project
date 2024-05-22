@@ -117,24 +117,27 @@ function CustomAvatar() {
 
   useEffect(() => {
     if (params.mode === 'edit') {
-      const avatar = myAvatars?.filter((avatar) => +avatar.id === Number(params.id))[0]
-      const template = templates?.filter((template) => template.id === params.templateId)[0]
-      template && setTemplate(template)
-      avatar && setAvatar(avatar)
-      avatar?.options && setOptions(avatar.options as unknown as OptionType[])
+      const avatar = myAvatars?.find((avatar) => +avatar.id === Number(params.id))
+      const template = templates?.find((template) => template.id === params.templateId)
+      if (template) setTemplate(template)
+      if (avatar) {
+        setAvatar(avatar)
+        if (avatar.options) setOptions(avatar.options as unknown as OptionType[])
+      }
     } else {
-      const template = templates?.filter((template) => template.id === params.templateId)[0]
-      template && setTemplate(template)
+      const template = templates?.find((template) => template.id === params.templateId)
+      if (template) setTemplate(template)
 
       const defaultOptions: OptionType[] = []
       template?.categories.forEach((category) => {
         const option = category.options[0]
-        option &&
+        if (option) {
           defaultOptions.push({
             id: option.id ?? '',
             type: category.type,
             value: option.image_url ?? ''
           })
+        }
       })
 
       setOptions([
@@ -149,7 +152,7 @@ function CustomAvatar() {
         }
       ])
     }
-  }, [params.mode, params.templateId, params.id, myAvatars, templates])
+  }, [params.id, params.mode, params.templateId, myAvatars, templates])
 
   useEffect(() => {
     if (!canvasRef.current) return

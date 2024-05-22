@@ -1,3 +1,5 @@
+import { User } from '@supabase/supabase-js'
+import { SignIn } from '~/types'
 import { httpRequest } from '~/utils/httpRequest'
 
 interface UserRole {
@@ -7,7 +9,10 @@ interface UserRole {
   }
 }
 
-export const getRole = async (accessToken: string): Promise<'admin' | 'editor' | 'user'> => {
+export const getRole = async (
+  accessToken: string | undefined
+): Promise<'admin' | 'editor' | 'user'> => {
+  if (!accessToken) return 'user'
   try {
     const res = await httpRequest.get<UserRole[]>('/rest/v1/user_roles', {
       params: {
@@ -25,10 +30,11 @@ export const getRole = async (accessToken: string): Promise<'admin' | 'editor' |
   }
 }
 
-export const getUser = async (accessToken: string) => {
+export const getUser = async (accessToken: string): Promise<User> => {
   try {
     return await httpRequest.get('/auth/v1/user', {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
       }
     })
@@ -37,9 +43,9 @@ export const getUser = async (accessToken: string) => {
   }
 }
 
-export const signIn = async (email: string, password: string) => {
+export const signIn = async (email: string, password: string): Promise<SignIn> => {
   try {
-    return await httpRequest.post(
+    return await httpRequest.post<SignIn>(
       '/auth/v1/token?grant_type=password',
       { email, password },
       {
@@ -85,6 +91,38 @@ export const signOut = async () => {
   }
 }
 
-export const recoverPassword = async () => {}
+export const recoverPassword = async (email: string, redirectTo?: string) => {
+  try {
+    return await httpRequest.post(
+      '/auth/v1/recover',
+      { email },
+      {
+        params: {
+          redirect_to: redirectTo
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
 
-export const updatePassword = async () => {}
+export const updatePassword = async (accessToken: string, password: string) => {
+  try {
+    return await httpRequest.put(
+      '/auth/v1/user',
+      { password },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    )
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}

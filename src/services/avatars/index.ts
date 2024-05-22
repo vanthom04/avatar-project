@@ -6,6 +6,7 @@ export const getAllMyAvatars = async (accessToken: string): Promise<MyAvatar[]> 
   try {
     const res = await httpRequest.get<MyAvatar[]>('/rest/v1/my_avatars?select=*', {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
       }
     })
@@ -86,6 +87,7 @@ export const deleteMyAvatar = async (accessToken: string, id: string) => {
         id: `eq.${id}`
       },
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
       }
     })

@@ -2,34 +2,22 @@ import { useEffect, useRef, useState } from 'react'
 import { CiCamera } from 'react-icons/ci'
 
 import { useUser } from '~/hooks'
-import { getRole } from '~/utils'
 
 function ProfilePage() {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
-  const [role, setRole] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<string>('')
 
-  const { user, userDetails } = useUser()
+  const { user, role, userDetails } = useUser()
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const role = (await getRole(user?.id ?? '')) ?? ''
-        setRole(role)
-      } catch (error) {
-        throw new Error((error as Error).message)
-      }
-    }
-
     if (userDetails) {
       setName(userDetails.full_name)
       setEmail(userDetails.email)
       setPhone(user?.phone ?? '')
       setSelectedImage(userDetails.avatar_url)
-      fetchData()
     }
   }, [user, userDetails])
 

@@ -1,6 +1,10 @@
-export interface User {
-  accessToken: string
-  user: {
-    id: string
-  }
+import { User } from '@supabase/supabase-js'
+
+export interface SignIn {
+  access_token: string
+  token_type: string
+  expires_in: number
+  expires_at: number
+  refresh_token: string
+  user: User
 }

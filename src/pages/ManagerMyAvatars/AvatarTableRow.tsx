@@ -5,8 +5,8 @@ import { RefetchOptions } from '@tanstack/react-query'
 import clsx from 'clsx'
 
 import { months } from '~/utils'
-import { useRouter } from '~/hooks'
-import { supabase } from '~/config'
+import { useRouter, useUser } from '~/hooks'
+import { deleteImageAvatar, deleteMyAvatar } from '~/services/avatars'
 
 interface AvatarTableRowProps {
   id: number | string
@@ -32,6 +32,7 @@ function AvatarTableRow({
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
+  const { accessToken } = useUser()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -47,24 +48,23 @@ function AvatarTableRow({
   }, [])
 
   const handleDeleteMyAvatar = async () => {
-    const { error: errorDeleteOptionsMyAvatar } = await supabase
-      .from('my_avatar_options')
-      .delete()
-      .eq('my_avatar_id', id)
-    if (errorDeleteOptionsMyAvatar) {
-      toast.error(errorDeleteOptionsMyAvatar.message)
-      return console.log(errorDeleteOptionsMyAvatar)
-    }
-    const { error: errorDeleteMyAvatar } = await supabase.from('my_avatars').delete().eq('id', id)
-    if (errorDeleteMyAvatar) {
-      toast.error(errorDeleteMyAvatar.message)
-      return console.log(errorDeleteMyAvatar)
-    }
-    const { error: errorRemoveImageAvatar } = await supabase.storage
-      .from('my_avatars')
-      .remove([image_path])
-    if (errorRemoveImageAvatar) {
-      return console.log(errorRemoveImageAvatar)
+    if (!accessToken) return
+
+    // handle delete my avatar
+    try {
+      await deleteMyAvatar(accessToken, String(id))
+
+      // handle delete image in storage
+      try {
+        // delete image my avatar
+        await deleteImageAvatar(accessToken, image_path)
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
+      }
+    } catch (error) {
+      setIsLoading(false)
+      return toast.error((error as Error).message)
     }
 
     toast.success('Avatar deleted successfully')

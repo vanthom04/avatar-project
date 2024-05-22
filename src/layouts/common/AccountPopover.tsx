@@ -1,8 +1,8 @@
-import { UserMetadata } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
+import { useUser } from '~/hooks'
 import config, { supabase } from '~/config'
 
 interface OptionsType {
@@ -30,12 +30,10 @@ const MENU_OPTIONS: OptionsType[] = [
   }
 ]
 
-interface AccountPopoverProps {
-  user: UserMetadata | null
-}
-
-function AccountPopover({ user }: AccountPopoverProps) {
+function AccountPopover() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  const { userDetails } = useUser()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -75,8 +73,8 @@ function AccountPopover({ user }: AccountPopoverProps) {
         <span className="sr-only">Open user menu</span>
         <img
           className="w-10 h-10 rounded-full"
-          src={user?.avatar_url || '/assets/images/no-avatar.jpg'}
-          alt={user?.full_name}
+          src={userDetails?.avatar_url || '/assets/images/no-avatar.jpg'}
+          alt={userDetails?.full_name}
         />
       </button>
       <div
@@ -87,8 +85,10 @@ function AccountPopover({ user }: AccountPopoverProps) {
         )}
       >
         <div className="px-4 py-3">
-          <span className="block text-sm font-semibold text-gray-900">{user?.full_name}</span>
-          <span className="block text-sm text-gray-600 truncate">{user?.email}</span>
+          <span className="block text-sm font-semibold text-gray-900">
+            {userDetails?.full_name}
+          </span>
+          <span className="block text-sm text-gray-600 truncate">{userDetails?.email}</span>
         </div>
         <ul className="py-2">
           {MENU_OPTIONS.map((option) => (

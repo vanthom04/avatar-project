@@ -13,7 +13,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
     >
       <div>
         <img
-          className="object-center origin-center hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-center origin-center lg:hover:scale-105 transition-transform duration-300"
           src={data.image_url}
           alt={data.name}
         />

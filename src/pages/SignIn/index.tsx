@@ -5,7 +5,6 @@ import { FieldValues, useForm } from 'react-hook-form'
 import { IoKeyOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
 import { CiMail } from 'react-icons/ci'
 
-// import { signIn } from '~/services/auth'
 import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
 
@@ -20,7 +19,7 @@ function SignIn() {
   const {
     register,
     handleSubmit,
-    // reset,
+    reset,
     formState: { errors }
   } = useForm()
 
@@ -28,12 +27,15 @@ function SignIn() {
     const { email, password } = values
     try {
       setLoading(true)
-      // const res = await signIn(email, password)
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-      // console.log(res)
+
+      if (data.user) {
+        reset()
+        toast.success('Login successfully')
+      }
     } catch (error) {
-      toast.error('Email or password do not match, please try again')
+      toast.error((error as Error).message)
     } finally {
       setLoading(false)
     }

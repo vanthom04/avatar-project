@@ -4,7 +4,7 @@ import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
-import { getRole, months } from '~/utils'
+import { months } from '~/utils'
 import { useTemplateModal, useUser } from '~/hooks'
 import { Template } from '~/types'
 import {
@@ -26,7 +26,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   const [isPreview, setIsPreview] = useState<boolean>(false)
 
   const inputId = useId()
-  const { accessToken, user } = useUser()
+  const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
 
   useEffect(() => {
@@ -41,7 +41,6 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   }, [])
 
   const handleEditTemplate = async () => {
-    const role = await getRole(user?.id ?? '')
     if (role && !['admin', 'editor'].includes(role)) {
       return toast.error('You do not have access')
     }
@@ -52,7 +51,6 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   }
 
   const handleOpenDialogDelete = async () => {
-    const role = await getRole(user?.id ?? '')
     if (role && !['admin', 'editor'].includes(role)) {
       return toast.error('You do not have access')
     }
