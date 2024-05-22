@@ -1,4 +1,3 @@
-import { lazy } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 
@@ -8,17 +7,17 @@ import Layout from '~/layouts'
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
 
-const HomePage = lazy(() => import('~/pages/Home'))
-const SignUpPage = lazy(() => import('~/pages/SignUp'))
-const SignInPage = lazy(() => import('~/pages/SignIn'))
-const ProfilePage = lazy(() => import('~/pages/Profile'))
-const NotFoundPage = lazy(() => import('~/pages/NotFound'))
-const TemplatesPage = lazy(() => import('~/pages/Templates'))
-const CustomAvatarPage = lazy(() => import('~/pages/CustomAvatar'))
-const UpdatePasswordPage = lazy(() => import('~/pages/UpdatePassword'))
-const RecoverPasswordPage = lazy(() => import('~/pages/RecoverPassword'))
-const ManagerMyAvatarsPage = lazy(() => import('~/pages/ManagerMyAvatars'))
-const ManagerTemplatesPage = lazy(() => import('~/pages/ManagerTemplates'))
+import HomePage from '~/pages/Home'
+import SignUpPage from '~/pages/SignUp'
+import SignInPage from '~/pages/SignIn'
+import ProfilePage from '~/pages/Profile'
+import NotFoundPage from '~/pages/NotFound'
+import TemplatesPage from '~/pages/Templates'
+import CustomAvatarPage from '~/pages/CustomAvatar'
+import UpdatePasswordPage from '~/pages/UpdatePassword'
+import RecoverPasswordPage from '~/pages/RecoverPassword'
+import ManagerMyAvatarsPage from '~/pages/ManagerMyAvatars'
+import ManagerTemplatesPage from '~/pages/ManagerTemplates'
 
 const router = createBrowserRouter([
   {
