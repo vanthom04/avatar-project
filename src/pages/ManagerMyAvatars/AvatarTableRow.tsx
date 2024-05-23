@@ -5,8 +5,8 @@ import { RefetchOptions } from '@tanstack/react-query'
 import clsx from 'clsx'
 
 import { months } from '~/utils'
-import { useRouter } from '~/hooks'
-import { supabase } from '~/config'
+import { useRouter, useUser } from '~/hooks'
+import { httpRequest } from '~/utils/httpRequest'
 
 interface AvatarTableRowProps {
   id: number | string
@@ -32,6 +32,7 @@ function AvatarTableRow({
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
+  const { accessToken } = useUser()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -47,24 +48,29 @@ function AvatarTableRow({
   }, [])
 
   const handleDeleteMyAvatar = async () => {
-    const { error: errorDeleteOptionsMyAvatar } = await supabase
-      .from('my_avatar_options')
-      .delete()
-      .eq('my_avatar_id', id)
-    if (errorDeleteOptionsMyAvatar) {
-      toast.error(errorDeleteOptionsMyAvatar.message)
-      return console.log(errorDeleteOptionsMyAvatar)
+    try {
+      await httpRequest.delete('rest/v1/my_avatars', {
+        params: {
+          id: `eq.${id}`
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+    } catch (error) {
+      console.log(error)
     }
-    const { error: errorDeleteMyAvatar } = await supabase.from('my_avatars').delete().eq('id', id)
-    if (errorDeleteMyAvatar) {
-      toast.error(errorDeleteMyAvatar.message)
-      return console.log(errorDeleteMyAvatar)
-    }
-    const { error: errorRemoveImageAvatar } = await supabase.storage
-      .from('my_avatars')
-      .remove([image_path])
-    if (errorRemoveImageAvatar) {
-      return console.log(errorRemoveImageAvatar)
+
+    try {
+      await httpRequest.delete(`rest/v1/my_avatars/${image_path}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+    } catch (error) {
+      console.log(error)
     }
 
     toast.success('Avatar deleted successfully')

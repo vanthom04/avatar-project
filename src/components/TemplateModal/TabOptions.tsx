@@ -11,6 +11,7 @@ import {
   useTemplateModal,
   initialData as defaultCategories
 } from '~/hooks'
+import { getImageUrl } from '~/utils'
 
 interface TabOptionProps {
   tab: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'
@@ -111,7 +112,11 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
           key={index}
           className="relative w-16 h-16 rounded-md overflow-hidden cursor-pointer border border-gray-300 group"
         >
-          <img className="w-full h-full" src={option.image_url} alt={option.name} />
+          <img
+            className="w-full h-full"
+            src={getImageUrl('template_options', option.image_path)}
+            alt={option.name}
+          />
           <div className="absolute top-0 left-0 right-0 bottom-0 hidden items-center justify-center bg-neutral-400/35 group-hover:flex">
             <IoMdClose
               className="w-6 h-6 hover:text-red-500"

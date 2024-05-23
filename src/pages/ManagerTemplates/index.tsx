@@ -8,11 +8,15 @@ import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
 import { Template } from '~/queries/useQueryTemplates/fetch'
 import { getRole } from '~/utils'
+import { useEffect, useState } from 'react'
+import { httpRequest } from '~/utils/httpRequest'
 
 function ManagerTemplatesPage() {
-  const { user } = useUser()
+  const [myTemplates, setMyTemplates] = useState<Template[]>([])
+
+  const { user, accessToken } = useUser()
   const templateModal = useTemplateModal()
-  const { data: templates, isLoading, refetch } = useQueryTemplates()
+  const { isLoading, refetch } = useQueryTemplates()
 
   const handleCreateNewTemplate = async () => {
     const role = await getRole(user?.id ?? '')
@@ -23,6 +27,27 @@ function ManagerTemplatesPage() {
     templateModal.onOpen()
     templateModal.setMode('create')
   }
+
+  useEffect(() => {
+    const fetchMyTemplates = async () => {
+      try {
+        const response = await httpRequest.get<Template[]>('rest/v1/templates', {
+          params: {
+            select:
+              '*, categories(template_id, name, created_at, type, options(category_id, name, image_path, created_at))'
+          },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        setMyTemplates(response)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchMyTemplates()
+  }, [accessToken])
 
   return (
     <div className="w-full flex flex-col gap-y-4">
@@ -74,8 +99,8 @@ function ManagerTemplatesPage() {
                   <Spinner className="mx-auto" />
                 </td>
               </tr>
-            ) : (templates as Template[]).length > 0 ? (
-              templates?.map((template) => (
+            ) : (myTemplates as Template[]).length > 0 ? (
+              myTemplates?.map((template) => (
                 <TemplateTableRow key={template.id} template={template} onRefetch={refetch} />
               ))
             ) : (

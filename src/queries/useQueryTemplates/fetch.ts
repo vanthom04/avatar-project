@@ -3,7 +3,7 @@ import { getImageUrl } from '~/utils'
 
 export interface Option {
   id: string | null
-  template_options_id: string | null
+  category_id: string | null
   name: string | null
   image_path: string | null
   image_url: string | null
@@ -44,7 +44,7 @@ const getOptions = async (id: string): Promise<Option[]> => {
   const { data: dataOptions, error: errorOptions } = await supabase
     .from('options')
     .select('*')
-    .eq('template_options_id', id)
+    .eq('category_id', id)
   if (errorOptions) {
     console.error(errorOptions)
     return []
@@ -54,7 +54,7 @@ const getOptions = async (id: string): Promise<Option[]> => {
   for (const option of dataOptions) {
     options.push({
       id: option.id,
-      template_options_id: option.template_options_id,
+      category_id: option.template_options_id,
       name: option.name,
       image_path: option.image_path,
       image_url: getImageUrl('template_options', option.image_path ?? '')

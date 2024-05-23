@@ -4,7 +4,7 @@ import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
-import { getRole, months } from '~/utils'
+import { getImageUrl, getRole, months } from '~/utils'
 import { useTemplateModal, useUser } from '~/hooks'
 import { Template } from '~/queries/useQueryTemplates/fetch'
 import { supabase } from '~/config'
@@ -131,7 +131,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
       <td className="px-4 py-2 flex items-center justify-center">
         <img
           className="object-cover w-16 h-16 cursor-pointer"
-          src={template.image_url}
+          src={getImageUrl('templates', template.image_path)}
           alt={template.name}
           onClick={() => setIsPreview(true)}
         />
@@ -148,7 +148,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
             <div className="rounded-lg inline-block overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-lg sm:w-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div id="model-image-preview" className="bg-white sm:p-6 sm:pb-4">
                 <img
-                  src={template.image_url}
+                  src={getImageUrl('templates', template.image_path)}
                   alt="Preview Image"
                   className="w-full h-full object-cover"
                 />

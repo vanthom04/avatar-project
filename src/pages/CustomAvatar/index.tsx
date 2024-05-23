@@ -68,7 +68,11 @@ function CustomAvatar() {
   const { user } = useUser()
   const debouncedColor = useDebounce(color, 300)
   const debouncedBgColor = useDebounce(bgColor, 300)
-  const params = useParams<{ mode: 'create' | 'edit'; templateId: string; id?: string }>()
+  const params = useParams<{
+    mode: 'create' | 'edit'
+    templateId: string
+    id?: string
+  }>()
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -116,6 +120,7 @@ function CustomAvatar() {
       const template = templates?.filter((template) => template.id === params.templateId)[0]
       template && setTemplate(template)
       avatar && setAvatar(avatar)
+      avatar && setName(avatar.name)
       avatar?.options && setOptions(avatar.options as unknown as OptionType[])
     } else {
       const template = templates?.filter((template) => template.id === params.templateId)[0]

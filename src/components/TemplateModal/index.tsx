@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
 import { supabase } from '~/config'
-import { slugify, months } from '~/utils'
+import { slugify, months, getImageUrl } from '~/utils'
 import { useTemplateModal, useFormData } from '~/hooks'
 import TabHead from './TabHead'
 
@@ -35,7 +35,7 @@ const TemplateModal: React.FC = () => {
     } else {
       setName(templateModal.template?.name ?? '')
       setCreatedAt(templateModal.template?.created_at ?? '')
-      setSelectedImage(templateModal.template?.image_url ?? '')
+      setSelectedImage(getImageUrl('templates', templateModal.template?.image_path ?? ''))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateModal.mode, templateModal.template])
