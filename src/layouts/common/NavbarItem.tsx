@@ -6,9 +6,10 @@ interface NavbarItemProps {
   to: string
   title: string
   icon: IconType
+  onClick: () => void
 }
 
-function NavbarItem({ to, title, icon: Icon }: NavbarItemProps) {
+function NavbarItem({ to, title, icon: Icon, onClick }: NavbarItemProps) {
   return (
     <NavLink
       to={to}
@@ -18,9 +19,10 @@ function NavbarItem({ to, title, icon: Icon }: NavbarItemProps) {
           { 'bg-[#e1e4e7]': isActive }
         )
       }
+      onClick={onClick}
     >
-      <Icon size={24} />
-      <span className="text-base font-medium">{title}</span>
+      <Icon className="lg:w-7 lg:h-7 md:w-5 md:h-5" />
+      <span className="lg:text-base font-medium md:text-sm">{title}</span>
     </NavLink>
   )
 }

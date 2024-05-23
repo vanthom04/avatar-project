@@ -7,7 +7,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <Header />
       <div className="h-[calc(100vh-80px)] flex">
         <Navbar />
-        <main className="basis-4/5 p-4 overflow-y-auto">{children}</main>
+        <main className="lg:basis-4/5 p-4 overflow-y-auto sm:w-full">{children}</main>
       </div>
     </div>
   )

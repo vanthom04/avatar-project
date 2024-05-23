@@ -74,7 +74,7 @@ function AccountPopover({ user }: AccountPopoverProps) {
       >
         <span className="sr-only">Open user menu</span>
         <img
-          className="w-10 h-10 rounded-full"
+          className="w-10 h-10 sm:w-8 sm:h-8 rounded-full"
           src={user?.avatar_url || '/assets/images/no-avatar.jpg'}
           alt={user?.full_name}
         />

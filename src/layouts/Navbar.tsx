@@ -14,7 +14,7 @@ export interface MenuItemType {
   icon: IconType
 }
 
-const MENU_ITEMS: MenuItemType[] = [
+export const MENU_ITEMS: MenuItemType[] = [
   {
     id: 1,
     to: config.routes.home,
@@ -43,7 +43,7 @@ const MENU_ITEMS: MenuItemType[] = [
 
 function Navbar() {
   return (
-    <aside className="basis-2/6 lg:basis-1/5 p-4 flex flex-col gap-y-3">
+    <aside className="p-4 flex flex-col gap-y-3 lg:basis-1/5 sm:hidden md:block">
       {MENU_ITEMS.map(({ id, to, title, icon }) => (
         <NavbarItem key={id} to={to} title={title} icon={icon} />
       ))}
