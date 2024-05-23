@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { IconType } from 'react-icons'
 import { TbReport } from 'react-icons/tb'
+import { HiOutlineHome } from 'react-icons/hi'
 import { LuLayoutTemplate } from 'react-icons/lu'
-import { RxPerson } from 'react-icons/rx'
 
 import config from '~/config'
 import NavbarItem from './common/NavbarItem'
@@ -20,7 +20,7 @@ const MENU_ITEMS: MenuItemType[] = [
     id: 1,
     to: config.routes.myAvatars,
     title: 'My Avatar',
-    icon: RxPerson
+    icon: HiOutlineHome
   },
   {
     id: 2,
@@ -36,7 +36,7 @@ function Navbar() {
 
   useEffect(() => {
     if (!user) return
-    if (role === 'admin') {
+    if (['admin', 'editor'].includes(role)) {
       if (!menu.find((item) => item.id === 3)) {
         setMenu((prevMenu) => [
           ...prevMenu,

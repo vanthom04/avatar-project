@@ -12,7 +12,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ element: Element }) => {
 
   if (isLoading) return null
 
-  return role === 'admin' ? (
+  return ['admin', 'editor'].includes(role) ? (
     <Element>
       <Outlet />
     </Element>
