@@ -4,9 +4,10 @@ import { PiSpinner } from 'react-icons/pi'
 import { RefetchOptions } from '@tanstack/react-query'
 import clsx from 'clsx'
 
-import { months } from '~/utils'
+import { downloadBase64Image, months } from '~/utils'
 import { useRouter, useUser } from '~/hooks'
 import { deleteImageAvatar, deleteMyAvatar } from '~/services/avatars'
+import { supabase } from '~/config'
 
 interface AvatarTableRowProps {
   id: number | string
@@ -72,6 +73,22 @@ function AvatarTableRow({
     onRefetch?.()
   }
 
+  const handleDownloadAvatar = async () => {
+    try {
+      const { data, error } = await supabase.storage.from('my_avatars').download(image_path)
+
+      if (error) throw error
+
+      const dataUrl = URL.createObjectURL(data)
+
+      downloadBase64Image(dataUrl, `${name}.${data.type.split('/').pop()}`)
+
+      URL.revokeObjectURL(dataUrl)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <tr className="bg-white border-b">
       <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -113,7 +130,7 @@ function AvatarTableRow({
         ${months[new Date(created_at).getMonth()]}
         ${new Date(created_at).getFullYear()}`}
       </td>
-      <td className="px-6 py-4">
+      <td className="px-2 py-2">
         <button
           className="font-medium text-blue-600 hover:underline"
           onClick={() => router.push(`/custom-avatar/edit/${template_id}/${id}`)}
@@ -127,7 +144,13 @@ function AvatarTableRow({
         >
           Delete
         </button>
-
+        <span className="px-1">/</span>
+        <button
+          className="font-medium text-green-600 hover:underline"
+          onClick={handleDownloadAvatar}
+        >
+          Download
+        </button>
         <div
           className={clsx(
             'fixed top-0 left-0 right-0 bottom-0 bg-neutral-800/45 backdrop-blur-sm hidden',

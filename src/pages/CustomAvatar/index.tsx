@@ -37,6 +37,7 @@ const colors = [
 ]
 
 const bgColors = [
+  'transparent',
   '#FF0000',
   '#00FF00',
   '#0000FF',
@@ -122,6 +123,7 @@ function CustomAvatar() {
       if (template) setTemplate(template)
       if (avatar) {
         setAvatar(avatar)
+        setName(avatar.name)
         if (avatar.options) setOptions(avatar.options as unknown as OptionType[])
       }
     } else {
@@ -152,8 +154,7 @@ function CustomAvatar() {
         }
       ])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id, params.mode, params.templateId])
+  }, [myAvatars, params.id, params.mode, params.templateId, templates])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -526,15 +527,20 @@ function CustomAvatar() {
                 { hidden: !isOpenBackgroundColor }
               )}
             >
-              <div className="w-full flex flex-col gap-y-1 p-3">
-                <h2 className="w-full text-left font-medium ml-2 mb-2">Bảng màu</h2>
-                <input
-                  type="color"
-                  width={30}
-                  height={30}
-                  className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
-                  onChange={(e) => setBgColor(e.target.value)}
-                />
+              <div className="w-full flex flex-row gap-y-1 p-3">
+                <div>
+                  <h2 className="w-full text-left font-medium ml-2 mb-2">Bảng màu</h2>
+                  <input
+                    type="color"
+                    width={30}
+                    height={30}
+                    className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
+                    onChange={(e) => setBgColor(e.target.value)}
+                  />
+                </div>
+                <div className="ml-3">
+                  <h2 className="w-full text-left font-medium ml-2 mb-2">Transparent</h2>
+                </div>
               </div>
               <div className="w-full flex flex-col gap-y-1 p-3">
                 <div className="flex flex-row">
@@ -547,13 +553,16 @@ function CustomAvatar() {
                       key={bgColor}
                       style={{ backgroundColor: bgColor }}
                       className={clsx(
-                        'flex flex-row w-14 h-14 bg-clip-content border rounded-md bg-white border-gray-500 cursor-pointer',
+                        'flex flex-row w-14 h-14 bg-clip-content border rounded-md border-gray-500 cursor-pointer',
                         {
                           'p-1 border-2 !border-blue-500':
                             bgColor &&
                             options.find(
                               (opt) => opt.type === 'background' && opt.value === bgColor
                             )
+                        },
+                        {
+                          '!bg-[url("/assets/bg-transparent.jpg")]': bgColor === 'transparent'
                         }
                       )}
                       onClick={() => setBgColor(bgColor)}
