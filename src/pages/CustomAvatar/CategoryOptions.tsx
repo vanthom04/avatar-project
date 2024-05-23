@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
-import { Template, Category } from '~/queries/useQueryTemplates/fetch'
 import { OptionType } from '.'
+import { Category, Template } from '~/types'
 
 interface CategoryOptionProps {
   tab: string
@@ -35,6 +35,7 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
           )}
           src={option.image_url ?? ''}
           alt={option.name ?? ''}
+          loading="lazy"
           onClick={() =>
             onSelect(
               option.id ?? '',

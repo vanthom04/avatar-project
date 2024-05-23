@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Template } from '~/queries/useQueryTemplates/fetch'
+import { Template } from '~/types'
 
 interface TemplateModalStore {
   isOpen: boolean

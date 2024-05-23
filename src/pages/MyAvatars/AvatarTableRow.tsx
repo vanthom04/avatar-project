@@ -5,8 +5,8 @@ import { RefetchOptions } from '@tanstack/react-query'
 import clsx from 'clsx'
 
 import { months } from '~/utils'
-import { useRouter } from '~/hooks'
-import { supabase } from '~/config'
+import { useRouter, useUser } from '~/hooks'
+import { deleteImageAvatar, deleteMyAvatar } from '~/services/avatars'
 
 interface AvatarTableRowProps {
   id: number | string
@@ -32,6 +32,7 @@ function AvatarTableRow({
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const router = useRouter()
+  const { accessToken } = useUser()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -47,24 +48,23 @@ function AvatarTableRow({
   }, [])
 
   const handleDeleteMyAvatar = async () => {
-    const { error: errorDeleteOptionsMyAvatar } = await supabase
-      .from('my_avatar_options')
-      .delete()
-      .eq('my_avatar_id', id)
-    if (errorDeleteOptionsMyAvatar) {
-      toast.error(errorDeleteOptionsMyAvatar.message)
-      return console.log(errorDeleteOptionsMyAvatar)
-    }
-    const { error: errorDeleteMyAvatar } = await supabase.from('my_avatars').delete().eq('id', id)
-    if (errorDeleteMyAvatar) {
-      toast.error(errorDeleteMyAvatar.message)
-      return console.log(errorDeleteMyAvatar)
-    }
-    const { error: errorRemoveImageAvatar } = await supabase.storage
-      .from('my_avatars')
-      .remove([image_path])
-    if (errorRemoveImageAvatar) {
-      return console.log(errorRemoveImageAvatar)
+    if (!accessToken) return
+
+    // handle delete my avatar
+    try {
+      await deleteMyAvatar(accessToken, String(id))
+
+      // handle delete image in storage
+      try {
+        // delete image my avatar
+        await deleteImageAvatar(accessToken, image_path)
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
+      }
+    } catch (error) {
+      setIsLoading(false)
+      return toast.error((error as Error).message)
     }
 
     toast.success('Avatar deleted successfully')
@@ -82,6 +82,7 @@ function AvatarTableRow({
         <img
           src={thumbnail}
           alt={name}
+          loading="lazy"
           className="w-16 h-16 cursor-pointer"
           onClick={() => setIsPreview(true)}
         />
@@ -96,7 +97,12 @@ function AvatarTableRow({
             <div className="fixed inset-0 bg-gray-900 bg-opacity-30 transition-opacity"></div>
             <div className="rounded-lg inline-block overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-lg sm:w-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div id="model-image-preview" className="bg-white sm:p-6 sm:pb-4">
-                <img src={thumbnail} alt="Preview Image" className="w-full h-full object-cover" />
+                <img
+                  src={thumbnail}
+                  alt="Preview Image"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>

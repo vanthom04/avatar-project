@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { getTemplates } from './fetch'
+import { getAllTemplates } from '~/services/templates'
 
-export function useQueryTemplates() {
+export function useQueryTemplates(accessToken: string) {
   return useQuery({
     queryKey: ['TEMPLATES'],
-    queryFn: getTemplates
+    queryFn: () => getAllTemplates(accessToken)
   })
 }
