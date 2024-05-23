@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import short from 'short-uuid'
 import { FaPlus } from 'react-icons/fa6'
 import { IoMdClose } from 'react-icons/io'
 
-import { supabase } from '~/config'
 import {
   Option,
   Category,
   useFormData,
   useTemplateModal,
-  initialData as defaultCategories
+  initialData as defaultCategories,
+  useUser
 } from '~/hooks'
-import { getImageUrl } from '~/utils'
+import { deleteImageTemplateOption, deleteTemplateOption } from '~/services/templates'
 
 interface TabOptionProps {
   tab: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'
@@ -21,6 +22,7 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
   const [categories, setCategories] = useState<Category[]>([])
   const [category, setCategory] = useState<Category>()
 
+  const { accessToken } = useUser()
   const templateModal = useTemplateModal()
   const formData = useFormData()
 
@@ -80,12 +82,15 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
     })
   }
 
-  const handleDeleteOption = async (id: string | null, index: number) => {
+  const handleDeleteOption = async (id: string | null, index: number, imagePath?: string) => {
     if (!category) return
     if (id) {
-      const { error: errorDeleteOption } = await supabase.from('options').delete().eq('id', id)
-      if (errorDeleteOption) {
-        console.error(errorDeleteOption)
+      if (!accessToken) return
+      try {
+        await deleteTemplateOption(accessToken, id)
+        imagePath && (await deleteImageTemplateOption(accessToken, imagePath))
+      } catch (error) {
+        return toast.error((error as Error).message)
       }
     }
 
@@ -103,6 +108,8 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
       }
       return newCategories
     })
+
+    toast.success('Remove option successfully')
   }
 
   return (
@@ -112,15 +119,11 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
           key={index}
           className="relative w-16 h-16 rounded-md overflow-hidden cursor-pointer border border-gray-300 group"
         >
-          <img
-            className="w-full h-full"
-            src={getImageUrl('template_options', option.image_path)}
-            alt={option.name}
-          />
+          <img className="w-full h-full" src={option.image_url} alt={option.name} />
           <div className="absolute top-0 left-0 right-0 bottom-0 hidden items-center justify-center bg-neutral-400/35 group-hover:flex">
             <IoMdClose
               className="w-6 h-6 hover:text-red-500"
-              onClick={() => handleDeleteOption(option.id ?? null, index)}
+              onClick={() => handleDeleteOption(option.id ?? null, index, option.image_path)}
             />
           </div>
         </div>

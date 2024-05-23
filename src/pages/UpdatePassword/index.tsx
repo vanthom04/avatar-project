@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { FieldValues, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { FieldValues, useForm } from 'react-hook-form'
 import { IoEyeOutline, IoKeyOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
-import Spinner from '~/components/Spinner'
+
 import config, { supabase } from '~/config'
+import { useRouter, useUser } from '~/hooks'
+import Spinner from '~/components/Spinner'
 
 function UpdatePassword() {
   const [loading, setLoading] = useState(false)
@@ -23,26 +25,28 @@ function UpdatePassword() {
     }
   })
 
+  const router = useRouter()
+  const { accessToken } = useUser()
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
   }
 
   const onSubmit = async (values: FieldValues) => {
+    if (!accessToken) return toast.error('No access token!')
     if (values.password === values.confirmPassword) {
       try {
         setLoading(true)
-        const { error } = await supabase.auth.updateUser(
-          { password: values.password },
-          { emailRedirectTo: config.routes.home }
-        )
+        const { error } = await supabase.auth.updateUser({ password: values.password })
         if (error) throw error
-        window.location.href = config.routes.home
+
+        reset()
         toast.success('Update password successfully')
+        router.push(config.routes.myAvatars)
       } catch (error) {
         toast.error((error as Error).message)
       } finally {
         setLoading(false)
-        reset()
       }
     }
   }
@@ -71,6 +75,7 @@ function UpdatePassword() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="**********"
+                spellCheck="false"
                 className="w-full p-2 rounded-lg outline-none"
                 {...register('password', { required: true })}
               />
@@ -100,6 +105,7 @@ function UpdatePassword() {
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="**********"
+                spellCheck="false"
                 className="w-full p-2 rounded-lg outline-none"
                 {...register('confirmPassword', { required: true })}
               />

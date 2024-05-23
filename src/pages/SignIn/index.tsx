@@ -24,12 +24,10 @@ function SignIn() {
   } = useForm()
 
   const onSubmit = async (values: FieldValues) => {
+    const { email, password } = values
     try {
       setLoading(true)
-      const { error, data } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password
-      })
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
 
       if (data.user) {
@@ -37,7 +35,7 @@ function SignIn() {
         toast.success('Login successfully')
       }
     } catch (error) {
-      toast.error('Email or password do not match, please try again')
+      toast.error((error as Error).message)
     } finally {
       setLoading(false)
     }
@@ -45,7 +43,7 @@ function SignIn() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <form onSubmit={handleSubmit(onSubmit)} className="rounded-lg p-4 bg-[#eff1f2] w-[400px]">
+      <form className="rounded-lg p-4 bg-[#eff1f2] w-[400px]" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="mb-4 text-[30px] text-[#0e64f1] flex items-center justify-center font-medium">
           Sign in
         </h1>
@@ -59,9 +57,10 @@ function SignIn() {
               className="px-2 py-2 w-full outline-none mr-2 "
               type="text"
               placeholder="Email"
-              {...register('email', { required: true })}
               autoComplete="off"
               disabled={loading}
+              spellCheck="false"
+              {...register('email', { required: true })}
             />
           </div>
           <div className="pl-2">
@@ -83,6 +82,7 @@ function SignIn() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               disabled={loading}
+              spellCheck="false"
               {...register('password', { required: true })}
             />
             <button type="button" className="pr-2" onClick={togglePasswordVisibility}>
@@ -95,7 +95,7 @@ function SignIn() {
           </div>
           {errors.password && (
             <div className="flex items-center">
-              <p className="text-red-500 italic text-sm"> Password is required!</p>
+              <p className="text-red-500 italic text-sm">Password is required!</p>
             </div>
           )}
         </div>

@@ -7,9 +7,18 @@ import { v4 as uuidv4 } from 'uuid'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
-import { supabase } from '~/config'
-import { slugify, months, getImageUrl } from '~/utils'
-import { useTemplateModal, useFormData } from '~/hooks'
+import { slugify, months } from '~/utils'
+import { useTemplateModal, useFormData, useUser } from '~/hooks'
+import {
+  insertTemplate,
+  uploadImageTemplate,
+  insertTemplateCategory,
+  insertTemplateOption,
+  uploadImageTemplateOption,
+  updateTemplate,
+  deleteImageTemplate,
+  moveImageTemplate
+} from '~/services/templates'
 import TabHead from './TabHead'
 
 const initialName = 'Create new template'
@@ -17,11 +26,12 @@ const initialName = 'Create new template'
 const TemplateModal: React.FC = () => {
   const [name, setName] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
-  const [createdAt, setCreatedAt] = useState<Date | string | null>(null)
+  const [createdAt, setCreatedAt] = useState<Date | string>(new Date())
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isEditName, setIsEditName] = useState<boolean>(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
+  const { accessToken } = useUser()
   const formData = useFormData()
   const templateModal = useTemplateModal()
 
@@ -32,10 +42,11 @@ const TemplateModal: React.FC = () => {
   useEffect(() => {
     if (templateModal.mode === 'create') {
       setName(initialName)
+      setCreatedAt(new Date())
     } else {
       setName(templateModal.template?.name ?? '')
       setCreatedAt(templateModal.template?.created_at ?? '')
-      setSelectedImage(getImageUrl('templates', templateModal.template?.image_path ?? ''))
+      setSelectedImage(templateModal.template?.image_url ?? '')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateModal.mode, templateModal.template])
@@ -81,6 +92,7 @@ const TemplateModal: React.FC = () => {
   }
 
   const handleSaveTemplate = async () => {
+    if (!accessToken) return toast.error('No access token!')
     if (templateModal.mode === 'create') {
       // Todo: handle create new template
       if (!name || !file || !formData.data) return toast.error('No data!')
@@ -89,68 +101,61 @@ const TemplateModal: React.FC = () => {
       const templateId = uuidv4()
       const slugName = slugify(name)
       const imagePath = `${slugName}/${slugName}-${templateId}.${file?.type.split('/')[1]}`
-      const { error: errorTemplate } = await supabase.from('templates').insert({
-        id: templateId,
-        name,
-        image_path: imagePath
-      })
-      if (errorTemplate) {
-        setIsLoading(false)
-        toast.error(errorTemplate.message)
-        return console.log(errorTemplate)
-      }
 
-      const { error: errorUpload } = await supabase.storage
-        .from('templates')
-        .upload(imagePath, file, {
-          cacheControl: '3600',
-          upsert: false
+      try {
+        await insertTemplate(accessToken, {
+          id: templateId,
+          name,
+          image_path: imagePath
         })
-      if (errorUpload) {
+
+        try {
+          await uploadImageTemplate(accessToken, file, imagePath)
+        } catch (error) {
+          setIsLoading(false)
+          return toast.error((error as Error).message)
+        }
+      } catch (error) {
         setIsLoading(false)
-        toast.error(errorUpload.message)
-        return console.log(errorUpload)
+        return toast.error((error as Error).message)
       }
 
       for (const data of formData.data) {
-        const templateOptionsId = uuidv4()
-        const { error: errorTemplateOptions } = await supabase.from('categories').insert({
-          id: templateOptionsId,
-          template_id: templateId,
-          name: data.name,
-          type: data.type
-        })
-        if (errorTemplateOptions) {
+        const categoryId = uuidv4()
+
+        try {
+          await insertTemplateCategory(accessToken, {
+            id: categoryId,
+            template_id: templateId,
+            name: data.name,
+            type: data.type
+          })
+        } catch (error) {
           setIsLoading(false)
-          toast.error(errorTemplateOptions.message)
-          return console.log(errorTemplateOptions)
+          return toast.error((error as Error).message)
         }
 
         for (const option of data.options) {
           if (!option.file) return
 
-          const { error: errorOptions } = await supabase.from('options').insert({
-            id: uuidv4(),
-            template_options_id: templateOptionsId,
-            name: option.name,
-            image_path: option.image_path
-          })
-          if (errorOptions) {
-            setIsLoading(false)
-            toast.error(errorOptions.message)
-            return console.log(errorOptions)
-          }
-
-          const { error: errorUploadOption } = await supabase.storage
-            .from('template_options')
-            .upload(option.image_path, option.file, {
-              cacheControl: '3600',
-              upsert: false
+          try {
+            await insertTemplateOption(accessToken, {
+              id: uuidv4(),
+              category_id: categoryId,
+              name: option.name,
+              image_path: option.image_path
             })
-          if (errorUploadOption) {
+
+            try {
+              if (!option.file) return
+              await uploadImageTemplateOption(accessToken, option.file, option.image_path)
+            } catch (error) {
+              setIsLoading(false)
+              return toast.error((error as Error).message)
+            }
+          } catch (error) {
             setIsLoading(false)
-            toast.error(errorUploadOption.message)
-            return console.log(errorUploadOption)
+            return toast.error((error as Error).message)
           }
         }
       }
@@ -167,41 +172,32 @@ const TemplateModal: React.FC = () => {
 
       const slug = slugify(name)
       const imagePath = `${slug}/${slug}-${template.id}.${template.image_path.split('.')[1]}`
-      const { error: errorUpdateTemplate } = await supabase
-        .from('templates')
-        .update({
+
+      try {
+        await updateTemplate(accessToken, template.id, {
           name,
           image_path: imagePath
         })
-        .eq('id', template.id)
-      if (errorUpdateTemplate) {
-        setIsLoading(false)
-        toast.error(errorUpdateTemplate.message)
-        return console.log(errorUpdateTemplate)
-      }
 
-      if (file) {
-        const { error: errorUploadTemplate } = await supabase.storage
-          .from('templates')
-          .upload(imagePath, file, {
-            cacheControl: '3600',
-            upsert: true
+        if (file) {
+          try {
+            await uploadImageTemplate(accessToken, file, imagePath)
+          } catch (error) {
+            setIsLoading(false)
+            return toast.error((error as Error).message)
+          }
+
+          await deleteImageTemplate(accessToken, template.image_path)
+        } else {
+          await moveImageTemplate(accessToken, {
+            bucketId: 'templates',
+            destinationKey: imagePath,
+            sourceKey: template.image_path
           })
-        if (errorUploadTemplate) {
-          setIsLoading(false)
-          toast.error(errorUploadTemplate.message)
-          return console.log(errorUploadTemplate)
         }
-        await supabase.storage.from('templates').remove([template.image_path])
-      } else {
-        const { error: errorMoveImageTemplate } = await supabase.storage
-          .from('templates')
-          .move(template.image_path, imagePath)
-        if (errorMoveImageTemplate) {
-          setIsLoading(false)
-          toast.error(errorMoveImageTemplate.message)
-          return console.log(errorMoveImageTemplate)
-        }
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
       }
 
       for (const data of categories) {
@@ -210,28 +206,23 @@ const TemplateModal: React.FC = () => {
           if (!option.file) return
 
           if (!option?.id) {
-            const { error: errorOptions } = await supabase.from('options').insert({
-              id: uuidv4(),
-              template_options_id: id,
-              name: option.name,
-              image_path: option.image_path
-            })
-            if (errorOptions) {
-              setIsLoading(false)
-              toast.error(errorOptions.message)
-              return console.log(errorOptions)
-            }
-
-            const { error: errorUploadOption } = await supabase.storage
-              .from('template_options')
-              .upload(option.image_path, option.file, {
-                cacheControl: '3600',
-                upsert: false
+            try {
+              await insertTemplateOption(accessToken, {
+                id: uuidv4(),
+                category_id: id,
+                name: option.name,
+                image_path: option.image_path
               })
-            if (errorUploadOption) {
+
+              try {
+                await uploadImageTemplateOption(accessToken, option.file, option.image_path)
+              } catch (error) {
+                setIsLoading(false)
+                return toast.error((error as Error).message)
+              }
+            } catch (error) {
               setIsLoading(false)
-              toast.error(errorUploadOption.message)
-              return console.log(errorUploadOption)
+              return toast.error((error as Error).message)
             }
           }
         }
@@ -271,13 +262,19 @@ const TemplateModal: React.FC = () => {
               spellCheck="false"
               autoComplete="off"
               className={clsx(
-                'absolute left-0 top-0 outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                'absolute left-0 top-0 w-auto outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
                 { '!block': isEditName }
               )}
               onChange={(e) => setName(e.target.value)}
               onBlur={() => {
                 setIsEditName(false)
                 !name && setName(initialName)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setIsEditName(false)
+                  !name && setName(initialName)
+                }
               }}
             />
           </div>

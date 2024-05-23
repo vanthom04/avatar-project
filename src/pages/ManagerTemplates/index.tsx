@@ -1,25 +1,19 @@
 import toast from 'react-hot-toast'
 import { FaPlus } from 'react-icons/fa6'
 
-import { useTemplateModal, useUser } from '~/hooks'
+import { Template } from '~/types'
 import { useQueryTemplates } from '~/queries'
+import { useTemplateModal, useUser } from '~/hooks'
 import Spinner from '~/components/Spinner'
 import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
-import { Template } from '~/queries/useQueryTemplates/fetch'
-import { getRole } from '~/utils'
-import { useEffect, useState } from 'react'
-import { httpRequest } from '~/utils/httpRequest'
 
 function ManagerTemplatesPage() {
-  const [myTemplates, setMyTemplates] = useState<Template[]>([])
-
-  const { user, accessToken } = useUser()
+  const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
-  const { isLoading, refetch } = useQueryTemplates()
+  const { data: templates, isLoading, refetch } = useQueryTemplates(accessToken ?? '')
 
   const handleCreateNewTemplate = async () => {
-    const role = await getRole(user?.id ?? '')
     if (role && !['admin', 'editor'].includes(role)) {
       return toast.error('You do not have access')
     }

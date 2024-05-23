@@ -4,10 +4,16 @@ import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
-import { getImageUrl, getRole, months } from '~/utils'
+import { months } from '~/utils'
 import { useTemplateModal, useUser } from '~/hooks'
-import { Template } from '~/queries/useQueryTemplates/fetch'
-import { supabase } from '~/config'
+import { Template } from '~/types'
+import {
+  deleteImageTemplate,
+  deleteImageTemplateOption,
+  deleteTemplate,
+  deleteTemplateCategory,
+  deleteTemplateOption
+} from '~/services/templates'
 
 interface TemplateTableRowProps {
   template: Template
@@ -20,7 +26,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   const [isPreview, setIsPreview] = useState<boolean>(false)
 
   const inputId = useId()
-  const { user } = useUser()
+  const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
 
   useEffect(() => {
@@ -35,7 +41,6 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   }, [])
 
   const handleEditTemplate = async () => {
-    const role = await getRole(user?.id ?? '')
     if (role && !['admin', 'editor'].includes(role)) {
       return toast.error('You do not have access')
     }
@@ -46,7 +51,6 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   }
 
   const handleOpenDialogDelete = async () => {
-    const role = await getRole(user?.id ?? '')
     if (role && !['admin', 'editor'].includes(role)) {
       return toast.error('You do not have access')
     }
@@ -55,53 +59,50 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
   }
 
   const handleDeleteTemplate = async () => {
+    if (!accessToken) return
     setIsLoading(true)
     for (const category of template.categories) {
       for (const option of category.options) {
         // handle delete option in table options
-        const { error: errorDeleteOption } = await supabase
-          .from('options')
-          .delete()
-          .eq('id', option.id ?? '')
-        if (errorDeleteOption) {
-          return console.error('Error delete option: ', errorDeleteOption)
-        }
+        try {
+          await deleteTemplateOption(accessToken, option.id)
 
-        // handle delete image in storage
-        if (!option.image_path) return
-        const { error: errorDeleteImage } = await supabase.storage
-          .from('template_options')
-          .remove([option.image_path])
-        if (errorDeleteImage) {
-          return console.error('Error delete image: ', errorDeleteImage)
+          // handle delete image in storage
+          if (!option.image_path) return
+          try {
+            await deleteImageTemplateOption(accessToken, option.image_path)
+          } catch (error) {
+            setIsLoading(false)
+            return toast.error((error as Error).message)
+          }
+        } catch (error) {
+          setIsLoading(false)
+          return toast.error((error as Error).message)
         }
       }
 
       // handle delete category in table categories
-      const { error: errorDeleteCategory } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', category.id ?? '')
-      if (errorDeleteCategory) {
-        return console.error('Error delete category: ', errorDeleteCategory)
+      try {
+        await deleteTemplateCategory(accessToken, category.id)
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
       }
     }
 
     // handle delete template in table templates
-    const { error: errorDeleteTemplate } = await supabase
-      .from('templates')
-      .delete()
-      .eq('id', template.id ?? '')
-    if (errorDeleteTemplate) {
-      return console.error('Error delete template: ', errorDeleteTemplate)
-    }
-
-    // handle delete image template in storage
-    const { error: errorImageTemplate } = await supabase.storage
-      .from('templates')
-      .remove([template.image_path])
-    if (errorImageTemplate) {
-      return console.error('Error delete image template: ', errorImageTemplate)
+    try {
+      await deleteTemplate(accessToken, template.id)
+      // handle delete image template in storage
+      try {
+        await deleteImageTemplate(accessToken, template.image_path)
+      } catch (error) {
+        setIsLoading(false)
+        return toast.error((error as Error).message)
+      }
+    } catch (error) {
+      setIsLoading(false)
+      return toast.error((error as Error).message)
     }
 
     toast.success('Delete template successfully')
@@ -133,6 +134,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
           className="object-cover w-16 h-16 cursor-pointer"
           src={getImageUrl('templates', template.image_path)}
           alt={template.name}
+          loading="lazy"
           onClick={() => setIsPreview(true)}
         />
         <div
@@ -150,6 +152,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
                 <img
                   src={getImageUrl('templates', template.image_path)}
                   alt="Preview Image"
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               </div>

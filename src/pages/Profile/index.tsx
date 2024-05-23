@@ -1,35 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { CiCamera } from 'react-icons/ci'
 
 import { useUser } from '~/hooks'
-import { getRole } from '~/utils'
+import { supabase } from '~/config'
+import { getImageUrl, slugify } from '~/utils'
 
 function ProfilePage() {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
-  const [role, setRole] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<string>('')
 
-  const { user, userDetails } = useUser()
+  const { user, role, userDetails } = useUser()
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const role = (await getRole(user?.id ?? '')) ?? ''
-        setRole(role)
-      } catch (error) {
-        throw new Error((error as Error).message)
-      }
-    }
-
     if (userDetails) {
       setName(userDetails.full_name)
       setEmail(userDetails.email)
       setPhone(user?.phone ?? '')
-      setSelectedImage(userDetails.avatar_url)
-      fetchData()
+      setSelectedImage(getImageUrl('profile', userDetails.avatar))
     }
   }, [user, userDetails])
 
@@ -39,7 +30,7 @@ function ProfilePage() {
     }
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
@@ -47,6 +38,28 @@ function ProfilePage() {
         setSelectedImage(e.target?.result as string)
       }
       reader.readAsDataURL(file)
+
+      // upload and update avatar user
+      const imagePath = `${slugify(name)}/${user?.id}.${file.type.split('.')[1]}`
+      // userDetails && userDetails.avatar = imagePath
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            avatar: imagePath
+          }
+        })
+
+        try {
+          await supabase.storage.from('profile').upload(imagePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          })
+        } catch (error) {
+          return toast.error((error as Error).message)
+        }
+      } catch (error) {
+        return toast.error((error as Error).message)
+      }
     }
   }
 
@@ -86,39 +99,39 @@ function ProfilePage() {
       <div className="2/3 w-full flex items-center justify-center">
         <ul className="list-none w-full p-12">
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
+            <label htmlFor="" className="basis-1/3">
               Name
             </label>
             <span className="mx-20">:</span>
-            <p className="basis-1/2">{name}</p>
+            <p className="basis-2/3">{name}</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
+            <label htmlFor="" className="basis-1/3">
               Email
             </label>
             <span className="mx-20">:</span>
-            <p className="basis-1/2">{email}</p>
+            <p className="basis-2/3">{email}</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
+            <label htmlFor="" className="basis-1/3">
               Phone
             </label>
             <span className="mx-20">:</span>
-            <p className="basis-1/2">{phone || 'No phone'}</p>
+            <p className="basis-2/3">{phone || 'No phone'}</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
+            <label htmlFor="" className="basis-1/3">
               Status
             </label>
             <span className="mx-20">:</span>
-            <p className="basis-1/2">Active</p>
+            <p className="basis-2/3">Active</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
+            <label htmlFor="" className="basis-1/3">
               Role
             </label>
             <span className="mx-20">:</span>
-            <p className="basis-1/2">{role.charAt(0).toUpperCase() + role.substring(1)}</p>
+            <p className="basis-2/3">{role.charAt(0).toUpperCase() + role.substring(1)}</p>
           </li>
         </ul>
       </div>

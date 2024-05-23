@@ -1,39 +1,13 @@
-import { useEffect, useState } from 'react'
+import { MyAvatar } from '~/types'
 import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
-import { AvatarsType } from '~/types/avatars'
-
-import { httpRequest } from '~/utils/httpRequest'
-import { getImageUrl } from '~/utils'
 import { useUser } from '~/hooks'
 
-function ManagerMyAvatars() {
-  const [dataMyAvatars, setDataMyAvatars] = useState<AvatarsType[]>([])
-
-  const { isLoading, refetch } = useQueryMyAvatars()
+function MyAvatars() {
   const { accessToken } = useUser()
-
-  useEffect(() => {
-    const fetchMyAvatars = async () => {
-      try {
-        const response = await httpRequest.get<AvatarsType[]>('rest/v1/my_avatars', {
-          params: {
-            select: '*'
-          },
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        setDataMyAvatars(response)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchMyAvatars()
-  }, [accessToken])
+  const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
 
   return (
     <div className="select-none">
@@ -65,15 +39,15 @@ function ManagerMyAvatars() {
                   <Spinner className="mx-auto text-white" />
                 </th>
               </tr>
-            ) : (dataMyAvatars as AvatarsType[]).length > 0 ? (
-              dataMyAvatars?.map((avatar) => (
+            ) : (myAvatars as MyAvatar[]).length > 0 ? (
+              myAvatars?.map((avatar) => (
                 <AvatarTableRow
                   key={avatar.id}
                   id={avatar.id}
                   template_id={avatar.template_id}
                   name={avatar.name}
                   image_path={avatar.image_path}
-                  thumbnail={getImageUrl('my_avatars', avatar.image_path)}
+                  thumbnail={avatar.thumbnail ?? ''}
                   created_at={avatar.created_at}
                   onRefetch={refetch}
                 />
@@ -88,4 +62,4 @@ function ManagerMyAvatars() {
   )
 }
 
-export default ManagerMyAvatars
+export default MyAvatars
