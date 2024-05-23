@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
 import { useUser } from '~/hooks'
-import { getImageUrl } from '~/utils'
 import config, { supabase } from '~/config'
+import { getImageUrl } from '~/utils'
 
 interface OptionsType {
   id: number
@@ -33,8 +33,9 @@ const MENU_OPTIONS: OptionsType[] = [
 
 function AccountPopover() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [avatar, setAvatar] = useState<string>('')
 
-  const { userDetails } = useUser()
+  const { userDetails, avatar: avatarUrl } = useUser()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -51,6 +52,10 @@ function AccountPopover() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    setAvatar(getImageUrl('profile', avatarUrl ?? ''))
+  }, [avatarUrl])
+
   const handleOpen = () => setIsOpen(!isOpen)
 
   const handleClose = () => setIsOpen(false)
@@ -63,19 +68,25 @@ function AccountPopover() {
     }
   }
 
+  const handleAvatarError = () => {
+    setAvatar('/assets/images/no-avatar.jpg')
+  }
+
   return (
     <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       <button
         id="button-user-menu"
         type="button"
-        className="flex text-sm bg-gray-800 rounded-full md:me-0"
+        className="flex text-sm border border-gray-300 rounded-full md:me-0"
         onClick={handleOpen}
       >
         <span className="sr-only">Open user menu</span>
         <img
           className="w-10 h-10 rounded-full"
-          src={getImageUrl('profile', userDetails?.avatar) || '/assets/images/no-avatar.jpg'}
+          src={avatar}
           alt={userDetails?.full_name}
+          loading="lazy"
+          onError={handleAvatarError}
         />
       </button>
       <div

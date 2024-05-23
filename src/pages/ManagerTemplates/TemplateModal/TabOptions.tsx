@@ -80,6 +80,9 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
       }
       return newCategories
     })
+
+    // clear files
+    e.target.value = ''
   }
 
   const handleDeleteOption = async (id: string | null, index: number, imagePath?: string) => {
