@@ -1,4 +1,3 @@
-import { MyAvatar } from '~/types'
 import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
@@ -16,7 +15,6 @@ function MyAvatars() {
   const [itemsPerPage] = useState(5)
 
   const startIndex = (currentPage - 1) * itemsPerPage
-
   const endIndex = startIndex + itemsPerPage
 
   const visibleAvatars = myAvatars?.slice(startIndex, endIndex)
@@ -35,7 +33,7 @@ function MyAvatars() {
 
   return (
     <div className="select-none">
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg  bg-gray-300">
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg bg-gray-300">
         <table className="table-auto sm:w-full text-sm text-left rtl:text-right text-gray-600">
           <thead className="text-xs text-center text-white uppercase bg-[#0e64f1]">
             <tr>
@@ -63,7 +61,7 @@ function MyAvatars() {
                   <Spinner className="mx-auto text-white" />
                 </th>
               </tr>
-            ) : (myAvatars as MyAvatar[]).length > 0 ? (
+            ) : myAvatars && myAvatars.length > 0 ? (
               visibleAvatars?.map((avatar) => (
                 <AvatarTableRow
                   key={avatar.id}
@@ -81,43 +79,42 @@ function MyAvatars() {
             )}
           </tbody>
         </table>
-        <div className="flex justify-end bg-white p-2 ">
-          {/* Previous Page Button */}
-          <button
-            className={clsx(
-              'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
-              { 'opacity-50 cursor-not-allowed': currentPage === 1 }
-            )}
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            <IoIosArrowBack />
-          </button>
-          {/* Render page number buttons */}
-          {Array.from({ length: totalPages }, (_, index) => (
+        {myAvatars && myAvatars.length > 0 && (
+          <div className="flex justify-end bg-white p-2">
             <button
-              className={clsx('mt-2 px-2 ml-3 hover:bg-blue-300 rounded-full hover:text-white', {
-                'font-medium text-white bg-blue-500': currentPage === index + 1
-              })}
-              key={index}
-              onClick={() => handlePageChange(index + 1)}
-              disabled={currentPage === index + 1}
+              className={clsx(
+                'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+                { 'opacity-50 cursor-not-allowed': currentPage === 1 }
+              )}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
             >
-              {index + 1}
+              <IoIosArrowBack />
             </button>
-          ))}
-          {/* Next Page Button */}
-          <button
-            className={clsx(
-              'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
-              { 'opacity-50 cursor-not-allowed': currentPage === totalPages }
-            )}
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            <IoIosArrowForward />
-          </button>
-        </div>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                className={clsx('mt-2 px-2 ml-3 hover:bg-blue-300 rounded-full hover:text-white', {
+                  'font-medium text-white bg-blue-500': currentPage === index + 1
+                })}
+                key={index}
+                onClick={() => handlePageChange(index + 1)}
+                disabled={currentPage === index + 1}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              className={clsx(
+                'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+                { 'opacity-50 cursor-not-allowed': currentPage === totalPages }
+              )}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
