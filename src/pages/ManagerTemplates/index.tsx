@@ -1,16 +1,14 @@
 import toast from 'react-hot-toast'
 import { FaPlus } from 'react-icons/fa6'
+import { IoIosArrowBack } from 'react-icons/io'
+import { IoIosArrowForward } from 'react-icons/io'
 
 import { Template } from '~/types'
 import { useQueryTemplates } from '~/queries'
 import { useTemplateModal, useUser } from '~/hooks'
 import Spinner from '~/components/Spinner'
-import { IoIosArrowBack } from 'react-icons/io'
-import { IoIosArrowForward } from 'react-icons/io'
 import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
-import { Template } from '~/queries/useQueryTemplates/fetch'
-import { getRole } from '~/utils'
 import { useState } from 'react'
 import clsx from 'clsx'
 
@@ -18,7 +16,7 @@ function ManagerTemplatesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(2)
 
-  const { user } = useUser()
+  const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
   const { data: templates, isLoading, refetch } = useQueryTemplates(accessToken ?? '')
 
