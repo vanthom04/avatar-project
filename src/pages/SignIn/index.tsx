@@ -2,8 +2,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { FieldValues, useForm } from 'react-hook-form'
-import { IoKeyOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
-import { CiMail } from 'react-icons/ci'
+import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
 
 import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
@@ -44,84 +43,93 @@ function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form onSubmit={handleSubmit(onSubmit)} className="rounded-lg p-4 bg-[#eff1f2] w-[400px]">
-        <h1 className="mb-4 text-[30px] text-[#0e64f1] flex items-center justify-center font-medium">
-          Sign in
-        </h1>
+    <div className="flex w-full h-screen items-center justify-center bg-gray-200 px-5 md:px-0">
+      <div className="w-[900px]  h-[500px] m-auto bg-white p-6 rounded-3xl flex flex-row gap-3 shadow-xl">
+        <div className="rounded-xl p-2 m-auto hidden md:block ">
+          <img src="./assets/avatar-customize.png" className="rounded-lg shadow-lg" />
+        </div>
 
-        <div className="mb-4 relative">
-          <div className="flex items-center bg-white rounded-lg ">
-            <div className="px-2">
-              <CiMail size={20} color="gray" />
+        <form className="bg-white w-full p-8" onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <h1 className="text-3xl font-medium mb-2 mt-2">Sign in here!</h1>
+            <p>Please sign in to generate Custom Avatars!</p>
+          </div>
+          <div className="mt-7">
+            <div className="flex flex-row">
+              <label className="block mb-1 font-medium">Email</label>
+              <p className="ml-1 text-red-500">*</p>
             </div>
             <input
-              className="px-2 py-2 w-full outline-none mr-2 "
+              disabled={loading}
               type="text"
+              autoComplete="off"
+              spellCheck="true"
+              className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-3 outline-none appearance-none"
               placeholder="Email"
               {...register('email', { required: true })}
-              autoComplete="off"
-              disabled={loading}
             />
-          </div>
-          <div className="pl-2">
             {errors.email && (
               <div className="flex items-center">
                 <p className="text-red-500 italic text-sm"> Email is required!</p>
               </div>
             )}
           </div>
-        </div>
-        <div className="mb-2 relative">
-          <div className="flex items-center bg-white rounded-lg">
-            <div className="mx-2">
-              <IoKeyOutline size={20} color="gray" />
+          <div className="relative">
+            <div className="flex flex-row">
+              <label className="block mb-1 font-medium">Password</label>
+              <p className="ml-1 text-red-500">*</p>
             </div>
-            <input
-              autoComplete="off"
-              className="px-2 py-2 w-full outline-none mr-2"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              disabled={loading}
-              {...register('password', { required: true })}
-            />
-            <button type="button" className="pr-2" onClick={togglePasswordVisibility}>
-              {showPassword ? (
-                <IoEyeOutline color="gray" size={20} />
-              ) : (
-                <IoEyeOffOutline color="gray" size={20} />
-              )}
-            </button>
+            <div className="relative">
+              <input
+                disabled={loading}
+                type={showPassword ? 'password' : 'text'}
+                autoComplete="off"
+                spellCheck="true"
+                className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-1 outline-none appearance-none"
+                placeholder="Password"
+                {...register('password', { required: true })}
+              />
+              <div className="flex justify-end ">
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+                >
+                  {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                </button>
+              </div>
+            </div>
+            {errors.password && (
+              <div className="flex items-center">
+                <p className="text-red-500 italic text-sm"> password is required!</p>
+              </div>
+            )}
           </div>
-          {errors.password && (
-            <div className="flex items-center">
-              <p className="text-red-500 italic text-sm"> Password is required!</p>
-            </div>
-          )}
-        </div>
-        <div className="text-end mr-2 text-gray-600 text-sm">
-          <Link
-            to={config.routes.recoverPassword}
-            className="mt-2 hover:underline hover:text-red-500"
-          >
-            Forgot password?
-          </Link>
-        </div>
+          <div>
+            <label className="flex justify-end mb-2 cursor-pointer text-blue-500 hover:underline">
+              <Link to={config.routes.recoverPassword}>Forget password?</Link>
+            </label>
+          </div>
 
-        <button
-          disabled={loading}
-          type="submit"
-          className="mx-auto flex justify-center bg-[#0e64f1] text-white font-medium py-2 px-4 rounded border border-blue-500 w-full mt-4"
-        >
-          {loading ? <Spinner className="w-5 h-5" /> : 'Sign in'}
-        </button>
-        <div className="ml-4 font-normal text-gray-600  my-4 flex justify-center">
-          Don't have an account?
-          <Link to={config.routes.signUp} className="font-normal text-base ml-1 text-blue-400">
-            Sign up
-          </Link>
-        </div>
-      </form>
+          <button
+            disabled={loading}
+            type="submit"
+            className="w-full flex justify-center text-[17px] p-2 border border-blue-500 mt-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+          >
+            {loading ? <Spinner className="w-5 h-6" /> : 'Sign in'}
+          </button>
+          <div className="mt-3 flex flex-row justify-center">
+            <span>Don't have an account?</span>
+            <Link
+              to={config.routes.signUp}
+              className="text-blue-500 ml-1 cursor-pointer hover:underline"
+            >
+              Sign up
+            </Link>
+          </div>
+        </form>
+      </div>
+      <div></div>
     </div>
   )
 }

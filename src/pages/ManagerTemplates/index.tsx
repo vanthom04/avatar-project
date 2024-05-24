@@ -11,10 +11,11 @@ import TemplateTableEmptyRow from './TemplateTableEmptyRow'
 import { Template } from '~/queries/useQueryTemplates/fetch'
 import { getRole } from '~/utils'
 import { useState } from 'react'
+import clsx from 'clsx'
 
 function ManagerTemplatesPage() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [itemsPerPage] = useState(2)
 
   const { user } = useUser()
   const templateModal = useTemplateModal()
@@ -46,17 +47,17 @@ function ManagerTemplatesPage() {
   }
   return (
     <div className="w-full flex flex-col gap-y-4">
-      <div className="flex  flex-col  sm:flex-row  items-center  justify-between">
-        <h1 className="text-[22px] sm:text-2xl font-normal sm:mb-0 ">Manager templates</h1>
+      <div className="flex  sm:flex-row  items-center  justify-between">
+        <h1 className="text-[22px] sm:text-2xl font-normal sm:mb-0">Manager templates</h1>
         <button
-          className="flex items-center justify-center bg-blue-500 text-white px-2.5 py-2 lg:px-3 lg:py-2.5 rounded-md active:scale-95 transition-transform duration-300"
+          className="flex items-center justify-center bg-blue-500 text-white px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-md active:scale-95 transition-transform duration-300 flex-shrink-0"
           onClick={handleCreateNewTemplate}
         >
           <FaPlus className="w-[16px] h-[16px] lg:w-[18px] lg:h-[18px] mr-1 flex" />
           <span>New template</span>
         </button>
       </div>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
@@ -103,19 +104,24 @@ function ManagerTemplatesPage() {
             )}
           </tbody>
         </table>
-        <div className="flex justify-center py-2 px-2">
-          {/* Click button */}
+        <div className="flex justify-end bg-white p-2 ">
+          {/* Previous Page Button */}
           <button
-            className={` mt-2 mr-2 flex justify-center items-center bg-blue-500 text-white w-6 h-6 rounded-full ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={clsx(
+              'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+              { 'opacity-50 cursor-not-allowed': currentPage === 1 }
+            )}
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
             <IoIosArrowBack />
           </button>
-          {/* Render numberPage */}
+          {/* Render page number buttons */}
           {Array.from({ length: totalPages }, (_, index) => (
             <button
-              className={`mt-2 px-2  ${currentPage === index + 1 ? 'font-bold text-white bg-blue-500 border flex justify-center' : ''} `}
+              className={clsx('mt-2 px-2 ml-3 hover:bg-blue-300 rounded-full hover:text-white', {
+                'font-medium text-white bg-blue-500': currentPage === index + 1
+              })}
               key={index}
               onClick={() => handlePageChange(index + 1)}
               disabled={currentPage === index + 1}
@@ -123,8 +129,12 @@ function ManagerTemplatesPage() {
               {index + 1}
             </button>
           ))}
+          {/* Next Page Button */}
           <button
-            className={` mt-2 ml-2 flex justify-center items-center bg-blue-500 text-white w-6 h-6 rounded-full ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={clsx(
+              'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+              { 'opacity-50 cursor-not-allowed': currentPage === totalPages }
+            )}
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
