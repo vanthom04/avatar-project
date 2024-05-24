@@ -27,12 +27,6 @@ const MENU_ITEMS: MenuItemType[] = [
     to: config.routes.templates,
     title: 'Templates',
     icon: LuLayoutTemplate
-  },
-  {
-    id: 4,
-    to: config.routes.managerTemplates,
-    title: 'Manager templates',
-    icon: TbReport
   }
 ]
 
