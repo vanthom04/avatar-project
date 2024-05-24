@@ -12,6 +12,7 @@ const PublicRoute: React.FC = () => {
   ) : (
     <>
       <Outlet />
+      <Navigate to={config.routes.signIn} replace />
     </>
   )
 }
