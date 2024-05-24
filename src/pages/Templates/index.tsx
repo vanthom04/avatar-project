@@ -1,11 +1,12 @@
-import { useRouter } from '~/hooks'
+import { useRouter, useUser } from '~/hooks'
 import { useQueryTemplates } from '~/queries'
 import Spinner from '~/components/Spinner'
 import TemplateItem from './TemplateItem'
 
 function TemplatesPage() {
   const router = useRouter()
-  const { data: templates, isLoading } = useQueryTemplates()
+  const { accessToken } = useUser()
+  const { data: templates, isLoading } = useQueryTemplates(accessToken ?? '')
 
   return (
     <div className="w-full h-full flex flex-col gap-y-4">

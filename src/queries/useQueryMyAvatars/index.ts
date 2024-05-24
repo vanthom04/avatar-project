@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchMyAvatars } from './fetch'
+import { getAllMyAvatars } from '~/services/avatars'
 
-export function useQueryMyAvatars() {
+export function useQueryMyAvatars(accessToken: string) {
   return useQuery({
     queryKey: ['MY_AVATARS'],
-    queryFn: fetchMyAvatars
+    queryFn: () => getAllMyAvatars(accessToken)
   })
 }

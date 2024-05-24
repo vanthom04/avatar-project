@@ -1,45 +1,52 @@
 import { useEffect, useRef, useState } from 'react'
+import clsx from 'clsx'
+import short from 'short-uuid'
+import toast from 'react-hot-toast'
 import { CiCamera } from 'react-icons/ci'
+import { GoPencil } from 'react-icons/go'
 
-import { useUser } from '~/hooks'
-import { getRole } from '~/utils'
+import { useRouter, useUser } from '~/hooks'
+import { supabase } from '~/config'
+import { getImageUrl, slugify } from '~/utils'
 
 function ProfilePage() {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
-  const [role, setRole] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<string>('')
+  const [isEditName, setIsEditName] = useState<boolean>(false)
+  const [isEditEmail, setIsEditEmail] = useState<boolean>(false)
+  const [isEditPhone, setIsEditPhone] = useState<boolean>(false)
 
-  const { user, userDetails } = useUser()
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const inputFileRef = useRef<HTMLInputElement | null>(null)
+  const inputNameRef = useRef<HTMLInputElement | null>(null)
+  const inputNameTimer = useRef<NodeJS.Timeout | null>(null)
+  const inputEmailRef = useRef<HTMLInputElement | null>(null)
+  const inputEmailTimer = useRef<NodeJS.Timeout | null>(null)
+  const inputPhoneRef = useRef<HTMLInputElement | null>(null)
+  const inputPhoneTimer = useRef<NodeJS.Timeout | null>(null)
+
+  const router = useRouter()
+  const { user, role, userDetails, avatar, setAvatar } = useUser()
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const role = (await getRole(user?.id ?? '')) ?? ''
-        setRole(role)
-      } catch (error) {
-        throw new Error((error as Error).message)
-      }
-    }
-
     if (userDetails) {
       setName(userDetails.full_name)
       setEmail(userDetails.email)
-      setPhone(user?.phone ?? '')
-      setSelectedImage(userDetails.avatar_url)
-      fetchData()
+      setPhone(userDetails?.phone ?? '')
+      setSelectedImage(getImageUrl('profile', avatar ?? ''))
     }
-  }, [user, userDetails])
+
+    console.log('re render')
+  }, [avatar, user, userDetails])
 
   const handleSelectImage = () => {
-    if (inputRef.current) {
-      inputRef.current?.click()
+    if (inputFileRef.current) {
+      inputFileRef.current.click()
     }
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
@@ -47,6 +54,34 @@ function ProfilePage() {
         setSelectedImage(e.target?.result as string)
       }
       reader.readAsDataURL(file)
+
+      // upload and update avatar user
+      const type = file.type.split('/')[1]
+      const imagePath = `${slugify(name)}/${slugify(name)}-${short.generate()}.${type}`
+      try {
+        const { error: updateUserError } = await supabase.auth.updateUser({
+          data: {
+            avatar: imagePath
+          }
+        })
+        if (updateUserError) throw updateUserError
+
+        const { error: removeError } = await supabase.storage.from('profile').remove([avatar ?? ''])
+        if (removeError) throw removeError
+
+        const { error: uploadError } = await supabase.storage
+          .from('profile')
+          .upload(imagePath, file, { upsert: true })
+        if (uploadError) throw uploadError
+
+        toast.success('Avatar updated successfully')
+      } catch (error) {
+        toast.error((error as Error).message)
+      }
+
+      setAvatar?.(imagePath)
+      setSelectedImage(getImageUrl('profile', imagePath))
+      router.reload()
     }
   }
 
@@ -54,13 +89,132 @@ function ProfilePage() {
     setSelectedImage('/assets/images/no-avatar.jpg')
   }
 
+  const handleClickEditName = () => {
+    setIsEditName(true)
+
+    if (inputNameTimer.current) {
+      clearTimeout(inputNameTimer.current)
+    }
+
+    inputNameTimer.current = setTimeout(() => {
+      inputNameRef.current?.focus()
+      inputNameRef.current?.select()
+    }, 0)
+  }
+
+  const handleBlurInputName = () => {
+    if (!name) {
+      setName(userDetails?.full_name)
+    }
+
+    setIsEditName(false)
+  }
+
+  const handleUpdateName = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      if (!name) {
+        return setName(userDetails?.full_name)
+      }
+
+      try {
+        const { error } = await supabase.auth.updateUser({
+          data: { full_name: name }
+        })
+        if (error) throw error
+
+        setIsEditName(false)
+        toast.success('Update name successfully')
+      } catch (error) {
+        return toast.error((error as Error).message)
+      }
+    }
+  }
+
+  const handleClickEditEmail = () => {
+    setIsEditEmail(true)
+
+    if (inputEmailTimer.current) {
+      clearTimeout(inputEmailTimer.current)
+    }
+
+    inputEmailTimer.current = setTimeout(() => {
+      inputEmailRef.current?.focus()
+      inputEmailRef.current?.select()
+    }, 0)
+  }
+
+  const handleBlurInputEmail = () => {
+    if (!email) {
+      setEmail(userDetails?.email)
+    }
+
+    setIsEditEmail(false)
+  }
+
+  const handleUpdateEmail = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      if (!email) {
+        return setEmail(userDetails?.email)
+      }
+
+      try {
+        const { error } = await supabase.auth.updateUser({ email })
+        if (error) throw error
+
+        setIsEditEmail(false)
+        toast.success('Update email successfully')
+      } catch (error) {
+        return toast.error((error as Error).message)
+      }
+    }
+  }
+
+  const handleClickEditPhone = () => {
+    setIsEditPhone(true)
+
+    if (inputPhoneTimer.current) {
+      clearTimeout(inputPhoneTimer.current)
+    }
+
+    inputPhoneTimer.current = setTimeout(() => {
+      inputPhoneRef.current?.focus()
+      inputPhoneRef.current?.select()
+    }, 0)
+  }
+
+  const handleBlurInputPhone = () => {
+    if (!phone) {
+      setPhone(userDetails?.phone ?? '')
+    }
+
+    setIsEditPhone(false)
+  }
+
+  const handleUpdatePhone = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      if (!phone) {
+        return setPhone(userDetails?.phone ?? '')
+      }
+
+      try {
+        const { error } = await supabase.auth.updateUser({ data: { phone } })
+        if (error) throw error
+
+        setIsEditPhone(false)
+        toast.success('Update phone successfully')
+      } catch (error) {
+        return toast.error((error as Error).message)
+      }
+    }
+  }
+
   return (
-    <div className="w-full h-full flex flex-row">
+    <div className="w-full h-full flex flex-col lg:flex-row">
       <div className="basis-2/5 flex flex-col items-center justify-center">
-        <div className="mb-6 w-[180px] h-[180px] rounded-full relative cursor-pointer overflow-hidden border-[4px] border-[#f0eeff] select-none group">
+        <div className="mb-4 lg:mb-6 w-[180px] h-[180px] rounded-full relative cursor-pointer overflow-hidden border-[4px] border-[#f0eeff] select-none group">
           <img
             className="w-full h-full object-cover"
-            src={selectedImage || '/assets/images/no-avatar.jpg'}
+            src={selectedImage}
             alt={name}
             onError={handleErrorImage}
           />
@@ -71,54 +225,133 @@ function ProfilePage() {
             <CiCamera className="w-12 h-12 text-white" />
           </div>
           <input
-            ref={inputRef}
+            ref={inputFileRef}
             type="file"
             accept="image/*"
             className="hidden"
             onChange={handleImageChange}
           />
         </div>
-        <div className="flex flex-col items-center gap-y-1">
-          <h3 className="text-xl font-medium">{name}</h3>
+        <div className="flex flex-col items-center gap-y-0.5 lg:gap-y-1">
+          <h3 className="text-lg lg:text-xl font-medium">{name}</h3>
           <p>{email}</p>
         </div>
       </div>
       <div className="2/3 w-full flex items-center justify-center">
-        <ul className="list-none w-full p-12">
+        <ul className="list-none w-full p-4 lg:p-12 select-none">
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
-              Name
-            </label>
-            <span className="mx-20">:</span>
-            <p className="basis-1/2">{name}</p>
+            <div className="basis-1/6 lg:basis-1/5">Name</div>
+            <span className="mx-6 lg:mx-12">:</span>
+            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+              <div
+                className={clsx('absolute p-1 border border-transparent rounded', {
+                  hidden: isEditName
+                })}
+              >
+                {name}
+                <div
+                  className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 cursor-pointer p-2 hover:bg-gray-200 hover:rounded-full transition-all duration-300 select-none"
+                  onClick={handleClickEditName}
+                >
+                  <GoPencil className="w-4 h-4" />
+                </div>
+              </div>
+              <input
+                ref={inputNameRef}
+                type="text"
+                value={name}
+                name="input-name"
+                spellCheck="false"
+                autoComplete="off"
+                className={clsx(
+                  'w-full absolute p-1 border border-transparent rounded text-base outline-none bg-transparent hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                  { '!block': isEditName }
+                )}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={handleBlurInputName}
+                onKeyDown={handleUpdateName}
+              />
+            </div>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
-              Email
-            </label>
-            <span className="mx-20">:</span>
-            <p className="basis-1/2">{email}</p>
+            <div className="basis-1/6 lg:basis-1/5">Email</div>
+            <span className="mx-6 lg:mx-12">:</span>
+            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+              <div
+                className={clsx('absolute p-1 border border-transparent rounded', {
+                  hidden: isEditEmail
+                })}
+              >
+                {email}
+                <div
+                  className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 cursor-pointer p-2 hover:bg-gray-200 hover:rounded-full transition-all duration-300 select-none"
+                  onClick={handleClickEditEmail}
+                >
+                  <GoPencil className="w-4 h-4" />
+                </div>
+              </div>
+              <input
+                ref={inputEmailRef}
+                type="email"
+                value={email}
+                name="input-email"
+                spellCheck="false"
+                autoComplete="off"
+                className={clsx(
+                  'w-full absolute p-1 border border-transparent rounded text-base outline-none bg-transparent hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                  { '!block': isEditEmail }
+                )}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={handleBlurInputEmail}
+                onKeyDown={handleUpdateEmail}
+              />
+            </div>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
-              Phone
-            </label>
-            <span className="mx-20">:</span>
-            <p className="basis-1/2">{phone || 'No phone'}</p>
+            <div className="basis-1/6 lg:basis-1/5">Phone</div>
+            <span className="mx-6 lg:mx-12">:</span>
+            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+              <div
+                className={clsx('absolute p-1 border border-transparent rounded', {
+                  hidden: isEditPhone
+                })}
+              >
+                {phone || 'No phone'}
+                <div
+                  className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 cursor-pointer p-2 hover:bg-gray-200 hover:rounded-full transition-all duration-300 select-none"
+                  onClick={handleClickEditPhone}
+                >
+                  <GoPencil className="w-4 h-4" />
+                </div>
+              </div>
+              <input
+                ref={inputPhoneRef}
+                type="text"
+                value={phone}
+                name="input-phone"
+                spellCheck="false"
+                autoComplete="off"
+                className={clsx(
+                  'w-full absolute p-1 border border-transparent rounded text-base outline-none bg-transparent hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                  { '!block': isEditPhone }
+                )}
+                onChange={(e) => setPhone(e.target.value)}
+                onBlur={handleBlurInputPhone}
+                onKeyDown={handleUpdatePhone}
+              />
+            </div>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
-              Status
-            </label>
-            <span className="mx-20">:</span>
-            <p className="basis-1/2">Active</p>
+            <div className="basis-1/6 lg:basis-1/5">Status</div>
+            <span className="mx-6 lg:mx-12">:</span>
+            <p className="basis-2/3 ml-8 lg:ml-0 xl:ml-6">Active</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
-            <label htmlFor="" className="basis-1/2">
-              Role
-            </label>
-            <span className="mx-20">:</span>
-            <p className="basis-1/2">{role.charAt(0).toUpperCase() + role.substring(1)}</p>
+            <div className="basis-1/6 lg:basis-1/5">Role</div>
+            <span className="mx-6 lg:mx-12">:</span>
+            <p className="basis-2/3 ml-8 lg:ml-0 xl:ml-6">
+              {role.charAt(0).toUpperCase() + role.substring(1)}
+            </p>
           </li>
         </ul>
       </div>

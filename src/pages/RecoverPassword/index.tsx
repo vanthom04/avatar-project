@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { FieldValues, useForm } from 'react-hook-form'
 import { CiMail } from 'react-icons/ci'
 
-import { supabase } from '~/config/supabase'
+import { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
 
 function RecoverPassword() {
@@ -19,9 +19,10 @@ function RecoverPassword() {
   const onSubmit = async (values: FieldValues) => {
     try {
       setLoading(true)
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: 'http://localhost:6200/update-password'
-      })
+      const redirectTo = import.meta.env.DEV
+        ? 'http://localhost:6200/update-password'
+        : 'https://avatar-project-psi.vercel.app/update-password'
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, { redirectTo })
       if (error) throw error
 
       reset()
@@ -53,6 +54,7 @@ function RecoverPassword() {
                 type="email"
                 autoComplete="off"
                 placeholder="Enter your email address"
+                spellCheck="false"
                 className="w-full outline-none pt-2 pb-2 mr-2"
                 {...register('email', { required: true })}
               />

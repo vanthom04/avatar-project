@@ -23,12 +23,10 @@ function SignIn() {
   } = useForm()
 
   const onSubmit = async (values: FieldValues) => {
+    const { email, password } = values
     try {
       setLoading(true)
-      const { error, data } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password
-      })
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
 
       if (data.user) {
@@ -36,7 +34,7 @@ function SignIn() {
         toast.success('Login successfully')
       }
     } catch (error) {
-      toast.error('Email or password do not match, please try again')
+      toast.error((error as Error).message)
     } finally {
       setLoading(false)
     }

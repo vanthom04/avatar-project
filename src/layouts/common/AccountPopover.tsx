@@ -1,9 +1,10 @@
-import { UserMetadata } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
+import { useUser } from '~/hooks'
 import config, { supabase } from '~/config'
+import { getImageUrl } from '~/utils'
 
 interface OptionsType {
   id: number
@@ -15,8 +16,8 @@ interface OptionsType {
 const MENU_OPTIONS: OptionsType[] = [
   {
     id: 1,
-    to: config.routes.home,
-    title: 'Home'
+    to: config.routes.myAvatars,
+    title: 'My avatars'
   },
   {
     id: 2,
@@ -30,12 +31,11 @@ const MENU_OPTIONS: OptionsType[] = [
   }
 ]
 
-interface AccountPopoverProps {
-  user: UserMetadata | null
-}
-
-function AccountPopover({ user }: AccountPopoverProps) {
+function AccountPopover() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [avatar, setAvatar] = useState<string>('')
+
+  const { userDetails, avatar: avatarUrl } = useUser()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -52,6 +52,10 @@ function AccountPopover({ user }: AccountPopoverProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    setAvatar(getImageUrl('profile', avatarUrl ?? ''))
+  }, [avatarUrl])
+
   const handleOpen = () => setIsOpen(!isOpen)
 
   const handleClose = () => setIsOpen(false)
@@ -64,19 +68,25 @@ function AccountPopover({ user }: AccountPopoverProps) {
     }
   }
 
+  const handleAvatarError = () => {
+    setAvatar('/assets/images/no-avatar.jpg')
+  }
+
   return (
     <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       <button
         id="button-user-menu"
         type="button"
-        className="flex text-sm bg-gray-800 rounded-full md:me-0"
+        className="flex text-sm border border-gray-300 rounded-full md:me-0"
         onClick={handleOpen}
       >
         <span className="sr-only">Open user menu</span>
         <img
           className="w-10 h-10 rounded-full"
-          src={user?.avatar_url || '/assets/images/no-avatar.jpg'}
-          alt={user?.full_name}
+          src={avatar}
+          alt={userDetails?.full_name}
+          loading="lazy"
+          onError={handleAvatarError}
         />
       </button>
       <div
@@ -87,8 +97,10 @@ function AccountPopover({ user }: AccountPopoverProps) {
         )}
       >
         <div className="px-4 py-3">
-          <span className="block text-sm font-semibold text-gray-900">{user?.full_name}</span>
-          <span className="block text-sm text-gray-600 truncate">{user?.email}</span>
+          <span className="block text-sm font-semibold text-gray-900">
+            {userDetails?.full_name}
+          </span>
+          <span className="block text-sm text-gray-600 truncate">{userDetails?.email}</span>
         </div>
         <ul className="py-2">
           {MENU_OPTIONS.map((option) => (

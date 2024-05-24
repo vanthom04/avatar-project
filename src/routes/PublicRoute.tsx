@@ -8,10 +8,11 @@ const PublicRoute: React.FC = () => {
   if (isLoading) return null
 
   return user ? (
-    <Navigate to={config.routes.home} replace />
+    <Navigate to={config.routes.myAvatars} replace />
   ) : (
     <>
       <Outlet />
+      <Navigate to={config.routes.signIn} replace />
     </>
   )
 }
