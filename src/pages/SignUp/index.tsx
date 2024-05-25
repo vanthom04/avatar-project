@@ -53,16 +53,19 @@ function SignUpPage() {
 
   return (
     <div className="w-full h-screen flex items-center bg-gray-100 p-3">
-      <div className="w-[900px] h-[550px] m-auto bg-white p-3 rounded-3xl flex flex-row justify-center gap-3 shadow-xl">
-        <form className="bg-white w-full p-4" onSubmit={handleSubmit(onSubmit)}>
+      <div className="w-[920px] h-[520px] m-auto bg-white p-3 rounded-3xl flex flex-row justify-center gap-3 shadow-xl">
+        <form
+          className="bg-white w-full flex flex-col justify-center select-none p-8"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div>
-            <h1 className="text-2xl font-medium mb-2">Sign up here!</h1>
-            <h3 className=" text-[#72747c] mb-8">
+            <h1 className="text-3xl font-medium mb-2">Sign up here!</h1>
+            <h3 className=" text-[#72747c] text-[15px] mb-6">
               Get started with our quick and easy registration process.
             </h3>
           </div>
           <div>
-            <div className="mb-3">
+            <div className="mb-2.5">
               <div className="flex flex-row">
                 <label className="block mb-1 font-medium">Full name</label>
                 <p className="ml-1 text-red-500">*</p>
@@ -81,7 +84,7 @@ function SignUpPage() {
               )}
             </div>
 
-            <div className="mb-3">
+            <div className="mb-2.5">
               <div className="flex flex-row">
                 <label className="block mb-1 font-medium">Email</label>
                 <p className="ml-1 text-red-500">*</p>
@@ -113,9 +116,9 @@ function SignUpPage() {
                 />
                 <div className="pr-2" onClick={togglePassword}>
                   {showPassword ? (
-                    <IoEyeOutline color="gray" size={20} />
+                    <IoEyeOffOutline className="w-5 h-5 text-gray-700" />
                   ) : (
-                    <IoEyeOffOutline color="gray" size={20} />
+                    <IoEyeOutline className="w-5 h-5 text-gray-700" />
                   )}
                 </div>
               </div>
@@ -124,7 +127,11 @@ function SignUpPage() {
               )}
             </div>
           </div>
-          <button className="w-full px-3 py-2 border border-blue-500 mt-8 rounded-lg bg-blue-500 text-white hover:bg-blue-700">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center text-[17px] py-2 border border-blue-500 mt-5 rounded-lg bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-transform duration-300"
+          >
             {loading ? <Spinner className="w-6 h-6 m-auto" /> : 'Sign up'}
           </button>
           <div className="mt-3 flex flex-row justify-center">

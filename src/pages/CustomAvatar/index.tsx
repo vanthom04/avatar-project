@@ -11,9 +11,9 @@ import { IoColorFillOutline } from 'react-icons/io5'
 import { fabric } from 'fabric'
 import clsx from 'clsx'
 
-import { MyAvatar, Template } from '~/types'
 import { downloadBase64Image, slugify } from '~/utils'
 import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
+import { AvatarOption, CategoryType, MyAvatar, Template } from '~/types'
 import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
 import {
   deleteImageAvatar,
@@ -50,10 +50,10 @@ const bgColors = [
   '#fff'
 ]
 
-export interface OptionType {
+type ParamsType = {
+  mode: 'create' | 'edit'
+  templateId: string
   id?: string
-  type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand' | 'color' | 'background'
-  value: string
 }
 
 function CustomAvatar() {
@@ -64,7 +64,7 @@ function CustomAvatar() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [color, setColor] = useState<string>('#000000')
   const [bgColor, setBgColor] = useState<string>('#fff')
-  const [options, setOptions] = useState<OptionType[]>([])
+  const [options, setOptions] = useState<AvatarOption[]>([])
   const [name, setName] = useState('Custom Avatar')
   const [template, setTemplate] = useState<Template>({} as Template)
   const [avatar, setAvatar] = useState<MyAvatar>({} as MyAvatar)
@@ -73,7 +73,7 @@ function CustomAvatar() {
   const { accessToken, user } = useUser()
   const debouncedColor = useDebounce(color, 300)
   const debouncedBgColor = useDebounce(bgColor, 300)
-  const params = useParams<{ mode: 'create' | 'edit'; templateId: string; id?: string }>()
+  const params = useParams<ParamsType>()
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -124,13 +124,13 @@ function CustomAvatar() {
       if (avatar) {
         setAvatar(avatar)
         setName(avatar.name)
-        if (avatar.options) setOptions(avatar.options as unknown as OptionType[])
+        if (avatar.options) setOptions(avatar.options as unknown as AvatarOption[])
       }
     } else {
       const template = templates?.find((template) => template.id === params.templateId)
       if (template) setTemplate(template)
 
-      const defaultOptions: OptionType[] = []
+      const defaultOptions: AvatarOption[] = []
       template?.categories.forEach((category) => {
         const option = category.options[0]
         if (option) {
@@ -145,10 +145,12 @@ function CustomAvatar() {
       setOptions([
         ...defaultOptions,
         {
+          id: null,
           type: 'background',
           value: '#fff'
         },
         {
+          id: null,
           type: 'color',
           value: '#000000'
         }
@@ -252,14 +254,10 @@ function CustomAvatar() {
 
   const handleDownload = () => {
     const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
-    downloadBase64Image(dataUrl, 'custom_avatar.png')
+    downloadBase64Image(dataUrl, `${name}.png`)
   }
 
-  const handleSelect = (
-    id: string,
-    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
-    value: string
-  ) => {
+  const handleSelect = (id: string, type: CategoryType, value: string) => {
     setOptions((prevOptions) => {
       const selectedIndex = options.findIndex((opt) => opt.type === type)
       if (selectedIndex !== -1) {

@@ -1,7 +1,13 @@
-interface TemplateType {
-  id: number
-  name: string
-  image_url: string
+import { FunctionComponent } from 'react'
+import { IconType } from 'react-icons'
+
+import { CategoryType } from '~/types'
+import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
+
+interface AvatarOptionType {
+  id: CategoryType
+  title: string
+  icon: IconType | FunctionComponent
 }
 
 interface Categories {
@@ -13,30 +19,31 @@ interface Categories {
   }[]
 }
 
-export const templates: TemplateType[] = [
+export const AVATAR_OPTIONS: AvatarOptionType[] = [
   {
-    id: 1,
-    name: 'Character 1',
-    image_url:
-      'https://avatar.canawan.com/image/?image=https://cdn-files.canawan.com/my-styles/characters/character-1.png'
+    id: 'hair',
+    title: 'Hair',
+    icon: HairIcon
   },
   {
-    id: 2,
-    name: 'Character 2',
-    image_url:
-      'https://avatar.canawan.com/image/?image=https://cdn-files.canawan.com/my-styles/characters/character-2.png'
+    id: 'eyes',
+    title: 'Eyes',
+    icon: EyeIcon
   },
   {
-    id: 3,
-    name: 'Character 3',
-    image_url:
-      'https://avatar.canawan.com/image/?image=https://cdn-files.canawan.com/my-styles/characters/character-3.png'
+    id: 'mouth',
+    title: 'Mouth',
+    icon: MouthIcon
   },
   {
-    id: 4,
-    name: 'Character 4',
-    image_url:
-      'https://avatar.canawan.com/image/?image=https://cdn-files.canawan.com/my-styles/characters/character-4.png'
+    id: 'accessory',
+    title: 'Accessory',
+    icon: GlassIcon
+  },
+  {
+    id: 'hand',
+    title: 'Hand',
+    icon: HandIcon
   }
 ]
 
@@ -232,50 +239,5 @@ export const dataOptions: Categories[] = [
         value: '/assets/images/hand/hand-4.png'
       }
     ]
-  }
-]
-
-export const images = [
-  {
-    src: './images/hair/hair-1.png',
-    x: 0,
-    y: 0,
-    width: 4000,
-    height: 4000
-  },
-  {
-    src: './images/eyes/eyes-2.png',
-    x: 0,
-    y: 0,
-    width: 4000,
-    height: 4000
-  },
-  {
-    src: './images/mouth/mouth-2.png',
-    x: 0,
-    y: 0,
-    width: 4000,
-    height: 4000
-  },
-  {
-    src: './images/accessory/accessory-2.png',
-    x: 0,
-    y: 0,
-    width: 4000,
-    height: 4000
-  },
-  {
-    src: './images/hand/hand-2.png',
-    x: 0,
-    y: 0,
-    width: 4000,
-    height: 4000
-  },
-  {
-    src: './images/body/body.png',
-    x: 0,
-    y: 0,
-    width: 4000,
-    height: 4000
   }
 ]

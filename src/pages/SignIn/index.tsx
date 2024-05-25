@@ -2,7 +2,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { FieldValues, useForm } from 'react-hook-form'
-import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
+import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5'
 
 import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
@@ -11,16 +11,16 @@ function SignIn() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassWord] = useState(false)
 
-  const togglePasswordVisibility = () => {
-    setShowPassWord(!showPassword)
-  }
-
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors }
   } = useForm()
+
+  const togglePasswordVisibility = () => {
+    setShowPassWord(!showPassword)
+  }
 
   const onSubmit = async (values: FieldValues) => {
     const { email, password } = values
@@ -61,14 +61,14 @@ function SignIn() {
               disabled={loading}
               type="text"
               autoComplete="off"
-              spellCheck="true"
+              spellCheck="false"
               className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-3 outline-none appearance-none"
               placeholder="Email"
               {...register('email', { required: true })}
             />
             {errors.email && (
               <div className="flex items-center">
-                <p className="text-red-500 italic text-sm"> Email is required!</p>
+                <p className="text-red-500 italic text-sm">Email is required!</p>
               </div>
             )}
           </div>
@@ -80,31 +80,34 @@ function SignIn() {
             <div className="relative">
               <input
                 disabled={loading}
-                type={showPassword ? 'password' : 'text'}
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="off"
-                spellCheck="true"
+                spellCheck="false"
                 className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-1 outline-none appearance-none"
                 placeholder="Password"
                 {...register('password', { required: true })}
               />
               <div className="flex justify-end ">
                 <button
-                  type="button"
                   onClick={togglePasswordVisibility}
                   className="absolute inset-y-0 right-0 flex items-center pr-3"
                 >
-                  {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                  {showPassword ? (
+                    <IoEyeOffOutline className="w-5 h-5 text-gray-700" />
+                  ) : (
+                    <IoEyeOutline className="w-5 h-5 text-gray-700" />
+                  )}
                 </button>
               </div>
             </div>
             {errors.password && (
               <div className="flex items-center">
-                <p className="text-red-500 italic text-sm"> password is required!</p>
+                <p className="text-red-500 italic text-sm">Password is required!</p>
               </div>
             )}
           </div>
           <div>
-            <label className="flex justify-end mb-2 cursor-pointer text-blue-500 hover:underline">
+            <label className="flex justify-end text-[15px] cursor-pointer text-blue-500 hover:underline">
               <Link to={config.routes.recoverPassword}>Forget password?</Link>
             </label>
           </div>
@@ -112,7 +115,7 @@ function SignIn() {
           <button
             disabled={loading}
             type="submit"
-            className="w-full flex justify-center text-[17px] p-2 border border-blue-500 mt-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+            className="w-full flex justify-center text-[17px] p-2 border border-blue-500 mt-6 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
           >
             {loading ? <Spinner className="w-5 h-6" /> : 'Sign in'}
           </button>

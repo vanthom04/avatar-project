@@ -1,11 +1,12 @@
+import clsx from 'clsx'
+import { useEffect, useState } from 'react'
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
+
+import { useUser } from '~/hooks'
 import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
-import { useUser } from '~/hooks'
-import { useEffect, useState } from 'react'
-import clsx from 'clsx'
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
 
 function MyAvatars() {
   const { accessToken } = useUser()

@@ -5,8 +5,8 @@ import { HiOutlineHome } from 'react-icons/hi'
 import { LuLayoutTemplate } from 'react-icons/lu'
 
 import config from '~/config'
-import NavbarItem from './common/NavbarItem'
 import { useUser } from '~/hooks'
+import NavbarItem from './common/NavbarItem'
 
 export interface MenuItemType {
   id: number
@@ -57,8 +57,8 @@ function Navbar() {
   }, [user, role, menu])
 
   return (
-    <aside className="p-4 flex flex-col gap-y-3 lg:basis-1/5 sm:hidden md:block border-r border-r-gray-300">
-      {MENU_ITEMS.map(({ id, to, title, icon }) => (
+    <aside className="p-4 flex-col gap-y-3 lg:basis-1/5 hidden md:flex border-r border-r-gray-300">
+      {menu.map(({ id, to, title, icon }) => (
         <NavbarItem key={id} to={to} title={title} icon={icon} />
       ))}
     </aside>

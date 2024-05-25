@@ -4,6 +4,7 @@ import { getAllTemplates } from '~/services/templates'
 export function useQueryTemplates(accessToken: string) {
   return useQuery({
     queryKey: ['TEMPLATES'],
-    queryFn: () => getAllTemplates(accessToken)
+    queryFn: () => getAllTemplates(accessToken),
+    enabled: !!accessToken
   })
 }
