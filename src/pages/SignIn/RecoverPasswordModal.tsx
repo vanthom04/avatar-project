@@ -31,9 +31,9 @@ function RecoverPasswordModal({ isOpen, onClick }: RecoverPasswordModalProps) {
       if (error) throw error
 
       reset()
+      onClick()
       toast.success('Successfully, check your mail inbox!')
     } catch (error) {
-      console.log(error)
       toast.error((error as Error).message)
     } finally {
       setLoading(false)
