@@ -4,9 +4,9 @@ import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
-import { getImageUrl, months } from '~/utils'
-import { useTemplateModal, useUser } from '~/hooks'
+import { months } from '~/utils'
 import { Template } from '~/types'
+import { useTemplateModal, useUser } from '~/hooks'
 import {
   deleteImageTemplate,
   deleteImageTemplateOption,
@@ -17,10 +17,12 @@ import {
 
 interface TemplateTableRowProps {
   template: Template
+  selected: boolean
+  onSelect: () => void
   onRefetch?: (options?: RefetchOptions | undefined) => void
 }
 
-function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
+function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateTableRowProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
   const [isPreview, setIsPreview] = useState<boolean>(false)
@@ -48,6 +50,7 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
     templateModal.onOpen()
     templateModal.setMode('edit')
     templateModal.setTemplate(template)
+    onRefetch && templateModal.setRefetch?.(onRefetch)
   }
 
   const handleOpenDialogDelete = async () => {
@@ -60,55 +63,46 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
 
   const handleDeleteTemplate = async () => {
     if (!accessToken) return
-    setIsLoading(true)
-    for (const category of template.categories) {
-      for (const option of category.options) {
-        // handle delete option in table options
-        try {
-          await deleteTemplateOption(accessToken, option.id)
 
-          // handle delete image in storage
-          if (!option.image_path) return
-          try {
-            await deleteImageTemplateOption(accessToken, option.image_path)
-          } catch (error) {
-            setIsLoading(false)
-            return toast.error((error as Error).message)
+    setIsLoading(true)
+
+    try {
+      const deleteOptionPromises = []
+      const deleteImagePromises = []
+
+      for (const category of template.categories) {
+        for (const option of category.options) {
+          deleteOptionPromises.push(deleteTemplateOption(accessToken, option.id))
+
+          if (option.image_path) {
+            deleteImagePromises.push(deleteImageTemplateOption(accessToken, option.image_path))
           }
-        } catch (error) {
-          setIsLoading(false)
-          return toast.error((error as Error).message)
         }
       }
 
-      // handle delete category in table categories
-      try {
-        await deleteTemplateCategory(accessToken, category.id)
-      } catch (error) {
-        setIsLoading(false)
-        return toast.error((error as Error).message)
-      }
-    }
+      await Promise.all(deleteOptionPromises)
+      await Promise.all(deleteImagePromises)
 
-    // handle delete template in table templates
-    try {
+      const deleteCategoryPromises = template.categories.map((category) =>
+        deleteTemplateCategory(accessToken, category.id)
+      )
+
+      await Promise.all(deleteCategoryPromises)
+
       await deleteTemplate(accessToken, template.id)
-      // handle delete image template in storage
-      try {
-        await deleteImageTemplate(accessToken, template.image_path)
-      } catch (error) {
-        setIsLoading(false)
-        return toast.error((error as Error).message)
-      }
-    } catch (error) {
-      setIsLoading(false)
-      return toast.error((error as Error).message)
-    }
 
-    toast.success('Delete template successfully')
-    setIsDelete(false)
-    setIsLoading(false)
-    onRefetch?.()
+      if (template.image_path) {
+        await deleteImageTemplate(accessToken, template.image_path)
+      }
+
+      toast.success('Delete template successfully')
+    } catch (error) {
+      toast.error((error as Error).message)
+    } finally {
+      setIsLoading(false)
+      setIsDelete(false)
+      onRefetch?.()
+    }
   }
 
   return (
@@ -117,8 +111,10 @@ function TemplateTableRow({ template, onRefetch }: TemplateTableRowProps) {
         <div className="flex items-center">
           <input
             id={`checkbox-${inputId}`}
+            checked={selected}
             type="checkbox"
             name="checkbox"
+            onChange={onSelect}
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
           />
           <label htmlFor={`checkbox-${inputId}`} className="sr-only">

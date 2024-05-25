@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
+
 import config from '~/config'
 import { useUser } from '~/hooks'
 
@@ -12,6 +13,7 @@ const PublicRoute: React.FC = () => {
   ) : (
     <>
       <Outlet />
+      <Navigate to={config.routes.signIn} replace />
     </>
   )
 }

@@ -1,9 +1,8 @@
 import { User, UserMetadata } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
-// import jsCookie from 'js-cookie'
 
-import { getRole } from '~/services/auth'
 import { supabase } from '~/config'
+import { getRole } from '~/services/auth'
 
 type UserContextType = {
   accessToken: string | null
@@ -11,6 +10,8 @@ type UserContextType = {
   userDetails: UserMetadata | null
   isLoading: boolean
   role: 'admin' | 'editor' | 'user'
+  avatar?: string
+  setAvatar?: (path: string) => void
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -21,6 +22,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [userDetails, setUserDetails] = useState<UserMetadata | null>(null)
+  const [avatar, setAvatar] = useState<string>('')
 
   useEffect(() => {
     const checkTokenAndAuthorize = async (token: string | undefined) => {
@@ -43,6 +45,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       const user = await checkTokenAndAuthorize(session?.access_token)
       const role = await getRole(session?.access_token)
       setRole(role)
+      setAvatar(user?.user_metadata?.avatar ?? '')
       setAccessToken(session?.access_token || null)
       setUser(user || null)
       setUserDetails(user?.user_metadata || null)
@@ -59,7 +62,9 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
     user,
     userDetails,
     isLoading,
-    role
+    role,
+    avatar,
+    setAvatar
   }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>

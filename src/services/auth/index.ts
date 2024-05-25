@@ -1,17 +1,8 @@
 import { User } from '@supabase/supabase-js'
-import { SignIn } from '~/types'
+import { RoleType, SignIn, UserRole } from '~/types'
 import { httpRequest } from '~/utils/httpRequest'
 
-interface UserRole {
-  user_id: string
-  roles: {
-    name: string
-  }
-}
-
-export const getRole = async (
-  accessToken: string | undefined
-): Promise<'admin' | 'editor' | 'user'> => {
+export const getRole = async (accessToken: string | undefined): Promise<RoleType> => {
   if (!accessToken) return 'user'
   try {
     const res = await httpRequest.get<UserRole[]>('/rest/v1/user_roles', {
@@ -24,7 +15,7 @@ export const getRole = async (
       }
     })
 
-    return res[0].roles.name as 'admin' | 'editor' | 'user'
+    return res[0].roles.name as RoleType
   } catch (error) {
     return Promise.reject(error)
   }

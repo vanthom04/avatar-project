@@ -9,7 +9,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
   return (
     <div
       className="flex flex-col gap-y-2 p-4 border rounded-xl cursor-pointer"
-      onClick={() => onClick?.(data?.id)}
+      onClick={() => onClick?.(data.id)}
     >
       <div>
         <img
