@@ -4,10 +4,10 @@ import { PiSpinner } from 'react-icons/pi'
 import { RefetchOptions } from '@tanstack/react-query'
 import clsx from 'clsx'
 
-import { downloadBase64Image, months } from '~/utils'
-import { useRouter, useUser } from '~/hooks'
-import { deleteImageAvatar, deleteMyAvatar } from '~/services/avatars'
 import { supabase } from '~/config'
+import { useRouter, useUser } from '~/hooks'
+import { downloadBase64Image, months } from '~/utils'
+import { deleteImageAvatar, deleteMyAvatar } from '~/services/avatars'
 
 interface AvatarTableRowProps {
   id: number | string

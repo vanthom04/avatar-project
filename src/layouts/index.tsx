@@ -3,7 +3,7 @@ import Navbar from './Navbar'
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-screen font-Roboto overflow-hidden">
+    <div className="w-full h-screen font-Roboto bg-[#f9fafb] overflow-hidden">
       <Header />
       <div className="h-[calc(100vh-80px)] flex">
         <Navbar />

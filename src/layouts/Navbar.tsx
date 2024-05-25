@@ -5,8 +5,8 @@ import { HiOutlineHome } from 'react-icons/hi'
 import { LuLayoutTemplate } from 'react-icons/lu'
 
 import config from '~/config'
-import NavbarItem from './common/NavbarItem'
 import { useUser } from '~/hooks'
+import NavbarItem from './common/NavbarItem'
 
 export interface MenuItemType {
   id: number

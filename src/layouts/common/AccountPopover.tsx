@@ -2,18 +2,18 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
-import { useUser } from '~/hooks'
-import config, { supabase } from '~/config'
 import { getImageUrl } from '~/utils'
+import config, { supabase } from '~/config'
+import { useUser, useDebounce } from '~/hooks'
 
-interface OptionsType {
+interface AccountOption {
   id: number
   to: string
   title: string
   action?: () => void
 }
 
-const MENU_OPTIONS: OptionsType[] = [
+const MENU_OPTIONS: AccountOption[] = [
   {
     id: 1,
     to: config.routes.myAvatars,
@@ -36,6 +36,7 @@ function AccountPopover() {
   const [avatar, setAvatar] = useState<string>('')
 
   const { userDetails, avatar: avatarUrl } = useUser()
+  const debounceAvatar = useDebounce(avatarUrl, 1000)
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -53,8 +54,9 @@ function AccountPopover() {
   }, [])
 
   useEffect(() => {
-    setAvatar(getImageUrl('profile', avatarUrl ?? ''))
-  }, [avatarUrl])
+    if (!debounceAvatar) return
+    setAvatar(getImageUrl('profile', debounceAvatar))
+  }, [debounceAvatar])
 
   const handleOpen = () => setIsOpen(!isOpen)
 

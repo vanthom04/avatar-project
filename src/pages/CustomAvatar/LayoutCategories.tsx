@@ -1,57 +1,18 @@
-import { IconType } from 'react-icons'
 import CategoryOptions from './CategoryOptions'
-import { FunctionComponent, useState } from 'react'
+import { useState } from 'react'
 import clsx from 'clsx'
-import { OptionType } from '.'
-import { Template } from '~/types'
-import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
 
-interface AvatarOptionType {
-  id: string
-  title: string
-  icon: IconType | FunctionComponent
-}
-
-export const AVATAR_OPTIONS: AvatarOptionType[] = [
-  {
-    id: 'hair',
-    title: 'Hair',
-    icon: HairIcon
-  },
-  {
-    id: 'eyes',
-    title: 'Eyes',
-    icon: EyeIcon
-  },
-  {
-    id: 'mouth',
-    title: 'Mouth',
-    icon: MouthIcon
-  },
-  {
-    id: 'accessory',
-    title: 'Accessory',
-    icon: GlassIcon
-  },
-  {
-    id: 'hand',
-    title: 'Hand',
-    icon: HandIcon
-  }
-]
+import { AVATAR_OPTIONS } from '~/_mock'
+import { AvatarOption, CategoryType, Template } from '~/types'
 
 interface LayoutCategoryProps {
   template: Template
-  options: OptionType[]
-  onSelect: (
-    id: string,
-    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
-    value: string
-  ) => void
+  options: AvatarOption[]
+  onSelect: (id: string, type: CategoryType, value: string) => void
 }
 
 function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) {
-  const [tab, setTab] = useState<string>('hair')
+  const [tab, setTab] = useState<CategoryType>('hair')
 
   return (
     <div className="basis-2/5 text-white flex">

@@ -1,9 +1,9 @@
+import { useUser } from '~/hooks'
 import { MyAvatar } from '~/types'
 import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
-import { useUser } from '~/hooks'
 
 function MyAvatars() {
   const { accessToken } = useUser()

@@ -11,8 +11,8 @@ import { IoColorFillOutline } from 'react-icons/io5'
 import { fabric } from 'fabric'
 import clsx from 'clsx'
 
-import { MyAvatar, Template } from '~/types'
 import { downloadBase64Image, slugify } from '~/utils'
+import { AvatarOption, CategoryType, MyAvatar, Template } from '~/types'
 import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
 import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
 import {
@@ -50,12 +50,6 @@ const bgColors = [
   '#fff'
 ]
 
-export interface OptionType {
-  id?: string
-  type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand' | 'color' | 'background'
-  value: string
-}
-
 function CustomAvatar() {
   const [isEdit, setIsEdit] = useState(false)
   const [isOpenOptions, setIsOpenOptions] = useState<boolean>(false)
@@ -64,7 +58,7 @@ function CustomAvatar() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [color, setColor] = useState<string>('#000000')
   const [bgColor, setBgColor] = useState<string>('#fff')
-  const [options, setOptions] = useState<OptionType[]>([])
+  const [options, setOptions] = useState<AvatarOption[]>([])
   const [name, setName] = useState('Custom Avatar')
   const [template, setTemplate] = useState<Template>({} as Template)
   const [avatar, setAvatar] = useState<MyAvatar>({} as MyAvatar)
@@ -124,13 +118,13 @@ function CustomAvatar() {
       if (avatar) {
         setAvatar(avatar)
         setName(avatar.name)
-        if (avatar.options) setOptions(avatar.options as unknown as OptionType[])
+        if (avatar.options) setOptions(avatar.options as unknown as AvatarOption[])
       }
     } else {
       const template = templates?.find((template) => template.id === params.templateId)
       if (template) setTemplate(template)
 
-      const defaultOptions: OptionType[] = []
+      const defaultOptions: AvatarOption[] = []
       template?.categories.forEach((category) => {
         const option = category.options[0]
         if (option) {
@@ -145,10 +139,12 @@ function CustomAvatar() {
       setOptions([
         ...defaultOptions,
         {
+          id: null,
           type: 'background',
           value: '#fff'
         },
         {
+          id: null,
           type: 'color',
           value: '#000000'
         }
@@ -255,11 +251,7 @@ function CustomAvatar() {
     downloadBase64Image(dataUrl, 'custom_avatar.png')
   }
 
-  const handleSelect = (
-    id: string,
-    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
-    value: string
-  ) => {
+  const handleSelect = (id: string, type: CategoryType, value: string) => {
     setOptions((prevOptions) => {
       const selectedIndex = options.findIndex((opt) => opt.type === type)
       if (selectedIndex !== -1) {

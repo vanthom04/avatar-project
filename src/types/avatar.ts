@@ -2,7 +2,7 @@ import { CategoryType } from './template'
 
 export interface AvatarOption {
   id: string | null
-  type: CategoryType
+  type: CategoryType | 'background' | 'color'
   value: string
 }
 
