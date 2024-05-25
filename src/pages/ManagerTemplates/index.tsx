@@ -7,11 +7,15 @@ import { useTemplateModal, useUser } from '~/hooks'
 import Spinner from '~/components/Spinner'
 import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
+import { useEffect, useState } from 'react'
+import { httpRequest } from '~/utils/httpRequest'
 
 function ManagerTemplatesPage() {
+  const [myTemplates, setMyTemplates] = useState<Template[]>([])
+
   const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
-  const { data: templates, isLoading, refetch } = useQueryTemplates(accessToken ?? '')
+  const { isLoading, refetch } = useQueryTemplates(accessToken ?? '')
 
   const handleCreateNewTemplate = async () => {
     if (role && !['admin', 'editor'].includes(role)) {

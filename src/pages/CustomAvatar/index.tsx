@@ -14,7 +14,7 @@ import clsx from 'clsx'
 import { MyAvatar, Template } from '~/types'
 import { downloadBase64Image, slugify } from '~/utils'
 import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
-import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
+import { useDebounce, useRouter, useUser } from '~/hooks'
 import {
   deleteImageAvatar,
   insertMyAvatar,
@@ -83,7 +83,6 @@ function CustomAvatar() {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const inputTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const windowSize = useWindowSize()
   const { data: myAvatars } = useQueryMyAvatars(accessToken ?? '')
   const { data: templates } = useQueryTemplates(accessToken ?? '')
 
@@ -256,7 +255,7 @@ function CustomAvatar() {
 
   const handleDownload = () => {
     const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
-    downloadBase64Image(dataUrl, 'custom_avatar.png')
+    downloadBase64Image(dataUrl, `${name}.png`)
   }
 
   const handleSelect = (
@@ -454,132 +453,131 @@ function CustomAvatar() {
           </div>
         </div>
       </div>
-      <div className="w-full h-[calc(100vh-60px)] bg-[#252627] flex">
+      <div className="w-full h-[calc(100vh-60px)] bg-[#252627] flex flex-col lg:flex-row">
         {/* LayoutCategories */}
         <LayoutCategories template={template} options={options} onSelect={handleSelect} />
 
-        <div className="w-full basis-3/5 flex justify-center pl-4 flex-col items-center bg-[#ebecf0] relative">
-          <div
-            id="button-select-color"
-            className="absolute left-6 top-6 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
-            onClick={handleOpenColor}
-          >
-            <button className="flex flex-row justify-center items-center" type="button">
-              <span>
-                <VscSymbolColor size={24} />
-              </span>
-            </button>
+        <div className="w-full basis-11/12 lg:basis-3/5 lg:p-3 flex flex-row gap-3 justify-center items-center bg-[#ebecf0]">
+          <div className="flex flex-col gap-2 h-full pt-8 pr-8">
             <div
-              id="menu-color-options"
-              className={clsx(
-                'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
-                { hidden: !isOpenColor }
-              )}
+              id="button-select-color"
+              className="bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
+              onClick={handleOpenColor}
             >
-              <div className="w-full flex flex-col gap-y-1 p-3">
-                <h2 className="w-full text-left font-medium ml-2 mb-2">Bảng màu</h2>
-                <input
-                  type="color"
-                  width={30}
-                  height={30}
-                  className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
-                  onChange={(e) => setColor(e.target.value)}
-                />
-              </div>
-              <div className="w-full flex flex-col gap-y-1 p-3">
-                <div className="flex flex-row">
+              <button className="flex flex-row justify-center items-center" type="button">
+                <span>
                   <VscSymbolColor size={24} />
-                  <h2 className="w-full text-left font-medium ml-2 mb-2">Màu sắc mặc định</h2>
-                </div>
-                <div className="grid grid-cols-4 w-[280px] gap-3">
-                  {colors.map((color) => (
-                    <div
-                      key={color}
-                      style={{ backgroundColor: color }}
-                      className={clsx(
-                        'flex flex-row w-14 h-14 bg-clip-content border rounded-md bg-white border-gray-500 cursor-pointer',
-                        {
-                          'p-1 border-2 !border-blue-500':
-                            color &&
-                            options.find((opt) => opt.type === 'color' && opt.value === color)
-                        }
-                      )}
-                      onClick={() => setColor(color)}
-                    ></div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className="absolute left-6 top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
-            onClick={handleOpenBackgroundColor}
-          >
-            <button
-              id="button-select-bg-color"
-              className="flex flex-row justify-center items-center"
-              type="button"
-            >
-              <span>
-                <IoColorFillOutline size={24} />
-              </span>
-            </button>
-            <div
-              id="menu-bg-color-options"
-              className={clsx(
-                'absolute top-[80%] right-0 z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
-                { hidden: !isOpenBackgroundColor }
-              )}
-            >
-              <div className="w-full flex flex-row gap-y-1 p-3">
-                <div>
+                </span>
+              </button>
+              <div
+                id="menu-color-options"
+                className={clsx(
+                  'absolute top-[21%] right-[42%] lg:top-[12%] lg:right-[25%] z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
+                  { hidden: !isOpenColor }
+                )}
+              >
+                <div className="w-full flex flex-col gap-y-1 p-3">
                   <h2 className="w-full text-left font-medium ml-2 mb-2">Bảng màu</h2>
                   <input
                     type="color"
                     width={30}
                     height={30}
                     className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
-                    onChange={(e) => setBgColor(e.target.value)}
+                    onChange={(e) => setColor(e.target.value)}
                   />
                 </div>
-                <div className="ml-3">
-                  <h2 className="w-full text-left font-medium ml-2 mb-2">Transparent</h2>
+                <div className="w-full flex flex-col gap-y-1 p-3">
+                  <div className="flex flex-row">
+                    <VscSymbolColor size={24} />
+                    <h2 className="w-full text-left font-medium ml-2 mb-2">Màu sắc mặc định</h2>
+                  </div>
+                  <div className="grid grid-cols-4 w-[280px] gap-3">
+                    {colors.map((color) => (
+                      <div
+                        key={color}
+                        style={{ backgroundColor: color }}
+                        className={clsx(
+                          'flex flex-row w-14 h-14 bg-clip-content border rounded-md bg-white border-gray-500 cursor-pointer',
+                          {
+                            'p-1 border-2 !border-blue-500':
+                              color &&
+                              options.find((opt) => opt.type === 'color' && opt.value === color)
+                          }
+                        )}
+                        onClick={() => setColor(color)}
+                      ></div>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="w-full flex flex-col gap-y-1 p-3">
-                <div className="flex flex-row">
-                  <VscSymbolColor size={24} />
-                  <h2 className="w-full text-left font-medium ml-2 mb-2">Màu sắc mặc định</h2>
+            </div>
+            <div
+              className="bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
+              onClick={handleOpenBackgroundColor}
+            >
+              <button
+                id="button-select-bg-color"
+                className="flex flex-row justify-center items-center"
+                type="button"
+              >
+                <span>
+                  <IoColorFillOutline size={24} />
+                </span>
+              </button>
+              <div
+                id="menu-bg-color-options"
+                className={clsx(
+                  'absolute top-[29%] right-[42%] lg:top-[20%] lg:right-[25%] z-50 my-4 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow',
+                  { hidden: !isOpenBackgroundColor }
+                )}
+              >
+                <div className="w-full flex flex-col gap-y-1 p-3">
+                  <div>
+                    <h2 className="w-full text-left font-medium ml-2 mb-2">Bảng màu</h2>
+                    <input
+                      type="color"
+                      width={30}
+                      height={30}
+                      className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
+                      onChange={(e) => setBgColor(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 w-[280px] gap-3">
-                  {bgColors.map((bgColor) => (
-                    <button
-                      key={bgColor}
-                      style={{ backgroundColor: bgColor }}
-                      className={clsx(
-                        'flex flex-row w-14 h-14 bg-clip-content border rounded-md border-gray-500 cursor-pointer',
-                        {
-                          'p-1 border-2 !border-blue-500':
-                            bgColor &&
-                            options.find(
-                              (opt) => opt.type === 'background' && opt.value === bgColor
-                            )
-                        },
-                        {
-                          '!bg-[url("/assets/bg-transparent.jpg")]': bgColor === 'transparent'
-                        }
-                      )}
-                      onClick={() => setBgColor(bgColor)}
-                    ></button>
-                  ))}
+                <div className="w-full flex flex-col gap-y-1 p-3">
+                  <div className="flex flex-row">
+                    <VscSymbolColor size={24} />
+                    <h2 className="w-full text-left font-medium ml-2 mb-2">Màu sắc mặc định</h2>
+                  </div>
+                  <div className="grid grid-cols-4 w-[280px] gap-3">
+                    {bgColors.map((bgColor) => (
+                      <button
+                        key={bgColor}
+                        style={{ backgroundColor: bgColor }}
+                        className={clsx(
+                          'flex flex-row w-14 h-14 bg-clip-content border rounded-md border-gray-500 cursor-pointer',
+                          {
+                            'p-1 border-2 !border-blue-500':
+                              bgColor &&
+                              options.find(
+                                (opt) => opt.type === 'background' && opt.value === bgColor
+                              )
+                          },
+                          {
+                            '!bg-[url("/assets/bg-transparent.jpg")]': bgColor === 'transparent'
+                          }
+                        )}
+                        onClick={() => setBgColor(bgColor)}
+                      ></button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <canvas
             ref={canvasRef}
-            width={windowSize.width > 1420 ? 620 : 520}
-            height={windowSize.width > 1420 ? 620 : 520}
+            width={520}
+            height={520}
             className="pointer-events-none rounded-lg shadow-md"
           ></canvas>
         </div>

@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { OptionType } from '.'
 import { Template } from '~/types'
 import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
+import { useWindowSize } from '~/hooks'
 
 interface AvatarOptionType {
   id: string
@@ -51,11 +52,23 @@ interface LayoutCategoryProps {
 }
 
 function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) {
-  const [tab, setTab] = useState<string>('hair')
+  const [tab, setTab] = useState<string>('')
+  const [isOpenCategoryOptions, setIsOpenCategoryOptions] = useState<boolean>(false)
+
+  const windowSize = useWindowSize()
+
+  const handleTabClick = (id: string) => {
+    if (tab === id) {
+      setIsOpenCategoryOptions(!isOpenCategoryOptions)
+    } else {
+      setTab(id)
+      setIsOpenCategoryOptions(true)
+    }
+  }
 
   return (
-    <div className="basis-2/5 text-white flex">
-      <div className="w-[90px] h-full bg-[#18191b] flex flex-col items-center justify-center">
+    <div className="basis-1/12 lg:basis-2/5 text-white flex flex-col lg:flex-row">
+      <div className="w-full h-20 lg:w-[90px] lg:h-full bg-[#18191b] flex justify-between lg:flex-col lg:justify-center">
         {AVATAR_OPTIONS.map(({ id, title, icon: Icon }) => (
           <div
             key={id}
@@ -63,17 +76,23 @@ function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) 
             className={clsx(
               'basis-1/5 flex flex-col items-center w-full justify-center cursor-pointer',
               {
-                'bg-[#252627]': tab === id
+                'bg-[#252627]': tab === id && isOpenCategoryOptions
               }
             )}
-            onClick={() => setTab(id)}
+            onClick={() => handleTabClick(id)}
           >
             <Icon />
             <h2>{title}</h2>
           </div>
         ))}
       </div>
-      <div className="w-[calc(100%-90px)] h-full p-4">
+      <div
+        className={clsx('w-full lg:w-[calc(100%-90px)] h-full pt-6 pl-4 lg:p-4 overflow-y-auto', {
+          hidden: !isOpenCategoryOptions,
+          'fixed top-[19%] w-full h-full bg-neutral-900/80 z-50':
+            isOpenCategoryOptions && windowSize.width < 1024
+        })}
+      >
         <CategoryOptions tab={tab} template={template} options={options} onSelect={onSelect} />
       </div>
     </div>
