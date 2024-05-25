@@ -73,7 +73,11 @@ function CustomAvatar() {
   const { accessToken, user } = useUser()
   const debouncedColor = useDebounce(color, 300)
   const debouncedBgColor = useDebounce(bgColor, 300)
-  const params = useParams<{ mode: 'create' | 'edit'; templateId: string; id?: string }>()
+  const params = useParams<{
+    mode: 'create' | 'edit'
+    templateId: string
+    id?: string
+  }>()
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -251,7 +255,7 @@ function CustomAvatar() {
 
   const handleDownload = () => {
     const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
-    downloadBase64Image(dataUrl, 'custom_avatar.png')
+    downloadBase64Image(dataUrl, `${name}.png`)
   }
 
   const handleSelect = (
@@ -453,7 +457,7 @@ function CustomAvatar() {
         {/* LayoutCategories */}
         <LayoutCategories template={template} options={options} onSelect={handleSelect} />
 
-        <div className="w-full basis-11/12 lg:basis-3/5 lg:p-3 p-3 flex flex-row gap-3 justify-center items-center bg-[#ebecf0]">
+        <div className="w-full basis-11/12 lg:basis-3/5 lg:p-3 flex flex-row gap-3 justify-center items-center bg-[#ebecf0]">
           <div className="flex flex-col gap-2 h-full pt-8 pr-8">
             <div
               id="button-select-color"
