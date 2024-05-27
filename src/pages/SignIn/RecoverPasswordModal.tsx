@@ -43,7 +43,7 @@ function RecoverPasswordModal({ isOpen, onClick }: RecoverPasswordModalProps) {
   return (
     <div
       className={clsx(
-        'fixed z-50 flex justify-center items-center w-full inset-0 bg-neutral-900/80',
+        'fixed z-50 flex justify-center items-center w-full inset-0 bg-neutral-900/80 backdrop-blur-sm animate-fade-in',
         { hidden: !isOpen }
       )}
     >
@@ -53,6 +53,7 @@ function RecoverPasswordModal({ isOpen, onClick }: RecoverPasswordModalProps) {
             <h3 className="text-xl font-semibold text-gray-900">Recover password</h3>
             <button
               type="button"
+              disabled={loading}
               className="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
               onClick={onClick}
             >
@@ -76,7 +77,7 @@ function RecoverPasswordModal({ isOpen, onClick }: RecoverPasswordModalProps) {
                   spellCheck="false"
                   type="email"
                   id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-none block w-full p-2.5 mb-1"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base rounded-lg outline-none block w-full p-2.5 mb-1"
                   placeholder="example@gmail.com"
                   {...register('email', { required: true })}
                 />

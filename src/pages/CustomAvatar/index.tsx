@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { IoIosArrowRoundBack, IoMdArrowDropdown } from 'react-icons/io'
+import { IoIosArrowBack, IoIosMore, IoMdArrowDropdown } from 'react-icons/io'
 import { GoDownload, GoPencil } from 'react-icons/go'
 import { BsCloudCheck } from 'react-icons/bs'
 import { v4 as uuidv4 } from 'uuid'
@@ -14,7 +14,7 @@ import clsx from 'clsx'
 import { downloadBase64Image, slugify } from '~/utils'
 import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
 import { AvatarOption, CategoryType, MyAvatar, Template } from '~/types'
-import { useDebounce, useRouter, useUser, useWindowSize } from '~/hooks'
+import { useDebounce, useRouter, useUser } from '~/hooks'
 import {
   deleteImageAvatar,
   insertMyAvatar,
@@ -22,6 +22,7 @@ import {
   uploadImageMyAvatar
 } from '~/services/avatars'
 import LayoutCategories from './LayoutCategories'
+import Avatar from './Avatar'
 
 const colors = [
   '#FF0000',
@@ -57,6 +58,7 @@ type ParamsType = {
 }
 
 function CustomAvatar() {
+  const [fabricCanvas, setFabricCanvas] = useState<fabric.Canvas | null>(null)
   const [isEdit, setIsEdit] = useState(false)
   const [isOpenOptions, setIsOpenOptions] = useState<boolean>(false)
   const [isOpenColor, setIsOpenColor] = useState<boolean>(false)
@@ -74,12 +76,9 @@ function CustomAvatar() {
   const debouncedColor = useDebounce(color, 300)
   const debouncedBgColor = useDebounce(bgColor, 300)
   const params = useParams<ParamsType>()
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const inputTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const windowSize = useWindowSize()
   const { data: myAvatars } = useQueryMyAvatars(accessToken ?? '')
   const { data: templates } = useQueryTemplates(accessToken ?? '')
 
@@ -159,45 +158,6 @@ function CustomAvatar() {
   }, [myAvatars, params.id, params.mode, params.templateId, templates])
 
   useEffect(() => {
-    if (!canvasRef.current) return
-
-    const canvas = new fabric.Canvas(canvasRef.current, {
-      width: canvasRef.current.width,
-      height: canvasRef.current.height,
-      backgroundColor: options.find((opt) => opt.type === 'background')?.value || '#fff'
-    })
-    fabricCanvasRef.current = canvas
-
-    options
-      .filter((opt) => !['color', 'background'].includes(opt.type))
-      .forEach((option) => {
-        fabric.Image.fromURL(
-          option.value,
-          (image) => {
-            image.scaleToWidth(canvas.getWidth())
-            image.scaleToHeight(canvas.getHeight())
-
-            image.filters?.push(
-              new fabric.Image.filters.BlendColor({
-                color: options.find((opt) => opt.type === 'color')?.value || '#000000',
-                mode: 'tint'
-              })
-            )
-
-            image.applyFilters()
-            canvas.add(image)
-          },
-          { crossOrigin: 'anonymous' }
-        )
-      })
-    canvas.renderAll()
-
-    return () => {
-      canvas.dispose()
-    }
-  }, [options])
-
-  useEffect(() => {
     setOptions((prevOptions) => {
       const index = options.findIndex((opt) => opt.type === 'color')
       if (index !== -1) {
@@ -222,6 +182,7 @@ function CustomAvatar() {
   const handleOpenOptions = () => setIsOpenOptions(!isOpenOptions)
   const handleOpenColor = () => setIsOpenColor(!isOpenColor)
   const handleOpenBackgroundColor = () => setIsOpenBackgroundColor(!isOpenBackgroundColor)
+
   const handleClickEdit = () => {
     setIsEdit(true)
 
@@ -253,7 +214,7 @@ function CustomAvatar() {
   }
 
   const handleDownload = () => {
-    const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+    const dataUrl = fabricCanvas?.toDataURL({ format: 'image/png' }) ?? ''
     downloadBase64Image(dataUrl, `${name}`)
     setIsOpenOptions(false)
   }
@@ -291,7 +252,7 @@ function CustomAvatar() {
         })
 
         // handle upload image my avatar
-        const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+        const dataUrl = fabricCanvas?.toDataURL({ format: 'image/png' }) ?? ''
         if (!dataUrl) {
           setIsLoading(false)
           return console.error('Failed to generate data URL from canvas.')
@@ -329,7 +290,7 @@ function CustomAvatar() {
         })
 
         // handle upload image my avatar
-        const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
+        const dataUrl = fabricCanvas?.toDataURL({ format: 'image/png' }) ?? ''
         if (!dataUrl) {
           setIsLoading(false)
           return console.error('Failed to generate data URL from canvas.')
@@ -361,17 +322,17 @@ function CustomAvatar() {
 
   return (
     <div className="max-h-screen h-screen select-none">
-      <div className="h-[60px] px-6 py-2 font-medium">
-        <div className="flex flex-row item-center justify-between">
+      <div className="w-full h-[60px] flex flex-row items-center px-2 md:px-6 py-2 font-medium">
+        <div className="w-full flex flex-row item-center justify-between">
           <button
-            className="flex flex-row items-center bg-gray-400 text-white px-3 py-2 rounded-md outline-none"
+            className="flex flex-row items-center bg-gray-400 text-white px-2 py-0 md:px-3 md:py-2 rounded-md outline-none"
             onClick={() => router.back()}
           >
-            <IoIosArrowRoundBack size={24} />
-            Back
+            <IoIosArrowBack className="w-5 h-5" />
+            <span className="hidden md:block">Back</span>
           </button>
 
-          <div className="relative min-w-56 flex justify-center items-center text-2xl">
+          <div className="relative min-w-40 md:min-w-56 flex justify-center items-center text-xl md:text-2xl">
             <h1
               className={clsx('absolute left-0 top-0 p-1 border border-transparent rounded', {
                 hidden: isEdit
@@ -392,7 +353,7 @@ function CustomAvatar() {
               type="text"
               spellCheck="false"
               className={clsx(
-                'w-56 absolute left-0 top-0 outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
+                'w-40 md:w-56 absolute left-0 top-0 outline-none rounded p-1 border border-white hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
                 { '!block': isEdit }
               )}
               onChange={(e) => setName(e.target.value)}
@@ -404,12 +365,13 @@ function CustomAvatar() {
           <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <button
               id="button-menu-options"
-              className="flex flex-row justify-center items-center bg-blue-500 text-white py-2 px-3 rounded-md outline-none hover:bg-blue-700 active:scale-95 transition-transform duration-300"
+              className="flex flex-row justify-center items-center bg-blue-500 text-white py-2 px-3 rounded-md outline-none md:hover:bg-blue-600 active:scale-95 transition-transform duration-300"
               type="button"
               onClick={handleOpenOptions}
             >
-              <span>Options</span>
-              <IoMdArrowDropdown size={24} />
+              <span className="hidden md:block">Options</span>
+              <IoMdArrowDropdown className="w-5 h-5 hidden md:block" />
+              <IoIosMore className="w-5 h-5 md:hidden" />
             </button>
             <div
               id="menu-options"
@@ -449,20 +411,19 @@ function CustomAvatar() {
           </div>
         </div>
       </div>
-      <div className="w-full h-[calc(100vh-60px)] bg-[#252627] flex">
+
+      <div className="w-full h-[calc(100vh-60px)] bg-[#252627] flex flex-col-reverse md:flex-row">
         {/* LayoutCategories */}
         <LayoutCategories template={template} options={options} onSelect={handleSelect} />
 
-        <div className="w-full basis-3/5 flex justify-center pl-4 flex-col items-center bg-[#ebecf0] relative">
+        <div className="w-full basis-3/5 flex justify-center flex-col items-center bg-[#ebecf0] relative">
           <div
             id="button-select-color"
-            className="absolute left-6 top-6 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
+            className="w-12 h-12 absolute bottom-3 right-3 md:left-6 md:top-6 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse md:hover:bg-gray-300 cursor-pointer"
             onClick={handleOpenColor}
           >
             <button className="flex flex-row justify-center items-center" type="button">
-              <span>
-                <VscSymbolColor size={24} />
-              </span>
+              <VscSymbolColor size={24} />
             </button>
             <div
               id="menu-color-options"
@@ -507,7 +468,7 @@ function CustomAvatar() {
             </div>
           </div>
           <div
-            className="absolute left-6 top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse hover:bg-gray-300 cursor-pointer"
+            className="w-12 h-12 absolute bottom-3 right-[70px] md:left-6 md:top-20 bg-white rounded-lg p-3 flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse md:hover:bg-gray-300 cursor-pointer"
             onClick={handleOpenBackgroundColor}
           >
             <button
@@ -571,12 +532,9 @@ function CustomAvatar() {
               </div>
             </div>
           </div>
-          <canvas
-            ref={canvasRef}
-            width={windowSize.width > 1420 ? 620 : 520}
-            height={windowSize.width > 1420 ? 620 : 520}
-            className="pointer-events-none rounded-lg shadow-md"
-          ></canvas>
+
+          {/* Avatar preview */}
+          <Avatar options={options} setFabricCanvas={setFabricCanvas} />
         </div>
       </div>
     </div>

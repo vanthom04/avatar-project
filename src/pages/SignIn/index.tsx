@@ -46,12 +46,14 @@ function SignIn() {
 
   return (
     <>
-      <div className="flex w-full h-screen items-center justify-center bg-gray-200 px-5 md:px-0">
-        <div className="w-[900px] h-[500px] m-auto bg-white p-6 rounded-3xl flex flex-row gap-3 shadow-xl">
+      <div className="flex w-full h-screen items-center justify-center bg-gray-200 px-0 sm:px-5 md:px-0">
+        <div className="sm:w-[900px] sm:h-[500px] m-auto bg-white md:p-6 rounded-3xl flex flex-row gap-3 shadow-xl overflow-hidden">
           <div className="rounded-xl p-2 m-auto hidden md:block ">
             <img src="./assets/avatar-customize.png" className="rounded-lg shadow-lg" />
           </div>
-          <form className="bg-white w-full p-8" onSubmit={handleSubmit(onSubmit)}>
+
+          {/* form sign in */}
+          <form className="bg-white w-full p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <h1 className="text-3xl font-medium mb-2 mt-2">Sign in here!</h1>
               <p>Please sign in to generate Custom Avatars!</p>
@@ -66,7 +68,7 @@ function SignIn() {
                 type="text"
                 autoComplete="off"
                 spellCheck="false"
-                className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-3 outline-none appearance-none"
+                className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-1 outline-none appearance-none"
                 placeholder="Email"
                 {...register('email', { required: true })}
               />
@@ -76,7 +78,7 @@ function SignIn() {
                 </div>
               )}
             </div>
-            <div className="relative">
+            <div className="mt-2">
               <div className="flex flex-row">
                 <label className="block mb-1 font-medium">Password</label>
                 <p className="ml-1 text-red-500">*</p>
@@ -137,6 +139,7 @@ function SignIn() {
           </form>
         </div>
       </div>
+
       <RecoverPasswordModal isOpen={isOpenModal} onClick={handleOpenModal} />
     </>
   )
