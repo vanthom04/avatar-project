@@ -144,7 +144,7 @@ function SignUpPage() {
             </Link>
           </div>
         </form>
-        <div className="w-full rounded-xl p-2 m-auto">
+        <div className="w-full rounded-xl p-2 m-auto hidden md:block">
           <img src="/assets/avatar-customize.png" className="rounded-lg shadow-lg" />
         </div>
       </div>

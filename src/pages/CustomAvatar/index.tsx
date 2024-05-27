@@ -254,7 +254,8 @@ function CustomAvatar() {
 
   const handleDownload = () => {
     const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
-    downloadBase64Image(dataUrl, `${name}.png`)
+    downloadBase64Image(dataUrl, `${name}`)
+    setIsOpenOptions(false)
   }
 
   const handleSelect = (id: string, type: CategoryType, value: string) => {
