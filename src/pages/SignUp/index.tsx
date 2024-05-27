@@ -55,14 +55,14 @@ function SignUpPage() {
     <div className="w-full h-screen flex items-center bg-gray-100 p-3">
       <div className="w-[920px] h-[520px] m-auto bg-white p-3 rounded-3xl flex flex-row justify-center gap-3 shadow-xl">
         <form
-          className="bg-white w-full flex flex-col justify-center select-none p-8"
+          className="bg-white w-full flex flex-col justify-center select-none p-4 sm:p-8"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div>
             <h1 className="text-3xl font-medium mb-2">Sign up here!</h1>
-            <h3 className=" text-[#72747c] text-[15px] mb-6">
+            <p className=" text-[#72747c] text-[15px] mb-6">
               Get started with our quick and easy registration process.
-            </h3>
+            </p>
           </div>
           <div>
             <div className="mb-2.5">
@@ -144,7 +144,7 @@ function SignUpPage() {
             </Link>
           </div>
         </form>
-        <div className="w-full rounded-xl p-2 m-auto">
+        <div className="w-full hidden md:block rounded-xl p-2 m-auto">
           <img src="/assets/avatar-customize.png" className="rounded-lg shadow-lg" />
         </div>
       </div>

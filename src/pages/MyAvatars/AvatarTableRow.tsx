@@ -153,7 +153,7 @@ function AvatarTableRow({
         </button>
         <div
           className={clsx(
-            'fixed top-0 left-0 right-0 bottom-0 bg-neutral-800/45 backdrop-blur-sm hidden',
+            'fixed top-0 left-0 right-0 bottom-0 z-50 bg-neutral-800/45 backdrop-blur-sm hidden',
             { '!block': isDelete }
           )}
         ></div>
@@ -166,7 +166,7 @@ function AvatarTableRow({
             }
           )}
         >
-          <div className="relative p-4 w-full max-w-md max-h-full">
+          <div className="relative p-4 w-[380px] md:w-full md:max-w-md max-h-full">
             <div className="relative bg-white rounded-lg shadow">
               <button
                 type="button"
@@ -205,7 +205,7 @@ function AvatarTableRow({
                   />
                 </svg>
                 <h3 className="mb-5 text-lg font-normal text-gray-500">
-                  Are you sure you want to delete "{name}" ?
+                  Are you sure you want to delete "{name}"?
                 </h3>
                 <div className="w-full flex flex-row items-center justify-center">
                   <button

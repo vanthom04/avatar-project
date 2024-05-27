@@ -15,26 +15,24 @@ function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) 
   const [tab, setTab] = useState<CategoryType>('hair')
 
   return (
-    <div className="basis-2/5 text-white flex">
-      <div className="w-[90px] h-full bg-[#18191b] flex flex-col items-center justify-center">
+    <div className="basis-2/5 flex flex-col md:flex-row text-white">
+      <div className="w-full md:w-[90px] bg-[#18191b] flex flex-row md:flex-col items-center justify-center">
         {AVATAR_OPTIONS.map(({ id, title, icon: Icon }) => (
           <div
             key={id}
             title={title}
             className={clsx(
-              'basis-1/5 flex flex-col items-center w-full justify-center cursor-pointer',
-              {
-                'bg-[#252627]': tab === id
-              }
+              'basis-1/5 flex flex-col items-center justify-center py-3 md:py-0 cursor-pointer',
+              { 'bg-[#252627]': tab === id }
             )}
             onClick={() => setTab(id)}
           >
-            <Icon />
-            <h2>{title}</h2>
+            <Icon className="w-5 h-5 md:w-6 md:h-6" />
+            <h2 className="text-sm md:text-base">{title}</h2>
           </div>
         ))}
       </div>
-      <div className="w-[calc(100%-90px)] h-full p-4">
+      <div className="w-full md:w-[calc(100%-90px)] h-full p-4 overflow-y-auto">
         <CategoryOptions tab={tab} template={template} options={options} onSelect={onSelect} />
       </div>
     </div>

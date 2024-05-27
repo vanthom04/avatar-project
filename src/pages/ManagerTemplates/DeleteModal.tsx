@@ -20,7 +20,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   return (
     <Dialog.Root open={isOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed inset-0" />
+        <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed inset-0 z-50" />
 
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50">
           <div className="w-full flex flex-col items-center justify-center mb-2">

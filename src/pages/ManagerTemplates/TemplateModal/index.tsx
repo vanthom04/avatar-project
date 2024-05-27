@@ -203,7 +203,7 @@ const TemplateModal: React.FC = () => {
   return (
     <Dialog.Root open={templateModal.isOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed inset-0" />
+        <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed z-50 inset-0" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-4 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50">
           <div className="relative text-2xl text-left mb-12">
             <h1

@@ -19,7 +19,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     id: 1,
     to: config.routes.myAvatars,
-    title: 'My Avatar',
+    title: 'My avatars',
     icon: HiOutlineHome
   },
   {
@@ -57,7 +57,7 @@ function Navbar() {
   }, [user, role, menu])
 
   return (
-    <aside className="p-4 flex-col gap-y-3 lg:basis-1/5 hidden md:flex border-r border-r-gray-300">
+    <aside className="p-4 flex-col gap-y-3 basis-1/3 xl:basis-1/5 hidden md:flex border-r border-r-gray-300">
       {menu.map(({ id, to, title, icon }) => (
         <NavbarItem key={id} to={to} title={title} icon={icon} />
       ))}
