@@ -26,7 +26,7 @@ function RecoverPasswordModal({ isOpen, onClick }: RecoverPasswordModalProps) {
       setLoading(true)
       const redirectTo = import.meta.env.DEV
         ? 'http://localhost:6200/update-password'
-        : 'https://avatar-project-psi.vercel.app/update-password'
+        : 'https://custom-avatar-eta.vercel.app/update-password'
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, { redirectTo })
       if (error) throw error
 
