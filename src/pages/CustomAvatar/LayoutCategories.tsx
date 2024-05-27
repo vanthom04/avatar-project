@@ -22,7 +22,7 @@ function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) 
             key={id}
             title={title}
             className={clsx(
-              'basis-1/5 flex flex-col items-center justify-center py-3 md:py-0 cursor-pointer',
+              'basis-1/5 w-full flex flex-col items-center justify-center py-3 md:py-0 cursor-pointer',
               { 'bg-[#252627]': tab === id }
             )}
             onClick={() => setTab(id)}
