@@ -1,13 +1,17 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
-
-import { AvatarOption, Category, CategoryType, Template } from '~/types'
+import { Category, Template } from '~/types'
+import { OptionsType } from '~/types/avatars'
 
 interface CategoryOptionProps {
-  tab: CategoryType
+  tab: string
   template: Template
-  options: AvatarOption[]
-  onSelect: (id: string, type: CategoryType, value: string) => void
+  options: OptionsType[]
+  onSelect: (
+    id: string,
+    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
+    value: string
+  ) => void
 }
 
 function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionProps) {
@@ -32,7 +36,13 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
           src={option.image_url ?? ''}
           alt={option.name ?? ''}
           loading="lazy"
-          onClick={() => onSelect(option.id ?? '', tab, option.image_url ?? '')}
+          onClick={() =>
+            onSelect(
+              option.id ?? '',
+              tab as 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
+              option.image_url ?? ''
+            )
+          }
         />
       ))}
     </div>

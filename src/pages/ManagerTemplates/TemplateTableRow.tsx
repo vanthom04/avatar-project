@@ -4,7 +4,7 @@ import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 
-import { months } from '~/utils'
+import { getImageUrl, months } from '~/utils'
 import { Template } from '~/types'
 import { useTemplateModal, useUser } from '~/hooks'
 import {

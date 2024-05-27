@@ -34,7 +34,7 @@ function ManagerTemplatesPage() {
 
   const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
-  const { isLoading, refetch } = useQueryTemplates(accessToken ?? '')
+  const { data: templates, isLoading, refetch } = useQueryTemplates(accessToken ?? '')
 
   const handleCreateNewTemplate = async () => {
     if (role && !['admin', 'editor'].includes(role)) {

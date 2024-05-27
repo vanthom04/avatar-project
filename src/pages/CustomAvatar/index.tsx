@@ -50,12 +50,6 @@ const bgColors = [
   '#fff'
 ]
 
-type ParamsType = {
-  mode: 'create' | 'edit'
-  templateId: string
-  id?: string
-}
-
 function CustomAvatar() {
   const [isEdit, setIsEdit] = useState(false)
   const [isOpenOptions, setIsOpenOptions] = useState<boolean>(false)
@@ -258,6 +252,7 @@ function CustomAvatar() {
   const handleDownload = () => {
     const dataUrl = fabricCanvasRef.current?.toDataURL({ format: 'image/png' }) ?? ''
     downloadBase64Image(dataUrl, `${name}.png`)
+    setIsOpenOptions(false)
   }
 
   const handleSelect = (id: string, type: CategoryType, value: string) => {

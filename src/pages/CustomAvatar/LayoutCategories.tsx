@@ -1,10 +1,10 @@
 import CategoryOptions from './CategoryOptions'
-import { useState } from 'react'
+import { FunctionComponent, useState } from 'react'
 import clsx from 'clsx'
-import { OptionType } from '.'
-import { Template } from '~/types'
+import { AvatarOption, CategoryType, Template } from '~/types'
 import { EyeIcon, GlassIcon, HairIcon, HandIcon, MouthIcon } from '~/components/Icons'
 import { useWindowSize } from '~/hooks'
+import { IconType } from 'react-icons'
 
 interface AvatarOptionType {
   id: string
@@ -84,7 +84,7 @@ function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) 
       <div
         className={clsx('w-full lg:w-[calc(100%-90px)] h-full pt-6 pl-4 lg:p-4 overflow-y-auto', {
           hidden: !isOpenCategoryOptions,
-          'fixed top-[19%] w-full h-full bg-neutral-900/80 z-50':
+          'fixed top-[140px] left-0 w-full h-full bg-neutral-900/80 z-50':
             isOpenCategoryOptions && windowSize.width < 1024
         })}
       >
