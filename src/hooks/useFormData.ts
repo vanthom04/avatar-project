@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { CategoryType } from '~/types'
 
 export interface Option {
   id?: string | null
@@ -9,18 +10,14 @@ export interface Option {
 }
 
 export interface Category {
-  type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'
+  type: CategoryType
   name: string
   options: Option[]
 }
 
 interface FormDataStore {
-  name: string
-  image_url?: string | null
-  image_path?: string | null
-  file?: File | null
   data: Category[] | null
-  setOptions: (type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand', options: Option[]) => void
+  setOptions: (type: CategoryType, options: Option[]) => void
   reset: () => void
 }
 
@@ -53,23 +50,12 @@ export const initialData: Category[] = [
 ]
 
 const useFormData: () => FormDataStore = create<FormDataStore>((set) => ({
-  name: '',
-  image_url: null,
-  image_path: null,
-  file: null,
-  data: initialData,
+  data: [...initialData],
   setOptions: (type, options) =>
     set((state) => ({
       data: state.data?.map((item) => (item.type === type ? { ...item, options } : item))
     })),
-  reset: () =>
-    set({
-      name: '',
-      image_url: null,
-      image_path: null,
-      file: null,
-      data: initialData
-    })
+  reset: () => set({ data: [...initialData] })
 }))
 
 export default useFormData

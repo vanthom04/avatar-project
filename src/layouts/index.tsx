@@ -3,9 +3,9 @@ import Navbar from './Navbar'
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-screen font-Roboto overflow-hidden">
+    <div className="w-full h-screen font-Roboto bg-[#f9fafb] overflow-hidden">
       <Header />
-      <div className="h-[calc(100vh-80px)] flex ">
+      <div className="h-[calc(100vh-60px)] md:h-[calc(100vh-80px)] flex ">
         <Navbar />
         <main className=" basis-full p-4 overflow-y-auto">{children}</main>
       </div>

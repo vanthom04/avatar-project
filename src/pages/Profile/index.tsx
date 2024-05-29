@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import { CiCamera } from 'react-icons/ci'
 import { GoPencil } from 'react-icons/go'
 
-import { useRouter, useUser } from '~/hooks'
+import { useUser } from '~/hooks'
 import { supabase } from '~/config'
 import { getImageUrl, slugify } from '~/utils'
 
@@ -15,18 +15,14 @@ function ProfilePage() {
   const [phone, setPhone] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<string>('')
   const [isEditName, setIsEditName] = useState<boolean>(false)
-  const [isEditEmail, setIsEditEmail] = useState<boolean>(false)
   const [isEditPhone, setIsEditPhone] = useState<boolean>(false)
 
   const inputFileRef = useRef<HTMLInputElement | null>(null)
   const inputNameRef = useRef<HTMLInputElement | null>(null)
   const inputNameTimer = useRef<NodeJS.Timeout | null>(null)
-  const inputEmailRef = useRef<HTMLInputElement | null>(null)
-  const inputEmailTimer = useRef<NodeJS.Timeout | null>(null)
   const inputPhoneRef = useRef<HTMLInputElement | null>(null)
   const inputPhoneTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const router = useRouter()
   const { user, role, userDetails, avatar, setAvatar } = useUser()
 
   useEffect(() => {
@@ -36,8 +32,6 @@ function ProfilePage() {
       setPhone(userDetails?.phone ?? '')
       setSelectedImage(getImageUrl('profile', avatar ?? ''))
     }
-
-    console.log('re render')
   }, [avatar, user, userDetails])
 
   const handleSelectImage = () => {
@@ -66,8 +60,10 @@ function ProfilePage() {
         })
         if (updateUserError) throw updateUserError
 
-        const { error: removeError } = await supabase.storage.from('profile').remove([avatar ?? ''])
-        if (removeError) throw removeError
+        if (avatar) {
+          const { error: removeError } = await supabase.storage.from('profile').remove([avatar])
+          if (removeError) throw removeError
+        }
 
         const { error: uploadError } = await supabase.storage
           .from('profile')
@@ -79,9 +75,8 @@ function ProfilePage() {
         toast.error((error as Error).message)
       }
 
-      setAvatar?.(imagePath)
       setSelectedImage(getImageUrl('profile', imagePath))
-      router.reload()
+      setAvatar?.(imagePath)
     }
   }
 
@@ -124,45 +119,6 @@ function ProfilePage() {
 
         setIsEditName(false)
         toast.success('Update name successfully')
-      } catch (error) {
-        return toast.error((error as Error).message)
-      }
-    }
-  }
-
-  const handleClickEditEmail = () => {
-    setIsEditEmail(true)
-
-    if (inputEmailTimer.current) {
-      clearTimeout(inputEmailTimer.current)
-    }
-
-    inputEmailTimer.current = setTimeout(() => {
-      inputEmailRef.current?.focus()
-      inputEmailRef.current?.select()
-    }, 0)
-  }
-
-  const handleBlurInputEmail = () => {
-    if (!email) {
-      setEmail(userDetails?.email)
-    }
-
-    setIsEditEmail(false)
-  }
-
-  const handleUpdateEmail = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      if (!email) {
-        return setEmail(userDetails?.email)
-      }
-
-      try {
-        const { error } = await supabase.auth.updateUser({ email })
-        if (error) throw error
-
-        setIsEditEmail(false)
-        toast.success('Update email successfully')
       } catch (error) {
         return toast.error((error as Error).message)
       }
@@ -237,12 +193,12 @@ function ProfilePage() {
           <p>{email}</p>
         </div>
       </div>
-      <div className="2/3 w-full flex items-center justify-center">
-        <ul className="list-none w-full p-4 lg:p-12 select-none">
-          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
+      <div className="2/3 w-full flex items-center justify-center py-2">
+        <ul className="list-none w-full p-1 xs:p-4 lg:p-12 select-none">
+          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Name</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+            <div className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6 relative">
               <div
                 className={clsx('absolute p-1 border border-transparent rounded', {
                   hidden: isEditName
@@ -273,44 +229,17 @@ function ProfilePage() {
               />
             </div>
           </li>
-          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
+          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Email</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
-              <div
-                className={clsx('absolute p-1 border border-transparent rounded', {
-                  hidden: isEditEmail
-                })}
-              >
-                {email}
-                <div
-                  className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 cursor-pointer p-2 hover:bg-gray-200 hover:rounded-full transition-all duration-300 select-none"
-                  onClick={handleClickEditEmail}
-                >
-                  <GoPencil className="w-4 h-4" />
-                </div>
-              </div>
-              <input
-                ref={inputEmailRef}
-                type="email"
-                value={email}
-                name="input-email"
-                spellCheck="false"
-                autoComplete="off"
-                className={clsx(
-                  'w-full absolute p-1 border border-transparent rounded text-base outline-none bg-transparent hover:border-gray-700 transition-all duration-300 focus:border-gray-700 hidden',
-                  { '!block': isEditEmail }
-                )}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={handleBlurInputEmail}
-                onKeyDown={handleUpdateEmail}
-              />
+            <div className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6 relative">
+              <div className="p-1 border border-transparent">{email}</div>
             </div>
           </li>
-          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
+          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Phone</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+            <div className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6 relative">
               <div
                 className={clsx('absolute p-1 border border-transparent rounded', {
                   hidden: isEditPhone
@@ -341,15 +270,15 @@ function ProfilePage() {
               />
             </div>
           </li>
-          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
+          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Status</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <p className="basis-2/3 ml-8 lg:ml-0 xl:ml-6">Active</p>
+            <p className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6">Active</p>
           </li>
-          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-white">
+          <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Role</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <p className="basis-2/3 ml-8 lg:ml-0 xl:ml-6">
+            <p className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6">
               {role.charAt(0).toUpperCase() + role.substring(1)}
             </p>
           </li>

@@ -8,8 +8,8 @@ interface TemplateItemProps {
 const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
   return (
     <div
-      className="flex flex-col gap-y-2 p-4 border rounded-xl cursor-pointer"
-      onClick={() => onClick?.(data?.id)}
+      className="flex flex-col gap-y-2 p-2 sm:p-4 border rounded-xl cursor-pointer"
+      onClick={() => onClick?.(data.id)}
     >
       <div>
         <img
@@ -19,7 +19,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
           loading="lazy"
         />
       </div>
-      <h3 className="text-black text-xl font-medium text-center">{data.name}</h3>
+      <h3 className="text-black sm:text-xl font-normal sm:font-medium text-center">{data.name}</h3>
     </div>
   )
 }

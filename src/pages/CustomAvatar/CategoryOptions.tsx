@@ -1,17 +1,13 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
-import { OptionType } from '.'
-import { Category, Template } from '~/types'
+
+import { AvatarOption, Category, CategoryType, Template } from '~/types'
 
 interface CategoryOptionProps {
-  tab: string
+  tab: CategoryType
   template: Template
-  options: OptionType[]
-  onSelect: (
-    id: string,
-    type: 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
-    value: string
-  ) => void
+  options: AvatarOption[]
+  onSelect: (id: string, type: CategoryType, value: string) => void
 }
 
 function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionProps) {
@@ -23,7 +19,7 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
   }, [tab, template.categories])
 
   return (
-    <div className="flex flex-row flex-wrap gap-8">
+    <div className="flex flex-row flex-wrap gap-3 md:gap-8">
       {category?.options?.map((option) => (
         <img
           key={option.id}
@@ -36,13 +32,7 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
           src={option.image_url ?? ''}
           alt={option.name ?? ''}
           loading="lazy"
-          onClick={() =>
-            onSelect(
-              option.id ?? '',
-              tab as 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand',
-              option.image_url ?? ''
-            )
-          }
+          onClick={() => onSelect(option.id ?? '', tab, option.image_url ?? '')}
         />
       ))}
     </div>

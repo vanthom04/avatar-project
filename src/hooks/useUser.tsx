@@ -1,8 +1,8 @@
 import { User, UserMetadata } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { getRole } from '~/services/auth'
 import { supabase } from '~/config'
+import { getRole } from '~/services/auth'
 
 type UserContextType = {
   accessToken: string | null
