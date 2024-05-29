@@ -86,7 +86,6 @@ function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) 
       </div>
       <div
         className={clsx('w-full lg:w-[calc(100%-90px)] h-full pt-6 pl-4 lg:p-4 overflow-y-auto', {
-          hidden: !isOpenCategoryOptions,
           'fixed top-[18%] w-full h-full bg-neutral-900/80 z-50':
             isOpenCategoryOptions && windowSize.width < 1024
         })}
