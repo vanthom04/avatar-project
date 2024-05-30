@@ -13,7 +13,7 @@ interface AccountOption {
   action?: () => void
 }
 
-const MENU_OPTIONS: AccountOption[] = [
+export const MENU_ACCOUNT: AccountOption[] = [
   {
     id: 1,
     to: config.routes.myAvatars,
@@ -23,11 +23,6 @@ const MENU_OPTIONS: AccountOption[] = [
     id: 2,
     to: config.routes.profile,
     title: 'Profile'
-  },
-  {
-    id: 3,
-    to: config.routes.settings,
-    title: 'Settings'
   }
 ]
 
@@ -75,7 +70,7 @@ function AccountPopover() {
   }
 
   return (
-    <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+    <div className="relative hidden md:flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       <button
         id="button-user-menu"
         type="button"
@@ -105,7 +100,7 @@ function AccountPopover() {
           <span className="block text-sm text-gray-600 truncate">{userDetails?.email}</span>
         </div>
         <ul className="py-2">
-          {MENU_OPTIONS.map((option) => (
+          {MENU_ACCOUNT.map((option) => (
             <li key={option.id}>
               <Link
                 to={option.to}

@@ -193,12 +193,12 @@ function ProfilePage() {
           <p>{email}</p>
         </div>
       </div>
-      <div className="2/3 w-full flex items-center justify-center">
-        <ul className="list-none w-full p-4 lg:p-12 select-none">
+      <div className="2/3 w-full flex items-center justify-center py-2">
+        <ul className="list-none w-full p-1 xs:p-4 lg:p-12 select-none">
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Name</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+            <div className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6 relative">
               <div
                 className={clsx('absolute p-1 border border-transparent rounded', {
                   hidden: isEditName
@@ -232,14 +232,14 @@ function ProfilePage() {
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Email</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+            <div className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6 relative">
               <div className="p-1 border border-transparent">{email}</div>
             </div>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Phone</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <div className="basis-2/3 ml-8 lg:ml-0 xl:ml-6 relative">
+            <div className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6 relative">
               <div
                 className={clsx('absolute p-1 border border-transparent rounded', {
                   hidden: isEditPhone
@@ -273,12 +273,12 @@ function ProfilePage() {
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Status</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <p className="basis-2/3 ml-8 lg:ml-0 xl:ml-6">Active</p>
+            <p className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6">Active</p>
           </li>
           <li className="w-full p-7 rounded-[10px] flex flex-row odd:bg-[#f0f5f8] even:bg-transparent">
             <div className="basis-1/6 lg:basis-1/5">Role</div>
             <span className="mx-6 lg:mx-12">:</span>
-            <p className="basis-2/3 ml-8 lg:ml-0 xl:ml-6">
+            <p className="basis-2/3 ml-0 xs:ml-8 lg:ml-0 xl:ml-6">
               {role.charAt(0).toUpperCase() + role.substring(1)}
             </p>
           </li>

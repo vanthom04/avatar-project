@@ -154,8 +154,8 @@ function ManagerTemplatesPage() {
   return (
     <>
       <div className="w-full flex flex-col gap-y-4">
-        <div className="flex flex-row items-center justify-between">
-          <h1 className="text-[22px] lg:text-2xl font-normal">Manager templates</h1>
+        <div className="flex flex-row items-center justify-end md:justify-between">
+          <h1 className="hidden md:block text-[22px] lg:text-2xl font-normal">Manager templates</h1>
           <button
             className="flex items-center justify-center bg-blue-500 text-white px-2.5 py-2 lg:px-3 lg:py-2.5 rounded-md active:scale-95 transition-transform duration-300"
             onClick={handleCreateNewTemplate}
@@ -164,7 +164,7 @@ function ManagerTemplatesPage() {
             <span>New template</span>
           </button>
         </div>
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div className="relative overflow-hidden rounded-lg shadow-md sm:rounded-lg">
           <div
             className={clsx('w-full h-20 p-4 bg-white', { '!bg-[#d0ecfe]': selected.length > 0 })}
           >
@@ -195,64 +195,66 @@ function ManagerTemplatesPage() {
               />
             </div>
           </div>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-              <tr>
-                <th scope="col" className="p-4">
-                  <div className="flex items-center">
-                    <input
-                      id="input-checkbox-all"
-                      checked={
-                        templates !== undefined &&
-                        templates?.length > 0 &&
-                        templates?.length === selected.length
-                      }
-                      type="checkbox"
-                      name="checkbox"
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
-                      onChange={handleSelectAll}
-                    />
-                    <label htmlFor="input-checkbox-all" className="sr-only">
-                      checkbox
-                    </label>
-                  </div>
-                </th>
-                <th scope="col" className="px-4 py-2">
-                  Name
-                </th>
-                <th scope="col" className="px-4 py-2 text-center">
-                  Thumbnail
-                </th>
-                <th scope="col" className="px-4 py-2 text-center">
-                  Created at
-                </th>
-                <th scope="col" className="px-4 py-2 text-center">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr className="bg-white">
-                  <td colSpan={5} className="p-4">
-                    <Spinner className="mx-auto" />
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+                <tr>
+                  <th scope="col" className="p-4">
+                    <div className="flex items-center">
+                      <input
+                        id="input-checkbox-all"
+                        checked={
+                          templates !== undefined &&
+                          templates?.length > 0 &&
+                          templates?.length === selected.length
+                        }
+                        type="checkbox"
+                        name="checkbox"
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                        onChange={handleSelectAll}
+                      />
+                      <label htmlFor="input-checkbox-all" className="sr-only">
+                        checkbox
+                      </label>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-2">
+                    Name
+                  </th>
+                  <th scope="col" className="px-4 py-2 text-center">
+                    Thumbnail
+                  </th>
+                  <th scope="col" className="px-4 py-2 text-center">
+                    Created at
+                  </th>
+                  <th scope="col" className="px-4 py-2 text-center">
+                    Action
+                  </th>
                 </tr>
-              ) : visibleTemplates.length > 0 ? (
-                visibleTemplates?.map((template) => (
-                  <TemplateTableRow
-                    key={template.id}
-                    template={template}
-                    selected={selected.findIndex((s) => s.id === template.id) !== -1}
-                    onSelect={() => handleSelect(template)}
-                    onRefetch={refetch}
-                  />
-                ))
-              ) : (
-                <TemplateTableEmptyRow />
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <tr className="bg-white">
+                    <td colSpan={5} className="p-4">
+                      <Spinner className="mx-auto" />
+                    </td>
+                  </tr>
+                ) : visibleTemplates.length > 0 ? (
+                  visibleTemplates?.map((template) => (
+                    <TemplateTableRow
+                      key={template.id}
+                      template={template}
+                      selected={selected.findIndex((s) => s.id === template.id) !== -1}
+                      onSelect={() => handleSelect(template)}
+                      onRefetch={refetch}
+                    />
+                  ))
+                ) : (
+                  <TemplateTableEmptyRow />
+                )}
+              </tbody>
+            </table>
+          </div>
           <div
             className={clsx('justify-end bg-white p-2 hidden', {
               '!flex': templates && templates?.length > 0
@@ -261,7 +263,7 @@ function ManagerTemplatesPage() {
             {/* Previous Page Button */}
             <button
               className={clsx(
-                'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full cursor-pointer',
+                'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
                 { 'opacity-50 cursor-not-allowed hover:bg-white': currentPage === 1 }
               )}
               onClick={() => handlePageChange(currentPage - 1)}
@@ -274,10 +276,9 @@ function ManagerTemplatesPage() {
               <button
                 key={index}
                 className={clsx(
-                  'mt-2 px-2 ml-3 rounded-full bg-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer',
+                  'mt-2 px-2 ml-3 text-white rounded-full bg-blue-400 hover:bg-blue-500',
                   {
-                    'font-medium text-white !bg-blue-500 hover:bg-blue-500':
-                      currentPage === index + 1
+                    'font-medium !bg-blue-500 hover:bg-blue-500': currentPage === index + 1
                   }
                 )}
                 onClick={() => handlePageChange(index + 1)}
@@ -289,7 +290,7 @@ function ManagerTemplatesPage() {
             {/* Next Page Button */}
             <button
               className={clsx(
-                'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full cursor-pointer',
+                'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
                 { 'opacity-50 cursor-not-allowed hover:bg-white': currentPage === totalPages }
               )}
               onClick={() => handlePageChange(currentPage + 1)}

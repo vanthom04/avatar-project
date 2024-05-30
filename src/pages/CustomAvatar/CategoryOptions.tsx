@@ -23,7 +23,7 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
   }, [tab, template.categories])
 
   return (
-    <div className="flex flex-row flex-wrap gap-8">
+    <div className="flex flex-row flex-wrap gap-3 md:gap-8">
       {category?.options?.map((option) => (
         <img
           key={option.id}
