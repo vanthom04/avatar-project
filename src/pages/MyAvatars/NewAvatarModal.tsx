@@ -27,8 +27,8 @@ const NewAvatarModal: React.FC<NewAvatarModalProps> = ({ isOpen, onClose }) => {
     <Dialog.Root open={isOpen} onOpenChange={onChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed z-50 inset-0" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-8 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50 overflow-hidden">
-          <Dialog.Title className="text-3xl font-semibold p-1">New avatar</Dialog.Title>
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-8 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50 overflow-hidden animate-fade-in">
+          <Dialog.Title className="text-xl md:text-3xl font-semibold p-1">New avatar</Dialog.Title>
           <div className="w-full h-full flex flex-col gap-y-4">
             {isLoading ? (
               <div className="w-full h-full flex items-center justify-center">

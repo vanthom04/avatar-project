@@ -204,7 +204,7 @@ const TemplateModal: React.FC = () => {
     <Dialog.Root open={templateModal.isOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed z-50 inset-0" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-4 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50">
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-4 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50 animate-fade-in">
           <div className="relative text-2xl text-left mb-12">
             <h1
               className={clsx('absolute left-0 top-0 p-1 border border-transparent rounded', {
