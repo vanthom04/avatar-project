@@ -1,4 +1,6 @@
 import { Template } from '~/types'
+import { getImageUrl } from '~/utils'
+import Avatar from '../CustomAvatar/Avatar'
 
 interface TemplateItemProps {
   data: Template
@@ -14,7 +16,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ data, onClick }) => {
       <div>
         <img
           className="w-full h-full object-center origin-center lg:hover:scale-105 transition-transform duration-300"
-          src={data.image_url}
+          src={getImageUrl('templates', data.image_path)}
           alt={data.name}
           loading="lazy"
         />

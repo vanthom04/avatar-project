@@ -14,7 +14,6 @@ export const getRole = async (accessToken: string | undefined): Promise<RoleType
         Authorization: `Bearer ${accessToken}`
       }
     })
-
     return res[0].roles.name as RoleType
   } catch (error) {
     return Promise.reject(error)
