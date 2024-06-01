@@ -1,5 +1,5 @@
-import clsx from 'clsx'
 import { useEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { AvatarOption, Category, CategoryType, Template } from '~/types'
 
@@ -19,16 +19,13 @@ function CategoryOptions({ tab, template, options, onSelect }: CategoryOptionPro
   }, [tab, template.categories])
 
   return (
-    <div className="flex flex-row flex-wrap gap-3 md:gap-8">
+    <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {category?.options?.map((option) => (
         <img
           key={option.id}
-          className={clsx(
-            'object-cover w-20 h-20 rounded-md border border-black bg-white cursor-pointer',
-            {
-              'border-2 border-red-500': option && options.find((opt) => opt.id === option.id)
-            }
-          )}
+          className={clsx('object-cover rounded-md border border-black bg-white cursor-pointer', {
+            'border-2 border-red-500': option && options.find((opt) => opt.id === option.id)
+          })}
           src={option.image_url ?? ''}
           alt={option.name ?? ''}
           loading="lazy"

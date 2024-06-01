@@ -77,8 +77,24 @@ const Avatar: React.FC<AvatarProps> = ({ options, setFabricCanvas }) => {
   return (
     <canvas
       ref={canvasRef}
-      width={windowSize.width > 1420 ? 620 : windowSize.width < 460 ? 320 : 520}
-      height={windowSize.width > 1420 ? 620 : windowSize.width < 460 ? 320 : 520}
+      width={
+        windowSize.width > 1420
+          ? 620
+          : windowSize.width < 460
+            ? 320
+            : windowSize.width < 640
+              ? 370
+              : 520
+      }
+      height={
+        windowSize.width > 1420
+          ? 620
+          : windowSize.width < 460
+            ? 320
+            : windowSize.width < 640
+              ? 370
+              : 520
+      }
       className="pointer-events-none rounded-lg shadow-md"
     ></canvas>
   )

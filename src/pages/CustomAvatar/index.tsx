@@ -489,7 +489,7 @@ function CustomAvatar() {
             >
               <div className="w-full flex flex-row gap-y-1 p-3">
                 <div>
-                  <h2 className="w-full text-left font-medium ml-2 mb-2">Bảng màu</h2>
+                  <h2 className="w-full text-left font-medium mb-2">Bảng màu</h2>
                   <input
                     type="color"
                     width={30}
@@ -497,9 +497,6 @@ function CustomAvatar() {
                     className="w-14 h-14 p-1 border rounded-md bg-white border-gray-500 cursor-pointer"
                     onChange={(e) => setBgColor(e.target.value)}
                   />
-                </div>
-                <div className="ml-3">
-                  <h2 className="w-full text-left font-medium ml-2 mb-2">Transparent</h2>
                 </div>
               </div>
               <div className="w-full flex flex-col gap-y-1 p-3">
