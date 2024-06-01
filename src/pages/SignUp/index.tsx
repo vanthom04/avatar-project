@@ -75,12 +75,12 @@ function SignUpPage() {
                 spellCheck="false"
                 autoComplete="off"
                 type="text"
-                className="w-full border border-gray-400 px-3 py-2 rounded-lg outline-none appearance-none"
+                className="w-full border border-gray-400 px-3 py-2 mb-1 rounded-lg outline-none appearance-none"
                 placeholder="Michael Jackson"
                 {...register('fullName', { required: true })}
               />
               {errors.fullName && (
-                <p className="text-red-500 text-xs italic">Full name is required!</p>
+                <p className="text-red-500 text-sm italic">Full name is required!</p>
               )}
             </div>
 
@@ -93,11 +93,11 @@ function SignUpPage() {
                 disabled={loading}
                 autoComplete="off"
                 type="text"
-                className="w-full border border-gray-400 px-3 py-2 rounded-lg outline-none"
+                className="w-full border border-gray-400 px-3 py-2 mb-1 rounded-lg outline-none"
                 placeholder="example@gmail.com"
                 {...register('email', { required: true })}
               />
-              {errors.email && <p className="text-red-500 text-xs italic">Email is required!</p>}
+              {errors.email && <p className="text-red-500 text-sm italic">Email is required!</p>}
             </div>
 
             <div className="relative">
@@ -105,7 +105,7 @@ function SignUpPage() {
                 <label className="block mb-1 font-medium">Password</label>
                 <p className="ml-1 text-red-500">*</p>
               </div>
-              <div className="flex items-center border border-gray-400 rounded-lg">
+              <div className="flex items-center border border-gray-400 rounded-lg mb-1">
                 <input
                   disabled={loading}
                   autoComplete="off"
@@ -123,7 +123,7 @@ function SignUpPage() {
                 </div>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs italic">Password is required!</p>
+                <p className="text-red-500 text-sm italic">Password is required!</p>
               )}
             </div>
           </div>
@@ -145,7 +145,11 @@ function SignUpPage() {
           </div>
         </form>
         <div className="w-full hidden md:block rounded-xl p-2 m-auto">
-          <img src="/assets/avatar-customize.webp" className="rounded-lg shadow-lg" />
+          <img
+            src="/assets/avatar-customize.webp"
+            alt="custom-avatar"
+            className="rounded-lg shadow-lg"
+          />
         </div>
       </div>
     </div>

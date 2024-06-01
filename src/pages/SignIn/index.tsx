@@ -49,11 +49,15 @@ function SignIn() {
       <div className="flex w-full h-screen items-center justify-center bg-gray-200 px-0 sm:px-5 md:px-0">
         <div className="sm:w-[900px] sm:h-[500px] m-auto bg-white md:p-6 rounded-3xl flex flex-row gap-3 shadow-xl overflow-hidden">
           <div className="rounded-xl p-2 m-auto hidden md:block ">
-            <img src="./assets/avatar-customize.webp" className="rounded-lg shadow-lg" />
+            <img
+              src="./assets/avatar-customize.webp"
+              alt="custom-avatar"
+              className="rounded-lg shadow-lg"
+            />
           </div>
 
           {/* form sign in */}
-          <form className="bg-white w-full p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
+          <form className="w-full p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <h1 className="text-3xl font-medium mb-2 mt-2">Sign in here!</h1>
               <p>Please sign in to generate Custom Avatars!</p>
@@ -101,6 +105,7 @@ function SignIn() {
                 />
                 <div className="flex justify-end ">
                   <button
+                    id="show-password"
                     type="button"
                     onClick={togglePasswordVisibility}
                     className="absolute inset-y-0 right-0 flex items-center pr-3"
@@ -120,16 +125,17 @@ function SignIn() {
               )}
             </div>
             <p
-              className="flex justify-end text-blue-500 cursor-pointer hover:underline"
+              className="flex justify-end text-blue-600 text-[15px] cursor-pointer hover:underline"
               onClick={handleOpenModal}
             >
               Forgot password
             </p>
 
             <button
+              id="sign-in"
               disabled={loading}
               type="submit"
-              className="w-full flex justify-center text-[17px] p-2 border border-blue-500 mt-6 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+              className="w-full flex justify-center text-[17px] p-2 border border-blue-500 mt-4 rounded-lg bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-transform duration-300"
             >
               {loading ? <Spinner className="w-5 h-6" /> : 'Sign in'}
             </button>
@@ -137,7 +143,7 @@ function SignIn() {
               <span>Don't have an account?</span>
               <Link
                 to={config.routes.signUp}
-                className="text-blue-500 ml-1 cursor-pointer hover:underline"
+                className="text-blue-600 ml-1 cursor-pointer hover:underline"
               >
                 Sign up
               </Link>
