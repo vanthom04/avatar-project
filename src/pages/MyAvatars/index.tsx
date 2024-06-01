@@ -7,11 +7,15 @@ import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
+import { httpRequest } from '~/utils/httpRequest'
+import { MyAvatar } from '~/types'
+import { getImageUrl } from '~/utils'
 
 function MyAvatars() {
   const { accessToken } = useUser()
   const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
 
+  const [dataMyAvatar, setDataMyAvatar] = useState<MyAvatar[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(5)
 
@@ -31,6 +35,23 @@ function MyAvatars() {
       setCurrentPage(page)
     }
   }
+
+  useEffect(() => {
+    const getDataMyAvatar = async () => {
+      try {
+        const response = await httpRequest.get<MyAvatar[]>('rest/v1/my_avatars?select=*', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`
+          }
+        })
+        setDataMyAvatar(response)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getDataMyAvatar()
+  }, [accessToken])
 
   return (
     <div className="select-none">
@@ -62,15 +83,15 @@ function MyAvatars() {
                   <Spinner className="mx-auto text-white" />
                 </th>
               </tr>
-            ) : myAvatars && myAvatars.length > 0 ? (
-              visibleAvatars?.map((avatar) => (
+            ) : dataMyAvatar && dataMyAvatar.length > 0 ? (
+              dataMyAvatar?.map((avatar) => (
                 <AvatarTableRow
                   key={avatar.id}
                   id={avatar.id}
                   template_id={avatar.template_id}
                   name={avatar.name}
                   image_path={avatar.image_path}
-                  thumbnail={avatar.thumbnail ?? ''}
+                  thumbnail={getImageUrl('my_avatars', avatar.image_path)}
                   created_at={avatar.created_at}
                   onRefetch={refetch}
                 />
