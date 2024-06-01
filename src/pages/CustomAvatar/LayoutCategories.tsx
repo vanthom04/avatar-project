@@ -47,7 +47,7 @@ interface LayoutCategoryProps {
 }
 
 function LayoutCategories({ template, options, onSelect }: LayoutCategoryProps) {
-  const [tab, setTab] = useState<string>('')
+  const [tab, setTab] = useState<string>('hair')
   const [isOpenCategoryOptions, setIsOpenCategoryOptions] = useState<boolean>(false)
 
   const windowSize = useWindowSize()

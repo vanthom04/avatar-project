@@ -97,7 +97,7 @@ function MyAvatars() {
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 className={clsx(
-                  'mt-2 px-2 ml-3 text-white rounded-full bg-blue-400 hover:bg-blue-500',
+                  'mt-2 px-2 ml-3 text-white rounded-full bg-blue-300 hover:bg-blue-500',
                   {
                     'font-medium !bg-blue-500 hover:bg-blue-500': currentPage === index + 1
                   }

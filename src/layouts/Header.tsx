@@ -45,7 +45,7 @@ function Header() {
 
   return (
     <>
-      <header className="relative w-full h-[60px] md:h-[80px] flex items-center justify-between px-5 border-b border-gray-300 z-40">
+      <header className="relative w-full h-[60px] md:h-[80px] flex items-center justify-between px-5 border-b border-gray-300 z-40 select-none">
         <Link to={config.routes.myAvatars} className="cursor-pointer">
           <img
             className="w-[35px] sm:w-[45px] lg:w-[65px]"
