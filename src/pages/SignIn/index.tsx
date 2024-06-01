@@ -49,7 +49,7 @@ function SignIn() {
       <div className="flex w-full h-screen items-center justify-center bg-gray-200 px-0 sm:px-5 md:px-0">
         <div className="sm:w-[900px] sm:h-[500px] m-auto bg-white md:p-6 rounded-3xl flex flex-row gap-3 shadow-xl overflow-hidden">
           <div className="rounded-xl p-2 m-auto hidden md:block ">
-            <img src="./assets/avatar-customize.png" className="rounded-lg shadow-lg" />
+            <img src="./assets/avatar-customize.webp" className="rounded-lg shadow-lg" />
           </div>
 
           {/* form sign in */}
@@ -60,10 +60,13 @@ function SignIn() {
             </div>
             <div className="mt-7">
               <div className="flex flex-row">
-                <label className="block mb-1 font-medium">Email</label>
+                <label htmlFor="email" className="block mb-1 font-medium">
+                  Email
+                </label>
                 <p className="ml-1 text-red-500">*</p>
               </div>
               <input
+                id="email"
                 disabled={loading}
                 type="text"
                 autoComplete="off"
@@ -80,11 +83,14 @@ function SignIn() {
             </div>
             <div className="mt-2">
               <div className="flex flex-row">
-                <label className="block mb-1 font-medium">Password</label>
+                <label htmlFor="password" className="block mb-1 font-medium">
+                  Password
+                </label>
                 <p className="ml-1 text-red-500">*</p>
               </div>
               <div className="relative">
                 <input
+                  id="password"
                   disabled={loading}
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="off"

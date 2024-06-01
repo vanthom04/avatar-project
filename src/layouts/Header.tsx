@@ -49,7 +49,7 @@ function Header() {
         <Link to={config.routes.myAvatars} className="cursor-pointer">
           <img
             className="w-[35px] sm:w-[45px] lg:w-[65px]"
-            src="/assets/logo2000x2000.png"
+            src="/assets/logo200x200.png"
             alt="Logo Canawan Global"
           />
         </Link>

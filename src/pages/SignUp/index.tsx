@@ -145,7 +145,7 @@ function SignUpPage() {
           </div>
         </form>
         <div className="w-full hidden md:block rounded-xl p-2 m-auto">
-          <img src="/assets/avatar-customize.png" className="rounded-lg shadow-lg" />
+          <img src="/assets/avatar-customize.webp" className="rounded-lg shadow-lg" />
         </div>
       </div>
     </div>

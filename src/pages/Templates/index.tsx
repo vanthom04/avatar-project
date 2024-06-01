@@ -1,7 +1,7 @@
 import { useRouter, useUser } from '~/hooks'
 import { useQueryTemplates } from '~/queries'
 import Spinner from '~/components/Spinner'
-import TemplateItem from './TemplateItem'
+import TemplateItem from '~/components/TemplateItem'
 
 function TemplatesPage() {
   const router = useRouter()
