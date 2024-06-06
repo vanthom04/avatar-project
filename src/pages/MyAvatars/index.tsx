@@ -1,17 +1,19 @@
+import clsx from 'clsx'
+import { useEffect, useState } from 'react'
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
+import { FaPlus } from 'react-icons/fa6'
+
+import { useUser } from '~/hooks'
 import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
-import { useUser } from '~/hooks'
-import { useState } from 'react'
-import clsx from 'clsx'
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
-import { FaPlus } from 'react-icons/fa6'
+import NewAvatarModal from './NewAvatarModal'
 
 function MyAvatars() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(4)
+  const itemsPerPage = 4
 
   const { accessToken } = useUser()
   const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
@@ -23,44 +25,15 @@ function MyAvatars() {
 
   const totalPages = Math.ceil((myAvatars?.length || 0) / itemsPerPage)
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [myAvatars])
+
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page)
     }
   }
-
-  const getPaginationItems = (currentPage: number, totalPages: number) => {
-    const pages = []
-    const maxPagesToShow = 1
-
-    if (totalPages <= 4) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
-      }
-    } else {
-      pages.push(1)
-
-      if (currentPage > maxPagesToShow + 1) {
-        pages.push('...')
-      }
-
-      const startPage = Math.max(2, currentPage - maxPagesToShow)
-      const endPage = Math.min(totalPages - 1, currentPage + maxPagesToShow)
-
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i)
-      }
-
-      if (currentPage < totalPages - maxPagesToShow - 1) {
-        pages.push('...')
-      }
-
-      pages.push(totalPages)
-    }
-    return pages
-  }
-
-  const paginationItems = getPaginationItems(currentPage, totalPages)
 
   return (
     <>
@@ -126,7 +99,7 @@ function MyAvatars() {
             <div className="w-full flex justify-end items-center bg-white p-2">
               <button
                 className={clsx(
-                  'mt-2 flex justify-center items-center border border-gray-400 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+                  'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
                   { 'opacity-50 cursor-not-allowed hover:bg-white': currentPage === 1 }
                 )}
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -134,23 +107,24 @@ function MyAvatars() {
               >
                 <IoIosArrowBack />
               </button>
-              {paginationItems.map((item, index) => (
+              {Array.from({ length: totalPages }, (_, index) => (
                 <button
-                  className={clsx('text-sm mt-2 ml-3 rounded-full w-6 h-6', {
-                    'hover:bg-blue-300 hover:text-white border border-gray-400': item !== '...',
-                    'font-medium text-white bg-blue-500': currentPage === item,
-                    'cursor-not-allowed': item === '...'
-                  })}
+                  className={clsx(
+                    'mt-2 px-2 ml-3 text-white rounded-full bg-blue-300 hover:bg-blue-500',
+                    {
+                      'font-medium !bg-blue-500 hover:bg-blue-500': currentPage === index + 1
+                    }
+                  )}
                   key={index}
-                  onClick={() => typeof item === 'number' && handlePageChange(item)}
-                  disabled={item === '...'}
+                  onClick={() => handlePageChange(index + 1)}
+                  disabled={currentPage === index + 1}
                 >
-                  {item}
+                  {index + 1}
                 </button>
               ))}
               <button
                 className={clsx(
-                  'mt-2 ml-3 flex justify-center items-center border border-gray-400 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+                  'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
                   { 'opacity-50 cursor-not-allowed hover:bg-white': currentPage === totalPages }
                 )}
                 onClick={() => handlePageChange(currentPage + 1)}
@@ -162,6 +136,8 @@ function MyAvatars() {
           )}
         </div>
       </div>
+      {/* Modal new avatar */}
+      <NewAvatarModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   )
 }
