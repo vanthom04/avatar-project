@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosArrowBack } from 'react-icons/io'
 import { IoIosArrowForward } from 'react-icons/io'
@@ -46,8 +46,15 @@ function ManagerTemplatesPage() {
     templateModal.setRefetch?.(refetch)
   }
 
+  const handleFilterByName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentPage(1)
+    setFilterName(e.target.value)
+  }
+
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page)
+    }
   }
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,11 +152,46 @@ function ManagerTemplatesPage() {
     }
   }
 
-  const startIndex = (currentPage - 1) * itemsPerPage
+  const getPaginationItems = (currentPage: number, totalPages: number) => {
+    const pages = []
+    const maxPagesToShow = 1
 
+    if (totalPages <= 4) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      pages.push(1)
+
+      if (currentPage > maxPagesToShow + 1) {
+        pages.push('...')
+      }
+
+      const startPage = Math.max(2, currentPage - maxPagesToShow)
+      const endPage = Math.min(totalPages - 1, currentPage + maxPagesToShow)
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i)
+      }
+
+      if (currentPage < totalPages - maxPagesToShow - 1) {
+        pages.push('...')
+      }
+
+      pages.push(totalPages)
+    }
+    return pages
+  }
+
+  const startIndex = (currentPage - 1) * itemsPerPage
   const dataFiltered = filterTemplates(templates ?? [], filterName)
-  const visibleTemplates = dataFiltered.slice(startIndex, startIndex + itemsPerPage)
   const totalPages = Math.ceil((dataFiltered.length || 0) / itemsPerPage)
+  const paginationItems = useMemo(
+    () => getPaginationItems(currentPage, totalPages),
+    [currentPage, totalPages]
+  )
+
+  console.log(paginationItems)
 
   return (
     <>
@@ -191,7 +233,7 @@ function ManagerTemplatesPage() {
                 autoComplete="off"
                 placeholder="Search template..."
                 className="w-[250px] absolute pl-9 pr-4 py-3 rounded-lg outline-none border hover:border-gray-400 focus:border-gray-400"
-                onChange={(e) => setFilterName(e.target.value)}
+                onChange={handleFilterByName}
               />
             </div>
           </div>
@@ -239,16 +281,18 @@ function ManagerTemplatesPage() {
                       <Spinner className="mx-auto" />
                     </td>
                   </tr>
-                ) : visibleTemplates.length > 0 ? (
-                  visibleTemplates?.map((template) => (
-                    <TemplateTableRow
-                      key={template.id}
-                      template={template}
-                      selected={selected.findIndex((s) => s.id === template.id) !== -1}
-                      onSelect={() => handleSelect(template)}
-                      onRefetch={refetch}
-                    />
-                  ))
+                ) : dataFiltered.length > 0 ? (
+                  dataFiltered
+                    .slice(startIndex, startIndex + itemsPerPage)
+                    .map((template) => (
+                      <TemplateTableRow
+                        key={template.id}
+                        template={template}
+                        selected={selected.findIndex((s) => s.id === template.id) !== -1}
+                        onSelect={() => handleSelect(template)}
+                        onRefetch={refetch}
+                      />
+                    ))
                 ) : (
                   <TemplateTableEmptyRow />
                 )}
@@ -272,19 +316,18 @@ function ManagerTemplatesPage() {
               <IoIosArrowBack />
             </button>
             {/* Render page number buttons */}
-            {Array.from({ length: totalPages }, (_, index) => (
+            {paginationItems.map((item, index) => (
               <button
+                className={clsx('mt-2 px-2 ml-3 rounded-full', {
+                  'hover:bg-blue-300 hover:text-white': item !== '...',
+                  'font-medium text-white bg-blue-500': currentPage === item,
+                  'cursor-not-allowed': item === '...'
+                })}
                 key={index}
-                className={clsx(
-                  'mt-2 px-2 ml-3 text-white rounded-full bg-blue-400 hover:bg-blue-500',
-                  {
-                    'font-medium !bg-blue-500 hover:bg-blue-500': currentPage === index + 1
-                  }
-                )}
-                onClick={() => handlePageChange(index + 1)}
-                disabled={currentPage === index + 1}
+                onClick={() => typeof item === 'number' && handlePageChange(item)}
+                disabled={item === '...'}
               >
-                {index + 1}
+                {item}
               </button>
             ))}
             {/* Next Page Button */}

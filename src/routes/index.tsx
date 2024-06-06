@@ -17,7 +17,6 @@ const TemplatesPage = lazy(() => import('~/pages/Templates'))
 const MyAvatarsPage = lazy(() => import('~/pages/MyAvatars'))
 const CustomAvatarPage = lazy(() => import('~/pages/CustomAvatar'))
 const UpdatePasswordPage = lazy(() => import('~/pages/UpdatePassword'))
-const RecoverPasswordPage = lazy(() => import('~/pages/RecoverPassword'))
 const ManagerTemplatesPage = lazy(() => import('~/pages/ManagerTemplates'))
 
 const router = createBrowserRouter([
@@ -26,8 +25,7 @@ const router = createBrowserRouter([
     element: <PublicRoute />,
     children: [
       { path: config.routes.signIn, element: <SignInPage /> },
-      { path: config.routes.signUp, element: <SignUpPage /> },
-      { path: config.routes.recoverPassword, element: <RecoverPasswordPage /> }
+      { path: config.routes.signUp, element: <SignUpPage /> }
     ]
   },
   {
