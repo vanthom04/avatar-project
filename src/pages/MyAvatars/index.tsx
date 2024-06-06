@@ -12,7 +12,7 @@ import AvatarTableEmpty from './AvatarTableEmpty'
 function MyAvatars() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(3)
+  const [itemsPerPage] = useState(4)
 
   const { accessToken } = useUser()
   const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
@@ -128,7 +128,7 @@ function MyAvatars() {
             <div className="w-full flex justify-end items-center bg-white p-2">
               <button
                 className={clsx(
-                  'mt-2 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+                  'mt-2 flex justify-center items-center border border-gray-400 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
                   { 'opacity-50 cursor-not-allowed hover:bg-white': currentPage === 1 }
                 )}
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -138,8 +138,8 @@ function MyAvatars() {
               </button>
               {paginationItems.map((item, index) => (
                 <button
-                  className={clsx('mt-2 px-2 ml-3 rounded-full', {
-                    'hover:bg-blue-300 hover:text-white': item !== '...',
+                  className={clsx('text-sm mt-2 ml-3 rounded-full w-6 h-6', {
+                    'hover:bg-blue-300 hover:text-white border border-gray-400': item !== '...',
                     'font-medium text-white bg-blue-500': currentPage === item,
                     'cursor-not-allowed': item === '...'
                   })}
@@ -152,7 +152,7 @@ function MyAvatars() {
               ))}
               <button
                 className={clsx(
-                  'mt-2 ml-3 flex justify-center items-center border border-gray-500 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
+                  'mt-2 ml-3 flex justify-center items-center border border-gray-400 hover:bg-gray-300 text-gray-900 w-6 h-6 rounded-full',
                   { 'opacity-50 cursor-not-allowed hover:bg-white': currentPage === totalPages }
                 )}
                 onClick={() => handlePageChange(currentPage + 1)}
