@@ -2,18 +2,18 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
-import { useUser } from '~/hooks'
-import config, { supabase } from '~/config'
 import { getImageUrl } from '~/utils'
+import config, { supabase } from '~/config'
+import { useUser, useDebounce } from '~/hooks'
 
-interface OptionsType {
+interface AccountOption {
   id: number
   to: string
   title: string
   action?: () => void
 }
 
-const MENU_OPTIONS: OptionsType[] = [
+export const MENU_ACCOUNT: AccountOption[] = [
   {
     id: 1,
     to: config.routes.myAvatars,
@@ -23,11 +23,6 @@ const MENU_OPTIONS: OptionsType[] = [
     id: 2,
     to: config.routes.profile,
     title: 'Profile'
-  },
-  {
-    id: 3,
-    to: config.routes.settings,
-    title: 'Settings'
   }
 ]
 
@@ -36,6 +31,7 @@ function AccountPopover() {
   const [avatar, setAvatar] = useState<string>('')
 
   const { userDetails, avatar: avatarUrl } = useUser()
+  const debounceAvatar = useDebounce(avatarUrl, 1000)
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -53,8 +49,9 @@ function AccountPopover() {
   }, [])
 
   useEffect(() => {
-    setAvatar(getImageUrl('profile', avatarUrl ?? ''))
-  }, [avatarUrl])
+    if (!debounceAvatar) return
+    setAvatar(getImageUrl('profile', debounceAvatar))
+  }, [debounceAvatar])
 
   const handleOpen = () => setIsOpen(!isOpen)
 
@@ -73,7 +70,7 @@ function AccountPopover() {
   }
 
   return (
-    <div className="relative flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+    <div className="relative hidden md:flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       <button
         id="button-user-menu"
         type="button"
@@ -103,7 +100,7 @@ function AccountPopover() {
           <span className="block text-sm text-gray-600 truncate">{userDetails?.email}</span>
         </div>
         <ul className="py-2">
-          {MENU_OPTIONS.map((option) => (
+          {MENU_ACCOUNT.map((option) => (
             <li key={option.id}>
               <Link
                 to={option.to}

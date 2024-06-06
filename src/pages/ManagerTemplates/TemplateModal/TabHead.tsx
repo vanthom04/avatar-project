@@ -1,11 +1,12 @@
 import clsx from 'clsx'
 import { useState } from 'react'
 
+import { AVATAR_OPTIONS } from '~/_mock'
+import { CategoryType } from '~/types'
 import TabOptions from './TabOptions'
-import { AVATAR_OPTIONS } from '~/pages/CustomAvatar/LayoutCategories'
 
 const TabHead: React.FC = () => {
-  const [tab, setTab] = useState<'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand'>('hair')
+  const [selectedTab, setSelectedTab] = useState<CategoryType>('hair')
 
   return (
     <div>
@@ -16,16 +17,15 @@ const TabHead: React.FC = () => {
               <button
                 className={clsx(
                   'inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 outline-none',
-                  {
-                    '!border-blue-600 !text-blue-600': tab === id
-                  }
+                  selectedTab === id && '!border-blue-600 !text-blue-600'
                 )}
-                onClick={() => setTab(id as 'hair' | 'eyes' | 'mouth' | 'accessory' | 'hand')}
+                onClick={() => setSelectedTab(id)}
               >
                 <Icon
-                  className={clsx('w-5 h-5 me-2 text-gray-600', {
-                    '!text-blue-600': tab === id
-                  })}
+                  className={clsx(
+                    'w-5 h-5 me-2 text-gray-600',
+                    selectedTab === id && '!text-blue-600'
+                  )}
                 />
                 {title}
               </button>
@@ -33,7 +33,7 @@ const TabHead: React.FC = () => {
           ))}
         </ul>
       </div>
-      <TabOptions tab={tab} />
+      <TabOptions tab={selectedTab} />
     </div>
   )
 }

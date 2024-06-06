@@ -1,7 +1,7 @@
 import { useRouter, useUser } from '~/hooks'
 import { useQueryTemplates } from '~/queries'
 import Spinner from '~/components/Spinner'
-import TemplateItem from './TemplateItem'
+import TemplateItem from '~/components/TemplateItem'
 
 function TemplatesPage() {
   const router = useRouter()
@@ -15,7 +15,7 @@ function TemplatesPage() {
           <Spinner className="w-12 h-12" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {templates?.map((template) => (
             <TemplateItem
               key={template.id}

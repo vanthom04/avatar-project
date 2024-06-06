@@ -80,6 +80,9 @@ const TemplateModal: React.FC = () => {
       setFile(file)
       reader.readAsDataURL(file)
     }
+
+    // clear file
+    e.target.value = ''
   }
 
   const handleClose = () => {
@@ -93,101 +96,69 @@ const TemplateModal: React.FC = () => {
 
   const handleSaveTemplate = async () => {
     if (!accessToken) return toast.error('No access token!')
-    if (templateModal.mode === 'create') {
-      // Todo: handle create new template
-      if (!name || !file || !formData.data) return toast.error('No data!')
-      setIsLoading(true)
+    if (!name || !formData.data) return toast.error('No data!')
 
-      const templateId = uuidv4()
-      const slugName = slugify(name)
-      const imagePath = `${slugName}/${slugName}-${templateId}.${file?.type.split('/')[1]}`
+    try {
+      if (templateModal.mode === 'create') {
+        if (!file) return toast.error('No image file')
+        setIsLoading(true)
 
-      try {
-        await insertTemplate(accessToken, {
-          id: templateId,
-          name,
-          image_path: imagePath
-        })
+        const templateId = uuidv4()
+        const slugName = slugify(name)
+        const type = file?.type.split('/')[1]
+        const imagePath = `${slugName}/${slugName}-${templateId}.${type}`
 
-        try {
-          await uploadImageTemplate(accessToken, file, imagePath)
-        } catch (error) {
-          setIsLoading(false)
-          return toast.error((error as Error).message)
-        }
-      } catch (error) {
-        setIsLoading(false)
-        return toast.error((error as Error).message)
-      }
+        await insertTemplate(accessToken, { id: templateId, name, image_path: imagePath })
+        await uploadImageTemplate(accessToken, file, imagePath)
 
-      for (const data of formData.data) {
-        const categoryId = uuidv4()
-
-        try {
-          await insertTemplateCategory(accessToken, {
-            id: categoryId,
-            template_id: templateId,
-            name: data.name,
-            type: data.type
-          })
-        } catch (error) {
-          setIsLoading(false)
-          return toast.error((error as Error).message)
-        }
-
-        for (const option of data.options) {
-          if (!option.file) return
-
-          try {
-            await insertTemplateOption(accessToken, {
-              id: uuidv4(),
-              category_id: categoryId,
-              name: option.name,
-              image_path: option.image_path
+        await Promise.all(
+          formData.data.map(async (data) => {
+            const categoryId = uuidv4()
+            await insertTemplateCategory(accessToken, {
+              id: categoryId,
+              template_id: templateId,
+              name: data.name,
+              type: data.type
             })
 
-            try {
-              if (!option.file) return
-              await uploadImageTemplateOption(accessToken, option.file, option.image_path)
-            } catch (error) {
-              setIsLoading(false)
-              return toast.error((error as Error).message)
-            }
-          } catch (error) {
-            setIsLoading(false)
-            return toast.error((error as Error).message)
-          }
-        }
-      }
+            await Promise.all(
+              data.options.map(async (option) => {
+                if (option.file) {
+                  const optionId = uuidv4()
+                  await insertTemplateOption(accessToken, {
+                    id: optionId,
+                    category_id: categoryId,
+                    name: option.name,
+                    image_path: option.image_path
+                  })
+                  await uploadImageTemplateOption(accessToken, option.file, option.image_path)
+                }
+              })
+            )
+          })
+        )
 
-      toast.success('Create new template successfully')
-    } else {
-      // Todo: handle edit template
-      if (!name || !formData.data) return toast.error('No data!')
-      setIsLoading(true)
+        toast.success('Create new template successfully')
+      } else {
+        const { template } = templateModal
+        const { data: categories } = formData
 
-      const { template } = templateModal
-      const { data: categories } = formData
-      if (!template || !categories) return
+        if (!template || !categories) return
+        setIsLoading(true)
 
-      const slug = slugify(name)
-      const imagePath = `${slug}/${slug}-${template.id}.${template.image_path.split('.')[1]}`
+        const slug = slugify(name)
+        const type = template.image_path.split('.')[1]
+        const imagePath = `${slug}/${slug}-${template.id}.${type}`
 
-      try {
         await updateTemplate(accessToken, template.id, {
           name,
-          image_path: imagePath
+          image_path: imagePath,
+          updated_at: new Date()
         })
 
         if (file) {
-          try {
-            await uploadImageTemplate(accessToken, file, imagePath)
-          } catch (error) {
-            setIsLoading(false)
-            return toast.error((error as Error).message)
-          }
-
           await deleteImageTemplate(accessToken, template.image_path)
+          await uploadImageTemplate(accessToken, file, imagePath)
         } else {
           await moveImageTemplate(accessToken, {
             bucketId: 'templates',
@@ -195,51 +166,45 @@ const TemplateModal: React.FC = () => {
             sourceKey: template.image_path
           })
         }
-      } catch (error) {
-        setIsLoading(false)
-        return toast.error((error as Error).message)
-      }
 
-      for (const data of categories) {
-        const id = template.categories.filter((c) => c.type === data.type)[0].id
-        for (const option of data.options) {
-          if (!option.file) return
+        await Promise.all(
+          categories.map(async (data) => {
+            const category = template.categories.find((c) => c.type === data.type)
+            const categoryId = category?.id
 
-          if (!option?.id) {
-            try {
-              await insertTemplateOption(accessToken, {
-                id: uuidv4(),
-                category_id: id,
-                name: option.name,
-                image_path: option.image_path
+            await Promise.all(
+              data.options.map(async (option) => {
+                if (option.file && !option.id) {
+                  const optionId = uuidv4()
+                  await insertTemplateOption(accessToken, {
+                    id: optionId,
+                    category_id: categoryId,
+                    name: option.name,
+                    image_path: option.image_path
+                  })
+                  await uploadImageTemplateOption(accessToken, option.file, option.image_path)
+                }
               })
+            )
+          })
+        )
 
-              try {
-                await uploadImageTemplateOption(accessToken, option.file, option.image_path)
-              } catch (error) {
-                setIsLoading(false)
-                return toast.error((error as Error).message)
-              }
-            } catch (error) {
-              setIsLoading(false)
-              return toast.error((error as Error).message)
-            }
-          }
-        }
+        toast.success('Updated template successfully')
       }
-
-      toast.success('Updated template successfully')
+    } catch (error) {
+      toast.error((error as Error).message)
     }
 
     setIsLoading(false)
+    templateModal.refetch?.()
     handleClose()
   }
 
   return (
     <Dialog.Root open={templateModal.isOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed inset-0" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-4 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none">
+        <Dialog.Overlay className="bg-neutral-900/80 backdrop-blur-sm fixed z-50 inset-0" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] lg:w-[65%] h-full max-h-[95vh] p-4 drop-shadow-md rounded-lg border border-neutral-700 bg-white focus:outline-none z-50">
           <div className="relative text-2xl text-left mb-12">
             <h1
               className={clsx('absolute left-0 top-0 p-1 border border-transparent rounded', {
@@ -284,6 +249,7 @@ const TemplateModal: React.FC = () => {
                 className="w-full h-full rounded-md shadow-sm object-cover border-none cursor-pointer fill-slate-500"
                 src={selectedImage || '/assets/images/no-image.png'}
                 alt={name}
+                loading="lazy"
               />
               <div
                 className={clsx(
@@ -322,7 +288,7 @@ const TemplateModal: React.FC = () => {
                 className={clsx(
                   'px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white active:scale-95 transition-all duration-300',
                   {
-                    'cursor-not-allowed bg-opacity-55 hover:bg-opacity-55 hover:bg-red-500 active:scale-100':
+                    'cursor-not-allowed bg-opacity-55 hover:!bg-red-500/55 active:!scale-100':
                       isLoading
                   }
                 )}
@@ -335,7 +301,7 @@ const TemplateModal: React.FC = () => {
                 className={clsx(
                   'px-4 py-2 min-w-20 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-lg text-white active:scale-95 transition-all duration-300',
                   {
-                    'cursor-not-allowed hover:!bg-blue-500': isLoading
+                    'cursor-not-allowed hover:!bg-blue-500 active:!scale-100': isLoading
                   }
                 )}
                 onClick={handleSaveTemplate}

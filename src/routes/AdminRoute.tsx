@@ -1,5 +1,6 @@
 import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
+
 import config from '~/config'
 import { useUser } from '~/hooks'
 
