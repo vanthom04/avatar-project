@@ -1,13 +1,12 @@
-import clsx from 'clsx'
-import { useEffect, useState } from 'react'
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
-import { FaPlus } from 'react-icons/fa6'
-
-import { useUser } from '~/hooks'
 import { useQueryMyAvatars } from '~/queries'
 import Spinner from '~/components/Spinner'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
+import { useUser } from '~/hooks'
+import { useState } from 'react'
+import clsx from 'clsx'
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
+import { FaPlus } from 'react-icons/fa6'
 
 function MyAvatars() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -16,7 +15,6 @@ function MyAvatars() {
 
   const { accessToken } = useUser()
   const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
-  console.log(myAvatars)
 
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
