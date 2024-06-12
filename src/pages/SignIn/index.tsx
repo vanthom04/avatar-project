@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
-import { FieldValues, useForm } from 'react-hook-form'
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5'
 
 import config, { supabase } from '~/config'
@@ -26,8 +26,7 @@ function SignIn() {
     setShowPassWord(!showPassword)
   }
 
-  const onSubmit = async (values: FieldValues) => {
-    const { email, password } = values
+  const onSubmit: SubmitHandler<FieldValues> = async ({ email, password }) => {
     try {
       setLoading(true)
       const { error, data } = await supabase.auth.signInWithPassword({ email, password })

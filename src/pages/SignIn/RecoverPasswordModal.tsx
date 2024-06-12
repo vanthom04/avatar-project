@@ -1,8 +1,9 @@
 import clsx from 'clsx'
-import { useState, useId } from 'react'
-import { FieldValues, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useState, useId } from 'react'
 import { IoMdClose } from 'react-icons/io'
+import { FieldValues, useForm } from 'react-hook-form'
+
 import Spinner from '~/components/Spinner'
 import { supabase } from '~/config'
 

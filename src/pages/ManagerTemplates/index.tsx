@@ -8,10 +8,8 @@ import clsx from 'clsx'
 
 import { Template } from '~/types'
 import { filterTemplates } from '~/utils'
-import { useQueryTemplates } from '~/queries'
+import { actions, useGlobalContext } from '~/context'
 import { useTemplateModal, useUser } from '~/hooks'
-
-import Spinner from '~/components/Spinner'
 import TemplateTableRow from './TemplateTableRow'
 import TemplateTableEmptyRow from './TemplateTableEmptyRow'
 import DeleteModal from './DeleteModal'
@@ -22,6 +20,7 @@ import {
   deleteTemplateCategory,
   deleteTemplateOption
 } from '~/services/templates'
+import TemplateModal from './TemplateModal'
 
 function ManagerTemplatesPage() {
   const [itemsPerPage] = useState<number>(4)
@@ -33,8 +32,10 @@ function ManagerTemplatesPage() {
   const [isLoadingDeleteTemplates, setIsLoadingDeleteTemplates] = useState<boolean>(false)
 
   const { accessToken, role } = useUser()
+  const [state, dispatch] = useGlobalContext()
+  const { templates } = state
+  console.log(templates)
   const templateModal = useTemplateModal()
-  const { data: templates, isLoading, refetch } = useQueryTemplates(accessToken ?? '')
 
   const handleCreateNewTemplate = async () => {
     if (role && !['admin', 'editor'].includes(role)) {
@@ -43,7 +44,6 @@ function ManagerTemplatesPage() {
 
     templateModal.onOpen()
     templateModal.setMode('create')
-    templateModal.setRefetch?.(refetch)
   }
 
   const handleFilterByName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,6 +139,8 @@ function ManagerTemplatesPage() {
             updateLoadingPercentage(currentStep, totalSteps)
           })
         }
+
+        dispatch(actions.removeTemplate(template.id))
       }
 
       toast.success('Delete templates successfully')
@@ -148,7 +150,6 @@ function ManagerTemplatesPage() {
       setIsOpenDeleteModal(false)
       setIsLoadingDeleteTemplates(false)
       setSelected([])
-      refetch()
     }
   }
 
@@ -190,8 +191,6 @@ function ManagerTemplatesPage() {
     () => getPaginationItems(currentPage, totalPages),
     [currentPage, totalPages]
   )
-
-  console.log(paginationItems)
 
   return (
     <>
@@ -275,13 +274,7 @@ function ManagerTemplatesPage() {
                 </tr>
               </thead>
               <tbody>
-                {isLoading ? (
-                  <tr className="bg-white">
-                    <td colSpan={5} className="p-4">
-                      <Spinner className="mx-auto" />
-                    </td>
-                  </tr>
-                ) : dataFiltered.length > 0 ? (
+                {dataFiltered.length > 0 ? (
                   dataFiltered
                     .slice(startIndex, startIndex + itemsPerPage)
                     .map((template) => (
@@ -290,7 +283,6 @@ function ManagerTemplatesPage() {
                         template={template}
                         selected={selected.findIndex((s) => s.id === template.id) !== -1}
                         onSelect={() => handleSelect(template)}
-                        onRefetch={refetch}
                       />
                     ))
                 ) : (
@@ -352,6 +344,7 @@ function ManagerTemplatesPage() {
         onChange={setIsOpenDeleteModal}
         onDeleteTemplates={handleDeleteTemplates}
       />
+      <TemplateModal />
     </>
   )
 }

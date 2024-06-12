@@ -1,32 +1,33 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { PiSpinner } from 'react-icons/pi'
-import { RefetchOptions } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import clsx from 'clsx'
 
 import { supabase } from '~/config'
 import { useRouter, useUser } from '~/hooks'
-import { downloadBase64Image, months } from '~/utils'
+import { downloadBase64Image } from '~/utils'
+import { actions, useGlobalContext } from '~/context'
 import { deleteImageAvatar, deleteMyAvatar } from '~/services/avatars'
 
 interface AvatarTableRowProps {
-  id: number | string
+  index: number
+  id: string
   template_id: string
   name: string
   image_path: string
   thumbnail: string
   created_at: Date | string
-  onRefetch?: (option?: RefetchOptions | undefined) => void
 }
 
 function AvatarTableRow({
+  index,
   id,
   template_id,
   name,
   image_path,
   thumbnail,
-  created_at,
-  onRefetch
+  created_at
 }: AvatarTableRowProps) {
   const [isPreview, setIsPreview] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
@@ -34,6 +35,7 @@ function AvatarTableRow({
 
   const router = useRouter()
   const { accessToken } = useUser()
+  const [, dispatch] = useGlobalContext()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -53,36 +55,35 @@ function AvatarTableRow({
 
     // handle delete my avatar
     try {
-      await deleteMyAvatar(accessToken, String(id))
+      await deleteMyAvatar(accessToken, id)
 
       // handle delete image in storage
       try {
         // delete image my avatar
         await deleteImageAvatar(accessToken, image_path)
       } catch (error) {
-        setIsLoading(false)
         return toast.error((error as Error).message)
+      } finally {
+        setIsLoading(false)
       }
     } catch (error) {
-      setIsLoading(false)
       return toast.error((error as Error).message)
+    } finally {
+      setIsLoading(false)
     }
+    dispatch(actions.removeMyAvatar(id))
 
     toast.success('Avatar deleted successfully')
     setIsDelete(false)
-    onRefetch?.()
   }
 
   const handleDownloadAvatar = async () => {
     try {
       const { data, error } = await supabase.storage.from('my_avatars').download(image_path)
-
       if (error) throw error
 
       const dataUrl = URL.createObjectURL(data)
-
       downloadBase64Image(dataUrl, `${name}.${data.type.split('/').pop()}`)
-
       URL.revokeObjectURL(dataUrl)
     } catch (error) {
       console.log(error)
@@ -92,7 +93,7 @@ function AvatarTableRow({
   return (
     <tr className="bg-white border-b">
       <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-        {id}
+        {index + 1}
       </th>
       <td className="px-6 py-4">{name}</td>
       <td className="px-6 py-4 flex justify-center">
@@ -125,11 +126,7 @@ function AvatarTableRow({
           </div>
         </div>
       </td>
-      <td className="px-6 py-4">
-        {`${new Date(created_at).getDate()}
-        ${months[new Date(created_at).getMonth()]}
-        ${new Date(created_at).getFullYear()}`}
-      </td>
+      <td className="px-6 py-4">{format(new Date(created_at), 'PP')}</td>
       <td className="px-2 py-2">
         <button
           className="font-medium text-blue-600 hover:underline"

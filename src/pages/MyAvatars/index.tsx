@@ -3,9 +3,7 @@ import { useState } from 'react'
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
 import { FaPlus } from 'react-icons/fa6'
 
-import { useUser } from '~/hooks'
-import { useQueryMyAvatars } from '~/queries'
-import Spinner from '~/components/Spinner'
+import { useGlobalContext } from '~/context'
 import AvatarTableRow from './AvatarTableRow'
 import AvatarTableEmpty from './AvatarTableEmpty'
 import NewAvatarModal from './NewAvatarModal'
@@ -15,8 +13,8 @@ function MyAvatars() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 4
 
-  const { accessToken } = useUser()
-  const { data: myAvatars, isLoading, refetch } = useQueryMyAvatars(accessToken ?? '')
+  const [state] = useGlobalContext()
+  const { myAvatars } = state
 
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
@@ -82,7 +80,7 @@ function MyAvatars() {
               <thead className="text-xs text-center text-white uppercase bg-[#0e64f1]">
                 <tr>
                   <th scope="col" className="px-6 py-3">
-                    ID
+                    STT
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Name
@@ -99,23 +97,17 @@ function MyAvatars() {
                 </tr>
               </thead>
               <tbody className="text-center">
-                {isLoading ? (
-                  <tr className="bg-white bg-opacity-50">
-                    <th colSpan={5} className="w-full p-6">
-                      <Spinner className="mx-auto text-white" />
-                    </th>
-                  </tr>
-                ) : myAvatars && myAvatars.length > 0 ? (
-                  visibleAvatars?.map((avatar) => (
+                {myAvatars && myAvatars.length > 0 ? (
+                  visibleAvatars?.map((avatar, index) => (
                     <AvatarTableRow
                       key={avatar.id}
+                      index={index}
                       id={avatar.id}
                       template_id={avatar.template_id}
                       name={avatar.name}
                       image_path={avatar.image_path}
                       thumbnail={avatar.thumbnail ?? ''}
                       created_at={avatar.created_at}
-                      onRefetch={refetch}
                     />
                   ))
                 ) : (

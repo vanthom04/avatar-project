@@ -1,10 +1,9 @@
 import { useId, useEffect, useState } from 'react'
-import { RefetchOptions } from '@tanstack/react-query'
 import { PiSpinner } from 'react-icons/pi'
 import toast from 'react-hot-toast'
+import { format } from 'date-fns'
 import clsx from 'clsx'
 
-import { months } from '~/utils'
 import { Template } from '~/types'
 import { useTemplateModal, useUser } from '~/hooks'
 import {
@@ -14,15 +13,15 @@ import {
   deleteTemplateCategory,
   deleteTemplateOption
 } from '~/services/templates'
+import { actions, useGlobalContext } from '~/context'
 
 interface TemplateTableRowProps {
   template: Template
   selected: boolean
   onSelect: () => void
-  onRefetch?: (options?: RefetchOptions | undefined) => void
 }
 
-function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateTableRowProps) {
+function TemplateTableRow({ template, selected, onSelect }: TemplateTableRowProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
   const [isPreview, setIsPreview] = useState<boolean>(false)
@@ -30,6 +29,7 @@ function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateT
   const inputId = useId()
   const { accessToken, role } = useUser()
   const templateModal = useTemplateModal()
+  const [, dispatch] = useGlobalContext()
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -50,7 +50,6 @@ function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateT
     templateModal.onOpen()
     templateModal.setMode('edit')
     templateModal.setTemplate(template)
-    onRefetch && templateModal.setRefetch?.(onRefetch)
   }
 
   const handleOpenDialogDelete = async () => {
@@ -95,13 +94,14 @@ function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateT
         await deleteImageTemplate(accessToken, template.image_path)
       }
 
+      dispatch(actions.removeTemplate(template.id))
+
       toast.success('Delete template successfully')
     } catch (error) {
       toast.error((error as Error).message)
     } finally {
       setIsLoading(false)
       setIsDelete(false)
-      onRefetch?.()
     }
   }
 
@@ -156,9 +156,7 @@ function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateT
           </div>
         </div>
       </td>
-      <td className="px-4 py-2 text-center">
-        {`${new Date(template.created_at).getDate()} ${months[new Date(template.created_at).getMonth()]} ${new Date(template.created_at).getFullYear()}`}
-      </td>
+      <td className="px-4 py-2 text-center">{format(new Date(template.created_at), 'PP')}</td>
       <td className="px-4 py-2 text-center">
         <button className="font-medium text-blue-600 hover:underline" onClick={handleEditTemplate}>
           Edit
@@ -172,7 +170,7 @@ function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateT
         </button>
         <div
           className={clsx(
-            'fixed top-0 left-0 right-0 bottom-0 bg-gray-900/60 backdrop-blur-sm hidden',
+            'fixed top-0 left-0 right-0 bottom-0 bg-gray-900/60 backdrop-blur-sm hidden z-30',
             { '!block': isDelete }
           )}
         ></div>
@@ -191,7 +189,7 @@ function TemplateTableRow({ template, selected, onSelect, onRefetch }: TemplateT
                 type="button"
                 disabled={isLoading}
                 className={clsx(
-                  'absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center',
+                  'absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center z-50',
                   {
                     'cursor-not-allowed': isLoading
                   }

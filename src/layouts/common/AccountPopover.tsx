@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 
@@ -10,7 +10,6 @@ interface AccountOption {
   id: number
   to: string
   title: string
-  action?: () => void
 }
 
 export const MENU_ACCOUNT: AccountOption[] = [
@@ -66,11 +65,15 @@ function AccountPopover() {
   }
 
   const handleAvatarError = () => {
-    setAvatar('/assets/images/no-avatar.jpg')
+    if (avatarUrl) {
+      setAvatar(getImageUrl('profile', avatarUrl))
+    } else {
+      setAvatar('/assets/images/no-avatar.jpg')
+    }
   }
 
   return (
-    <div className="relative hidden md:flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+    <div className="relative hidden md:flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse z-50">
       <button
         id="button-user-menu"
         type="button"
@@ -99,7 +102,7 @@ function AccountPopover() {
           </span>
           <span className="block text-sm text-gray-600 truncate">{userDetails?.email}</span>
         </div>
-        <ul className="py-2">
+        <ul className="py-2 z-50">
           {MENU_ACCOUNT.map((option) => (
             <li key={option.id}>
               <Link
@@ -125,4 +128,4 @@ function AccountPopover() {
   )
 }
 
-export default AccountPopover
+export default memo(AccountPopover)

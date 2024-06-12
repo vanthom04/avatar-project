@@ -36,25 +36,28 @@ function Navbar() {
 
   useEffect(() => {
     if (!user) return
-    if (['admin', 'editor'].includes(role)) {
-      if (!menu.find((item) => item.id === 3)) {
-        setMenu((prevMenu) => [
-          ...prevMenu,
-          {
+    setMenu((prevMenu) => {
+      const newMenu = [...prevMenu]
+
+      if (['admin', 'editor'].includes(role)) {
+        if (!newMenu.find((item) => item.id === 3)) {
+          newMenu.push({
             id: 3,
             to: config.routes.managerTemplates,
             title: 'Manager templates',
             icon: TbReport
-          }
-        ])
+          })
+        }
+      } else {
+        const index = newMenu.findIndex((item) => item.id === 3)
+        if (index !== -1) {
+          newMenu.splice(index, 1)
+        }
       }
-    } else {
-      const index = menu.findIndex((item) => item.id === 3)
-      if (index !== -1) {
-        menu.splice(index, 1)
-      }
-    }
-  }, [user, role, menu])
+
+      return newMenu
+    })
+  }, [user, role])
 
   return (
     <aside className="p-4 flex-col gap-y-3 basis-1/3 xl:basis-1/5 hidden md:flex border-r border-r-gray-300">

@@ -28,18 +28,24 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
       setCategories([...initialData])
     } else {
       const result: Category[] =
-        templateModal.template?.categories.map((category) => ({
-          name: category.name ?? '',
-          type: category.type,
-          options: category.options.map((option) => ({
+        templateModal.template?.categories.map((category) => {
+          const options = category.options.map((option) => ({
             id: option.id,
             name: option.name ?? '',
             image_path: option.image_path ?? '',
             image_url: option.image_url ?? ''
           }))
-        })) ?? []
+
+          formData.setOptions(category.type, options)
+          return {
+            name: category.name ?? '',
+            type: category.type,
+            options
+          }
+        }) ?? []
       setCategories(result)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateModal.mode, templateModal.template?.categories])
 
   useEffect(() => {
@@ -60,7 +66,9 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
       }
     })
 
-    formData.setOptions(tab, options)
+    if (category) {
+      formData.setOptions(tab, [...category.options, ...options])
+    }
     setCategories((prevCategories) => {
       const newCategories = [...prevCategories]
       const newCategoryIndex = newCategories.findIndex((c) => c.type === tab)
@@ -104,7 +112,6 @@ const TabOptions: React.FC<TabOptionProps> = ({ tab }) => {
       return newCategories
     })
 
-    console.log('render delete options')
     setIsLoading(false)
     toast.success('Remove option successfully')
   }

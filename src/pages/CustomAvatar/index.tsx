@@ -11,10 +11,10 @@ import { IoColorFillOutline } from 'react-icons/io5'
 import { fabric } from 'fabric'
 import clsx from 'clsx'
 
-import { downloadBase64Image, slugify } from '~/utils'
-import { useQueryMyAvatars, useQueryTemplates } from '~/queries'
-import { AvatarOption, CategoryType, MyAvatar, Template } from '~/types'
+import { actions, useGlobalContext } from '~/context'
+import { downloadBase64Image, getImageUrl, slugify } from '~/utils'
 import { useDebounce, useRouter, useUser } from '~/hooks'
+import { AvatarOption, CategoryType, MyAvatar, Template } from '~/types'
 import {
   deleteImageAvatar,
   insertMyAvatar,
@@ -79,8 +79,8 @@ function CustomAvatar() {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const inputTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const { data: myAvatars } = useQueryMyAvatars(accessToken ?? '')
-  const { data: templates } = useQueryTemplates(accessToken ?? '')
+  const [state, dispatch] = useGlobalContext()
+  const { myAvatars, templates } = state
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -233,7 +233,7 @@ function CustomAvatar() {
   }
 
   const handleSaveAvatar = async () => {
-    if (!accessToken) return
+    if (!accessToken || !user?.id) return
     setIsLoading(true)
     if (params.mode === 'create') {
       // handle create new avatar
@@ -243,13 +243,15 @@ function CustomAvatar() {
       const imagePath = `${slug}/${slug}-${uid}.png`
 
       try {
-        await insertMyAvatar(accessToken, {
+        const newAvatar = {
+          id: uid,
           name,
-          user_id: user?.id,
+          user_id: user.id,
           template_id: template.id,
           image_path: imagePath,
           options
-        })
+        }
+        await insertMyAvatar(accessToken, newAvatar)
 
         // handle upload image my avatar
         const dataUrl = fabricCanvas?.toDataURL({ format: 'image/png' }) ?? ''
@@ -264,13 +266,23 @@ function CustomAvatar() {
         try {
           // upload image my avatar
           await uploadImageMyAvatar(accessToken, file, imagePath)
+          dispatch(
+            actions.addMyAvatar({
+              ...newAvatar,
+              thumbnail: getImageUrl('my_avatars', newAvatar.image_path),
+              created_at: new Date(),
+              updated_at: null
+            })
+          )
         } catch (error) {
-          setIsLoading(false)
           return toast.error((error as Error).message)
+        } finally {
+          setIsLoading(false)
         }
       } catch (error) {
-        setIsLoading(false)
         return toast.error((error as Error).message)
+      } finally {
+        setIsLoading(false)
       }
     } else {
       // handle update avatar
@@ -289,6 +301,20 @@ function CustomAvatar() {
           updated_at: new Date()
         })
 
+        dispatch(
+          actions.updateMyAvatar({
+            id: params.id,
+            name,
+            user_id: user?.id,
+            template_id: template.id,
+            image_path: imagePath,
+            thumbnail: getImageUrl('my_avatars', imagePath),
+            options,
+            created_at: avatar.created_at,
+            updated_at: new Date()
+          })
+        )
+
         // handle upload image my avatar
         const dataUrl = fabricCanvas?.toDataURL({ format: 'image/png' }) ?? ''
         if (!dataUrl) {
@@ -306,12 +332,14 @@ function CustomAvatar() {
           // upload image my avatar
           await uploadImageMyAvatar(accessToken, file, imagePath)
         } catch (error) {
-          setIsLoading(false)
           return toast.error((error as Error).message)
+        } finally {
+          setIsLoading(false)
         }
       } catch (error) {
-        setIsLoading(false)
         return toast.error((error as Error).message)
+      } finally {
+        setIsLoading(false)
       }
     }
 

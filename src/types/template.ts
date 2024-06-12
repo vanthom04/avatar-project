@@ -15,7 +15,7 @@ export interface Category {
   template_id: string
   type: CategoryType
   name: string
-  created_at: Date | string
+  created_at?: Date | string
   options: Option[]
 }
 
@@ -25,5 +25,5 @@ export interface Option {
   name: string
   image_path: string
   image_url?: string
-  created_at: Date | string
+  created_at?: Date | string
 }

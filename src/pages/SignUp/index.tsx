@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
-import { FieldValues, useForm } from 'react-hook-form'
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { IoEyeOutline } from 'react-icons/io5'
 import { IoEyeOffOutline } from 'react-icons/io5'
 
@@ -21,8 +21,7 @@ function SignUpPage() {
     formState: { errors }
   } = useForm()
 
-  const onSubmit = async (values: FieldValues) => {
-    const { fullName, email, password } = values
+  const onSubmit: SubmitHandler<FieldValues> = async ({ fullName, email, password }) => {
     try {
       setLoading(true)
       const { data, error } = await supabase.auth.signUp({

@@ -5,9 +5,11 @@ import { GoPencil } from 'react-icons/go'
 import { PiSpinner } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
 import toast from 'react-hot-toast'
+import { format } from 'date-fns'
 import clsx from 'clsx'
 
-import { slugify, months } from '~/utils'
+import { getImageUrl, slugify } from '~/utils'
+import { actions, useGlobalContext } from '~/context'
 import { useTemplateModal, useFormData, useUser } from '~/hooks'
 import {
   insertTemplate,
@@ -20,6 +22,7 @@ import {
   moveImageTemplate
 } from '~/services/templates'
 import TabHead from './TabHead'
+import { Category, Option, Template } from '~/types'
 
 const initialName = 'Create new template'
 
@@ -33,6 +36,7 @@ const TemplateModal: React.FC = () => {
 
   const { accessToken } = useUser()
   const formData = useFormData()
+  const [, dispatch] = useGlobalContext()
   const templateModal = useTemplateModal()
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -93,6 +97,7 @@ const TemplateModal: React.FC = () => {
     templateModal.setTemplate(null)
     templateModal.onClose()
   }
+  console.log(formData.data)
 
   const handleSaveTemplate = async () => {
     if (!accessToken) return toast.error('No access token!')
@@ -102,15 +107,25 @@ const TemplateModal: React.FC = () => {
       if (templateModal.mode === 'create') {
         if (!file) return toast.error('No image file')
         setIsLoading(true)
+        const template: Template = {} as Template
 
         const templateId = uuidv4()
         const slugName = slugify(name)
         const type = file?.type.split('/')[1]
         const imagePath = `${slugName}/${slugName}-${templateId}.${type}`
 
+        // add template
+        template.id = templateId
+        template.name = name
+        template.image_path = imagePath
+        template.image_url = getImageUrl('templates', imagePath)
+        template.created_at = new Date()
+        template.updated_at = null
+
         await insertTemplate(accessToken, { id: templateId, name, image_path: imagePath })
         await uploadImageTemplate(accessToken, file, imagePath)
 
+        const categories: Category[] = []
         await Promise.all(
           formData.data.map(async (data) => {
             const categoryId = uuidv4()
@@ -121,6 +136,7 @@ const TemplateModal: React.FC = () => {
               type: data.type
             })
 
+            const options: Option[] = []
             await Promise.all(
               data.options.map(async (option) => {
                 if (option.file) {
@@ -132,11 +148,30 @@ const TemplateModal: React.FC = () => {
                     image_path: option.image_path
                   })
                   await uploadImageTemplateOption(accessToken, option.file, option.image_path)
+                  options.push({
+                    id: optionId,
+                    category_id: categoryId,
+                    name: option.name,
+                    image_path: option.image_path,
+                    image_url: getImageUrl('template_options', option.image_path),
+                    created_at: new Date()
+                  })
                 }
               })
             )
+
+            categories.push({
+              id: categoryId,
+              template_id: templateId,
+              name: data.name,
+              type: data.type,
+              options,
+              created_at: new Date()
+            })
           })
         )
+
+        dispatch(actions.addTemplate({ ...template, categories }))
 
         toast.success('Create new template successfully')
       } else {
@@ -150,11 +185,21 @@ const TemplateModal: React.FC = () => {
         const type = template.image_path.split('.')[1]
         const imagePath = `${slug}/${slug}-${template.id}.${type}`
 
+        const updatedTemplate: Template = {} as Template
+
         await updateTemplate(accessToken, template.id, {
           name,
           image_path: imagePath,
           updated_at: new Date()
         })
+
+        // add updated template
+        updatedTemplate.id = template.id
+        updatedTemplate.name = name
+        updatedTemplate.image_path = imagePath
+        updatedTemplate.image_url = getImageUrl('templates', imagePath)
+        updatedTemplate.created_at = template.created_at
+        updatedTemplate.updated_at = new Date()
 
         if (file) {
           await deleteImageTemplate(accessToken, template.image_path)
@@ -167,27 +212,58 @@ const TemplateModal: React.FC = () => {
           })
         }
 
+        const updatedCategories: Category[] = []
         await Promise.all(
           categories.map(async (data) => {
             const category = template.categories.find((c) => c.type === data.type)
             const categoryId = category?.id
 
+            const options: Option[] = []
             await Promise.all(
               data.options.map(async (option) => {
-                if (option.file && !option.id) {
-                  const optionId = uuidv4()
-                  await insertTemplateOption(accessToken, {
-                    id: optionId,
-                    category_id: categoryId,
+                if (!option.id) {
+                  if (option.file) {
+                    const optionId = uuidv4()
+                    await insertTemplateOption(accessToken, {
+                      id: optionId,
+                      category_id: categoryId,
+                      name: option.name,
+                      image_path: option.image_path
+                    })
+                    await uploadImageTemplateOption(accessToken, option.file, option.image_path)
+
+                    options.push({
+                      id: optionId,
+                      category_id: categoryId ?? '',
+                      name: option.name,
+                      image_path: option.image_path,
+                      image_url: getImageUrl('template_options', option.image_path)
+                    })
+                  }
+                } else {
+                  options.push({
+                    id: option?.id ?? '',
+                    category_id: categoryId ?? '',
                     name: option.name,
-                    image_path: option.image_path
+                    image_path: option.image_path,
+                    image_url: getImageUrl('template_options', option.image_path)
                   })
-                  await uploadImageTemplateOption(accessToken, option.file, option.image_path)
                 }
               })
             )
+
+            console.log(options)
+            updatedCategories.push({
+              id: categoryId ?? '',
+              template_id: template.id,
+              name: data.name,
+              type: data.type,
+              options
+            })
           })
         )
+
+        dispatch(actions.updateTemplate({ ...updatedTemplate, categories: updatedCategories }))
 
         toast.success('Updated template successfully')
       }
@@ -196,7 +272,6 @@ const TemplateModal: React.FC = () => {
     }
 
     setIsLoading(false)
-    templateModal.refetch?.()
     handleClose()
   }
 
@@ -272,12 +347,7 @@ const TemplateModal: React.FC = () => {
               onChange={handleImageChange}
             />
             <div>
-              <p>
-                Created at:{' '}
-                {createdAt
-                  ? `${new Date(createdAt).getDate()} ${months[new Date(createdAt).getMonth()]} ${new Date(createdAt).getFullYear()}`
-                  : 'No date'}
-              </p>
+              <p>Created at: {createdAt ? format(new Date(createdAt), 'PP') : 'No date'}</p>
             </div>
             <div className="w-full">
               <TabHead />
