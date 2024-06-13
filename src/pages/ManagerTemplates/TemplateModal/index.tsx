@@ -97,7 +97,6 @@ const TemplateModal: React.FC = () => {
     templateModal.setTemplate(null)
     templateModal.onClose()
   }
-  console.log(formData.data)
 
   const handleSaveTemplate = async () => {
     if (!accessToken) return toast.error('No access token!')
@@ -252,7 +251,6 @@ const TemplateModal: React.FC = () => {
               })
             )
 
-            console.log(options)
             updatedCategories.push({
               id: categoryId ?? '',
               template_id: template.id,

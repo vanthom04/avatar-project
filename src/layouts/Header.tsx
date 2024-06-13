@@ -73,7 +73,7 @@ function Header() {
           '!block': isOpenMenu
         })}
       >
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex md:hidden flex-col items-center gap-2">
           {MENU_ITEMS.map((item) => (
             <div key={item.id} className="cursor-pointer" onClick={() => handleClose(item.to)}>
               {item.title}

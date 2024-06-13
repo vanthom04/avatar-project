@@ -117,45 +117,50 @@ function CustomAvatar() {
 
   useEffect(() => {
     if (params.mode === 'edit') {
-      const avatar = myAvatars?.find((avatar) => +avatar.id === Number(params.id))
       const template = templates?.find((template) => template.id === params.templateId)
       if (template) setTemplate(template)
-      if (avatar) {
-        setAvatar(avatar)
-        setName(avatar.name)
-        if (avatar.options) setOptions(avatar.options as unknown as AvatarOption[])
+
+      if (!avatar.id) {
+        const newAvatar = myAvatars?.find((avatar) => avatar.id === params.id)
+        if (newAvatar) {
+          setAvatar(newAvatar)
+          setName(newAvatar.name)
+          if (newAvatar.options) setOptions(newAvatar.options as unknown as AvatarOption[])
+        }
       }
     } else {
       const template = templates?.find((template) => template.id === params.templateId)
       if (template) setTemplate(template)
 
-      const defaultOptions: AvatarOption[] = []
-      template?.categories.forEach((category) => {
-        const option = category.options[0]
-        if (option) {
-          defaultOptions.push({
-            id: option.id ?? '',
-            type: category.type,
-            value: option.image_url ?? ''
-          })
-        }
-      })
+      if (options.length === 0) {
+        const defaultOptions: AvatarOption[] = []
+        template?.categories.forEach((category) => {
+          const option = category.options[0]
+          if (option) {
+            defaultOptions.push({
+              id: option.id ?? '',
+              type: category.type,
+              value: option.image_url ?? ''
+            })
+          }
+        })
 
-      setOptions([
-        ...defaultOptions,
-        {
-          id: null,
-          type: 'background',
-          value: '#fff'
-        },
-        {
-          id: null,
-          type: 'color',
-          value: '#000000'
-        }
-      ])
+        setOptions([
+          ...defaultOptions,
+          {
+            id: null,
+            type: 'background',
+            value: '#fff'
+          },
+          {
+            id: null,
+            type: 'color',
+            value: '#000000'
+          }
+        ])
+      }
     }
-  }, [myAvatars, params.id, params.mode, params.templateId, templates])
+  }, [avatar.id, myAvatars, options.length, params.id, params.mode, params.templateId, templates])
 
   useEffect(() => {
     setOptions((prevOptions) => {
@@ -294,8 +299,6 @@ function CustomAvatar() {
       try {
         await updateMyAvatar(accessToken, params.id, {
           name,
-          user_id: user?.id,
-          template_id: template.id,
           image_path: imagePath,
           options,
           updated_at: new Date()

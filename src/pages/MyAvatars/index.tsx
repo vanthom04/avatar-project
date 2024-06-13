@@ -40,7 +40,7 @@ function MyAvatars() {
     } else {
       pages.push(1)
 
-      if (currentPage > maxPagesToShow + 1) {
+      if (currentPage > maxPagesToShow + 2) {
         pages.push('...')
       }
 

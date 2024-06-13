@@ -86,7 +86,7 @@ function AvatarTableRow({
       downloadBase64Image(dataUrl, `${name}.${data.type.split('/').pop()}`)
       URL.revokeObjectURL(dataUrl)
     } catch (error) {
-      console.log(error)
+      throw new Error((error as Error).message)
     }
   }
 

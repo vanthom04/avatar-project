@@ -34,7 +34,6 @@ function ManagerTemplatesPage() {
   const { accessToken, role } = useUser()
   const [state, dispatch] = useGlobalContext()
   const { templates } = state
-  console.log(templates)
   const templateModal = useTemplateModal()
 
   const handleCreateNewTemplate = async () => {
@@ -164,7 +163,7 @@ function ManagerTemplatesPage() {
     } else {
       pages.push(1)
 
-      if (currentPage > maxPagesToShow + 1) {
+      if (currentPage > maxPagesToShow + 2) {
         pages.push('...')
       }
 
