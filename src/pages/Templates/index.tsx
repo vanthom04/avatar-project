@@ -1,5 +1,6 @@
 import { useRouter } from '~/hooks'
 import { useGlobalContext } from '~/context'
+import EmptyState from '~/components/EmptyState'
 import TemplateItem from '~/components/TemplateItem'
 
 function TemplatesPage() {
@@ -7,16 +8,7 @@ function TemplatesPage() {
   const [state] = useGlobalContext()
 
   if (state.templates.length === 0) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center">
-        <img
-          className="w-72 object-cover"
-          src="/assets/images/not-found-templates.png"
-          alt="Not Found Templates"
-        />
-        <h1 className="text-3xl">Not found templates!</h1>
-      </div>
-    )
+    return <EmptyState />
   }
 
   return (

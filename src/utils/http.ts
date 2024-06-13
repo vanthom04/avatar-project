@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
-class Api {
+class Http {
   private axiosInstance: AxiosInstance
 
   constructor(baseURL: string, apiKey: string) {
@@ -48,4 +48,4 @@ class Api {
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_KEY
 
-export const httpRequest = new Api(supabaseUrl, supabaseAnonKey)
+export const http = new Http(supabaseUrl, supabaseAnonKey)

@@ -1,10 +1,10 @@
-import { httpRequest } from '~/utils/httpRequest'
+import { http } from '~/utils/http'
 import { MyAvatar } from '~/types'
 import { getImageUrl } from '~/utils'
 
 export const getAllMyAvatars = async (accessToken: string): Promise<MyAvatar[]> => {
   try {
-    const res = await httpRequest.get<MyAvatar[]>('/rest/v1/my_avatars?select=*', {
+    const res = await http.get<MyAvatar[]>('/rest/v1/my_avatars?select=*', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -27,7 +27,7 @@ export const getAllMyAvatars = async (accessToken: string): Promise<MyAvatar[]> 
 
 export const insertMyAvatar = async (accessToken: string, data: object) => {
   try {
-    return await httpRequest.post('/rest/v1/my_avatars', data, {
+    return await http.post('/rest/v1/my_avatars', data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -42,7 +42,7 @@ export const uploadImageMyAvatar = async (accessToken: string, file: File, filen
   try {
     const formData = new FormData()
     formData.append('file', file)
-    return await httpRequest.post(`/storage/v1/object/my_avatars/${filename}`, formData, {
+    return await http.post(`/storage/v1/object/my_avatars/${filename}`, formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -54,7 +54,7 @@ export const uploadImageMyAvatar = async (accessToken: string, file: File, filen
 
 export const deleteImageAvatar = async (accessToken: string, path: string) => {
   try {
-    return await httpRequest.delete(`/storage/v1/object/my_avatars/${path}`, {
+    return await http.delete(`/storage/v1/object/my_avatars/${path}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -66,7 +66,7 @@ export const deleteImageAvatar = async (accessToken: string, path: string) => {
 
 export const updateMyAvatar = async (accessToken: string, id: string, data: object) => {
   try {
-    return await httpRequest.patch('/rest/v1/my_avatars', data, {
+    return await http.patch('/rest/v1/my_avatars', data, {
       params: {
         id: `eq.${id}`
       },
@@ -82,7 +82,7 @@ export const updateMyAvatar = async (accessToken: string, id: string, data: obje
 
 export const deleteMyAvatar = async (accessToken: string, id: string) => {
   try {
-    return await httpRequest.delete('/rest/v1/my_avatars', {
+    return await http.delete('/rest/v1/my_avatars', {
       params: {
         id: `eq.${id}`
       },

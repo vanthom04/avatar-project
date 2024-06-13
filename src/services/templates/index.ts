@@ -1,6 +1,6 @@
 import { Template } from '~/types'
 import { getImageUrl } from '~/utils'
-import { httpRequest } from '~/utils/httpRequest'
+import { http } from '~/utils/http'
 
 interface MoveTemplateObject {
   bucketId: string
@@ -10,7 +10,7 @@ interface MoveTemplateObject {
 
 export const getAllTemplates = async (accessToken: string): Promise<Template[]> => {
   try {
-    const res = await httpRequest.get<Template[]>('/rest/v1/templates', {
+    const res = await http.get<Template[]>('/rest/v1/templates', {
       params: {
         select:
           '*, categories(id, template_id, type, name, created_at, options(id, category_id, name, image_path, created_at))'
@@ -37,7 +37,7 @@ export const getAllTemplates = async (accessToken: string): Promise<Template[]> 
 
 export const insertTemplate = async (accessToken: string, data?: object) => {
   try {
-    return await httpRequest.post('/rest/v1/templates', data, {
+    return await http.post('/rest/v1/templates', data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -50,7 +50,7 @@ export const insertTemplate = async (accessToken: string, data?: object) => {
 
 export const updateTemplate = async (accessToken: string, id: string, data?: object) => {
   try {
-    return await httpRequest.patch('/rest/v1/templates', data, {
+    return await http.patch('/rest/v1/templates', data, {
       params: {
         id: `eq.${id}`
       },
@@ -67,7 +67,7 @@ export const updateTemplate = async (accessToken: string, id: string, data?: obj
 
 export const deleteTemplate = async (accessToken: string, id: string) => {
   try {
-    return await httpRequest.delete('/rest/v1/templates', {
+    return await http.delete('/rest/v1/templates', {
       params: {
         id: `eq.${id}`
       },
@@ -85,7 +85,7 @@ export const uploadImageTemplate = async (accessToken: string, file: File, filen
   try {
     const formData = new FormData()
     formData.append('file', file)
-    return await httpRequest.post(`/storage/v1/object/templates/${filename}`, formData, {
+    return await http.post(`/storage/v1/object/templates/${filename}`, formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -97,7 +97,7 @@ export const uploadImageTemplate = async (accessToken: string, file: File, filen
 
 export const moveImageTemplate = async (accessToken: string, data: MoveTemplateObject) => {
   try {
-    return await httpRequest.post('/storage/v1/object/move', data, {
+    return await http.post('/storage/v1/object/move', data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -110,7 +110,7 @@ export const moveImageTemplate = async (accessToken: string, data: MoveTemplateO
 
 export const deleteImageTemplate = async (accessToken: string, path: string) => {
   try {
-    return await httpRequest.delete(`/storage/v1/object/templates/${path}`, {
+    return await http.delete(`/storage/v1/object/templates/${path}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -122,7 +122,7 @@ export const deleteImageTemplate = async (accessToken: string, path: string) => 
 
 export const insertTemplateCategory = async (accessToken: string, data: object) => {
   try {
-    return await httpRequest.post('/rest/v1/categories', data, {
+    return await http.post('/rest/v1/categories', data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -135,7 +135,7 @@ export const insertTemplateCategory = async (accessToken: string, data: object) 
 
 export const deleteTemplateCategory = async (accessToken: string, id: string) => {
   try {
-    return await httpRequest.delete('/rest/v1/categories', {
+    return await http.delete('/rest/v1/categories', {
       params: {
         id: `eq.${id}`
       },
@@ -151,7 +151,7 @@ export const deleteTemplateCategory = async (accessToken: string, id: string) =>
 
 export const insertTemplateOption = async (accessToken: string, data: object) => {
   try {
-    return await httpRequest.post('/rest/v1/options', data, {
+    return await http.post('/rest/v1/options', data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -164,7 +164,7 @@ export const insertTemplateOption = async (accessToken: string, data: object) =>
 
 export const updateTemplateOption = async (accessToken: string, data: object) => {
   try {
-    return await httpRequest.patch('/rest/v1/options', data, {
+    return await http.patch('/rest/v1/options', data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -177,7 +177,7 @@ export const updateTemplateOption = async (accessToken: string, data: object) =>
 
 export const deleteTemplateOption = async (accessToken: string, id: string) => {
   try {
-    return await httpRequest.delete('/rest/v1/options', {
+    return await http.delete('/rest/v1/options', {
       params: {
         id: `eq.${id}`
       },
@@ -199,7 +199,7 @@ export const uploadImageTemplateOption = async (
   try {
     const formData = new FormData()
     formData.append('file', file)
-    return await httpRequest.post(`/storage/v1/object/template_options/${filename}`, formData, {
+    return await http.post(`/storage/v1/object/template_options/${filename}`, formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -211,7 +211,7 @@ export const uploadImageTemplateOption = async (
 
 export const deleteImageTemplateOption = async (accessToken: string, path: string) => {
   try {
-    return await httpRequest.delete(`/storage/v1/object/template_options/${path}`, {
+    return await http.delete(`/storage/v1/object/template_options/${path}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }

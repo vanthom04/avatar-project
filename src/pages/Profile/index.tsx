@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import clsx from 'clsx'
-import short from 'short-uuid'
-import toast from 'react-hot-toast'
 import { CiCamera } from 'react-icons/ci'
 import { GoPencil } from 'react-icons/go'
+import toast from 'react-hot-toast'
+import short from 'short-uuid'
+import clsx from 'clsx'
 
 import { useUser } from '~/hooks'
-import { supabase } from '~/config'
 import { getImageUrl, slugify } from '~/utils'
+import { updateUser, deleteAvatarUser, uploadAvatarUser } from '~/services/auth'
 
 function ProfilePage() {
   const [name, setName] = useState<string>('')
@@ -23,7 +23,7 @@ function ProfilePage() {
   const inputPhoneRef = useRef<HTMLInputElement | null>(null)
   const inputPhoneTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const { user, role, userDetails, avatar, setAvatar } = useUser()
+  const { accessToken, user, role, userDetails, avatar, setAvatar } = useUser()
 
   useEffect(() => {
     if (userDetails) {
@@ -49,26 +49,16 @@ function ProfilePage() {
       }
       reader.readAsDataURL(file)
 
+      if (!accessToken) return
       // upload and update avatar user
       const type = file.type.split('/')[1]
       const imagePath = `${slugify(name)}/${slugify(name)}-${short.generate()}.${type}`
       try {
-        const { error: updateUserError } = await supabase.auth.updateUser({
-          data: {
-            avatar: imagePath
-          }
-        })
-        if (updateUserError) throw updateUserError
-
+        await updateUser(accessToken, { data: { avatar: imagePath } })
         if (avatar) {
-          const { error: removeError } = await supabase.storage.from('profile').remove([avatar])
-          if (removeError) throw removeError
+          await deleteAvatarUser(accessToken, avatar)
         }
-
-        const { error: uploadError } = await supabase.storage
-          .from('profile')
-          .upload(imagePath, file, { upsert: true })
-        if (uploadError) throw uploadError
+        await uploadAvatarUser(accessToken, imagePath, file)
 
         toast.success('Avatar updated successfully')
       } catch (error) {
@@ -98,25 +88,19 @@ function ProfilePage() {
   }
 
   const handleBlurInputName = () => {
-    if (!name) {
-      setName(userDetails?.full_name)
-    }
-
+    setName(userDetails?.full_name)
     setIsEditName(false)
   }
 
   const handleUpdateName = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      if (!accessToken) return
       if (!name) {
         return setName(userDetails?.full_name)
       }
 
       try {
-        const { error } = await supabase.auth.updateUser({
-          data: { full_name: name }
-        })
-        if (error) throw error
-
+        await updateUser(accessToken, { data: { full_name: name } })
         setIsEditName(false)
         toast.success('Update name successfully')
       } catch (error) {
@@ -148,14 +132,13 @@ function ProfilePage() {
 
   const handleUpdatePhone = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      if (!accessToken) return
       if (!phone) {
         return setPhone(userDetails?.phone ?? '')
       }
 
       try {
-        const { error } = await supabase.auth.updateUser({ data: { phone } })
-        if (error) throw error
-
+        await updateUser(accessToken, { data: { phone } })
         setIsEditPhone(false)
         toast.success('Update phone successfully')
       } catch (error) {
@@ -215,7 +198,7 @@ function ProfilePage() {
               <input
                 ref={inputNameRef}
                 type="text"
-                value={name}
+                // value={name}
                 name="input-name"
                 spellCheck="false"
                 autoComplete="off"

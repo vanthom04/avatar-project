@@ -1,11 +1,11 @@
 import { User } from '@supabase/supabase-js'
-import { RoleType, SignIn, UserRole } from '~/types'
-import { httpRequest } from '~/utils/httpRequest'
+import { SignIn, RoleType, UserRole } from '~/types'
+import { http } from '~/utils/http'
 
 export const getRole = async (accessToken: string | undefined): Promise<RoleType> => {
   if (!accessToken) return 'user'
   try {
-    const res = await httpRequest.get<UserRole[]>('/rest/v1/user_roles', {
+    const res = await http.get<UserRole[]>('/rest/v1/user_roles', {
       params: {
         select: 'user_id, roles(name)'
       },
@@ -23,7 +23,7 @@ export const getRole = async (accessToken: string | undefined): Promise<RoleType
 
 export const getUser = async (accessToken: string): Promise<User> => {
   try {
-    return await httpRequest.get('/auth/v1/user', {
+    return await http.get('/auth/v1/user', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`
@@ -36,7 +36,7 @@ export const getUser = async (accessToken: string): Promise<User> => {
 
 export const signIn = async (email: string, password: string): Promise<SignIn> => {
   try {
-    return await httpRequest.post<SignIn>(
+    return await http.post<SignIn>(
       '/auth/v1/token?grant_type=password',
       { email, password },
       {
@@ -52,7 +52,7 @@ export const signIn = async (email: string, password: string): Promise<SignIn> =
 
 export const signUp = async (email: string, password: string, options?: object) => {
   try {
-    return await httpRequest.post(
+    return await http.post(
       '/auth/v1/signup',
       { email, password, data: options },
       {
@@ -68,7 +68,7 @@ export const signUp = async (email: string, password: string, options?: object) 
 
 export const signOut = async () => {
   try {
-    return await httpRequest.post(
+    return await http.post(
       '/auth/v1/logout',
       {},
       {
@@ -84,7 +84,7 @@ export const signOut = async () => {
 
 export const recoverPassword = async (email: string, redirectTo?: string) => {
   try {
-    return await httpRequest.post(
+    return await http.post(
       '/auth/v1/recover',
       { email },
       {
@@ -101,9 +101,48 @@ export const recoverPassword = async (email: string, redirectTo?: string) => {
   }
 }
 
+export const updateUser = async (accessToken: string, data: object) => {
+  try {
+    return await http.put('/auth/v1/user', data, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+export const uploadAvatarUser = async (accessToken: string, filename: string, file: File) => {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    return await http.post(`/storage/v1/object/profile/${filename}`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+export const deleteAvatarUser = async (accessToken: string, path: string) => {
+  try {
+    return await http.delete(`/storage/v1/object/profile/${path}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
 export const updatePassword = async (accessToken: string, password: string) => {
   try {
-    return await httpRequest.put(
+    return await http.put(
       '/auth/v1/user',
       { password },
       {

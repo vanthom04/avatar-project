@@ -1,5 +1,5 @@
 import { Template } from '~/types'
-import { httpRequest } from './httpRequest'
+import { http } from './http'
 
 export const getImageUrl = (folder: string, path: string): string => {
   if (!folder || !path) return ''
@@ -12,7 +12,7 @@ export const downloadFile = async (
   path: string
 ): Promise<Blob> => {
   try {
-    return (await httpRequest.get(`/storage/v1/object/${folder}/${path}`, {
+    return (await http.get(`/storage/v1/object/${folder}/${path}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
