@@ -8,6 +8,7 @@ import { IoEyeOffOutline } from 'react-icons/io5'
 import { useRouter } from '~/hooks'
 import config, { supabase } from '~/config'
 import Spinner from '~/components/Spinner'
+import { ENDPOINT } from '~/utils'
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -24,18 +25,20 @@ function SignUpPage() {
   const onSubmit: SubmitHandler<FieldValues> = async ({ fullName, email, password }) => {
     try {
       setLoading(true)
+      const redirectTo = `${ENDPOINT}/sign-in`
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
         options: {
-          data: { full_name: fullName }
+          data: { full_name: fullName },
+          emailRedirectTo: redirectTo
         }
       })
       if (error) throw error
 
       if (data.user) {
         toast.success('Sign up successfully')
-        router.push(config.routes.signIn)
+        router.push(config.routes.myAvatars)
         reset()
       }
     } catch (error) {

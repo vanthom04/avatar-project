@@ -6,6 +6,7 @@ import { FieldValues, useForm } from 'react-hook-form'
 
 import Spinner from '~/components/Spinner'
 import { supabase } from '~/config'
+import { ENDPOINT } from '~/utils'
 
 interface RecoverPasswordModalProps {
   isOpen: boolean
@@ -26,9 +27,7 @@ function RecoverPasswordModal({ isOpen, onClick }: RecoverPasswordModalProps) {
   const onSubmit = async (values: FieldValues) => {
     try {
       setLoading(true)
-      const redirectTo = import.meta.env.DEV
-        ? 'http://localhost:6200/update-password'
-        : 'https://custom-avatar-eta.vercel.app/update-password'
+      const redirectTo = `${ENDPOINT}/update-password`
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, { redirectTo })
       if (error) throw error
 

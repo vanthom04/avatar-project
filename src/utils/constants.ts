@@ -1,15 +1,3 @@
-// constants
-export const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec'
-]
+export const ENDPOINT: string = import.meta.env.DEV
+  ? 'http://localhost:6200'
+  : 'https://custom-avatar-eta.vercel.app'
